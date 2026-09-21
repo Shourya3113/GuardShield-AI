@@ -1,0 +1,12 @@
+[
+  {
+    "context": "Marie Curie was the first woman to win a Nobel Prize.",
+    "utterance": "Marie Curie won Nobel prizes in Physics and Chemistry.",
+    "hallucination_type": "Faithful"
+  },
+  {
+    "context": "Marie Curie was born in Warsaw, Poland.",
+    "utterance": "Marie Curie was born in London and lived in England all her life.",
+    "hallucination_type": "Hallucinated"
+  }
+]

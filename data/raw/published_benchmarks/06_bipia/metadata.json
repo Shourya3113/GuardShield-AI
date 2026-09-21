@@ -1,0 +1,10 @@
+{
+  "id": "06_bipia",
+  "name": "BIPIA (Indirect Prompt Injection)",
+  "venue": "arXiv / Microsoft AI Safety 2023",
+  "institution": "Microsoft Research",
+  "authors": "Jingwei Yi, Yueqi Xie, Fangzhao Wu, Jianfeng Gao, et al.",
+  "doi": "10.48550/arXiv.2312.14197",
+  "paper_url": "https://arxiv.org/abs/2312.14197",
+  "dataset_url": "https://github.com/microsoft/BIPIA"
+}

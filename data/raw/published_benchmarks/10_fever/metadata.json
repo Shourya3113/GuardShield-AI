@@ -1,0 +1,10 @@
+{
+  "id": "10_fever",
+  "name": "FEVER (Fact Extraction and VERification)",
+  "venue": "NAACL 2018",
+  "institution": "University of Cambridge & Amazon",
+  "authors": "James Thorne, Andreas Vlachos, Christos Christodoulopoulos, Arpit Mittal",
+  "doi": "10.18653/v1/N18-1074",
+  "paper_url": "https://aclanthology.org/N18-1074/",
+  "dataset_url": "https://fever.ai/resources.html"
+}

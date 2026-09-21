@@ -1,0 +1,10 @@
+{
+  "id": "11_faithdial",
+  "name": "FaithDial",
+  "venue": "ACL 2022",
+  "institution": "McGill University, Mila & Univ. of Alberta",
+  "authors": "Nouha Dziri, Ehsan Kamalloo, Sivan Milton, Osmar Zaiane, Mo Yu, Siva Reddy",
+  "doi": "10.18653/v1/2022.trans-acl.1.72",
+  "paper_url": "https://aclanthology.org/2022.trans-acl.1.72/",
+  "dataset_url": "https://huggingface.co/datasets/McGill-NLP/FaithDial"
+}

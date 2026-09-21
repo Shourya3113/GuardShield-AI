@@ -1,0 +1,10 @@
+{
+  "id": "05_autodan",
+  "name": "AutoDAN",
+  "venue": "ICLR 2024",
+  "institution": "University of Wisconsin-Madison & UC Davis",
+  "authors": "Xiaogeng Liu, Nan Xu, Muhao Chen, Chaowei Xiao",
+  "doi": "10.48550/arXiv.2310.04451",
+  "paper_url": "https://arxiv.org/abs/2310.04451",
+  "dataset_url": "https://github.com/SheltonLiu-N/AutoDAN"
+}

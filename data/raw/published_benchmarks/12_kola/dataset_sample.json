@@ -1,0 +1,14 @@
+[
+  {
+    "entity": "James Webb Space Telescope",
+    "relation": "launch_year",
+    "expected_fact": "2021",
+    "domain": "Astronomy"
+  },
+  {
+    "entity": "DeBERTa",
+    "relation": "mechanism",
+    "expected_fact": "disentangled_attention",
+    "domain": "Artificial Intelligence"
+  }
+]

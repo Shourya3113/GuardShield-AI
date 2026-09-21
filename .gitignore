@@ -1,0 +1,63 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE configurations
+.vscode/
+.idea/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Scratch & temporary files
+scratch/
+tmp/
+*.tmp
+*.log
+
+# Heavy Machine Learning Model Weights & Checkpoints (>100MB)
+# Note: Keep training configurations, tokenizers, and metadata JSONs
+models/**/checkpoint-*/
+models/**/checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.onnx
+
+# Confidential administrative and personal identity documents
+docs/05 Admin and Credentials/
+scripts/copy_signatures.py
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini

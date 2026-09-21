@@ -1,0 +1,9 @@
+[
+  {
+    "knowledge": "Python was created by Guido van Rossum and released in 1991.",
+    "question": "Who created Python and when?",
+    "factual_response": "Guido van Rossum in 1991.",
+    "hallucinated_response": "Dennis Ritchie created Python in 1972.",
+    "hallucination": true
+  }
+]

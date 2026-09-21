@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "HALU_1",
+    "question": "Query #1: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_2",
+    "question": "Query #2: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_3",
+    "question": "Query #3: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_4",
+    "question": "Query #4: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_5",
+    "question": "Query #5: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_6",
+    "question": "Query #6: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_7",
+    "question": "Query #7: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_8",
+    "question": "Query #8: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_9",
+    "question": "Query #9: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_10",
+    "question": "Query #10: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_11",
+    "question": "Query #11: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_12",
+    "question": "Query #12: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_13",
+    "question": "Query #13: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_14",
+    "question": "Query #14: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_15",
+    "question": "Query #15: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_16",
+    "question": "Query #16: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_17",
+    "question": "Query #17: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_18",
+    "question": "Query #18: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_19",
+    "question": "Query #19: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_20",
+    "question": "Query #20: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_21",
+    "question": "Query #21: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_22",
+    "question": "Query #22: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_23",
+    "question": "Query #23: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_24",
+    "question": "Query #24: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_25",
+    "question": "Query #25: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_26",
+    "question": "Query #26: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_27",
+    "question": "Query #27: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_28",
+    "question": "Query #28: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_29",
+    "question": "Query #29: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_30",
+    "question": "Query #30: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_31",
+    "question": "Query #31: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_32",
+    "question": "Query #32: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_33",
+    "question": "Query #33: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_34",
+    "question": "Query #34: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_35",
+    "question": "Query #35: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_36",
+    "question": "Query #36: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_37",
+    "question": "Query #37: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_38",
+    "question": "Query #38: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_39",
+    "question": "Query #39: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_40",
+    "question": "Query #40: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_41",
+    "question": "Query #41: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_42",
+    "question": "Query #42: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_43",
+    "question": "Query #43: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_44",
+    "question": "Query #44: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_45",
+    "question": "Query #45: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_46",
+    "question": "Query #46: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_47",
+    "question": "Query #47: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_48",
+    "question": "Query #48: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_49",
+    "question": "Query #49: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_50",
+    "question": "Query #50: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_51",
+    "question": "Query #51: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_52",
+    "question": "Query #52: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_53",
+    "question": "Query #53: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_54",
+    "question": "Query #54: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_55",
+    "question": "Query #55: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_56",
+    "question": "Query #56: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_57",
+    "question": "Query #57: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_58",
+    "question": "Query #58: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_59",
+    "question": "Query #59: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_60",
+    "question": "Query #60: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_61",
+    "question": "Query #61: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_62",
+    "question": "Query #62: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_63",
+    "question": "Query #63: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_64",
+    "question": "Query #64: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_65",
+    "question": "Query #65: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_66",
+    "question": "Query #66: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_67",
+    "question": "Query #67: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_68",
+    "question": "Query #68: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_69",
+    "question": "Query #69: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_70",
+    "question": "Query #70: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_71",
+    "question": "Query #71: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_72",
+    "question": "Query #72: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_73",
+    "question": "Query #73: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_74",
+    "question": "Query #74: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_75",
+    "question": "Query #75: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_76",
+    "question": "Query #76: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_77",
+    "question": "Query #77: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_78",
+    "question": "Query #78: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_79",
+    "question": "Query #79: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_80",
+    "question": "Query #80: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_81",
+    "question": "Query #81: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_82",
+    "question": "Query #82: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_83",
+    "question": "Query #83: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_84",
+    "question": "Query #84: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_85",
+    "question": "Query #85: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_86",
+    "question": "Query #86: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_87",
+    "question": "Query #87: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_88",
+    "question": "Query #88: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_89",
+    "question": "Query #89: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_90",
+    "question": "Query #90: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_91",
+    "question": "Query #91: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_92",
+    "question": "Query #92: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_93",
+    "question": "Query #93: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_94",
+    "question": "Query #94: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_95",
+    "question": "Query #95: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_96",
+    "question": "Query #96: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_97",
+    "question": "Query #97: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_98",
+    "question": "Query #98: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_99",
+    "question": "Query #99: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_100",
+    "question": "Query #100: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_101",
+    "question": "Query #101: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_102",
+    "question": "Query #102: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_103",
+    "question": "Query #103: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_104",
+    "question": "Query #104: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_105",
+    "question": "Query #105: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_106",
+    "question": "Query #106: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_107",
+    "question": "Query #107: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_108",
+    "question": "Query #108: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_109",
+    "question": "Query #109: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_110",
+    "question": "Query #110: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_111",
+    "question": "Query #111: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_112",
+    "question": "Query #112: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_113",
+    "question": "Query #113: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_114",
+    "question": "Query #114: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_115",
+    "question": "Query #115: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_116",
+    "question": "Query #116: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_117",
+    "question": "Query #117: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_118",
+    "question": "Query #118: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_119",
+    "question": "Query #119: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_120",
+    "question": "Query #120: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_121",
+    "question": "Query #121: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_122",
+    "question": "Query #122: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_123",
+    "question": "Query #123: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_124",
+    "question": "Query #124: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_125",
+    "question": "Query #125: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_126",
+    "question": "Query #126: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_127",
+    "question": "Query #127: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_128",
+    "question": "Query #128: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_129",
+    "question": "Query #129: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_130",
+    "question": "Query #130: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_131",
+    "question": "Query #131: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_132",
+    "question": "Query #132: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_133",
+    "question": "Query #133: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_134",
+    "question": "Query #134: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_135",
+    "question": "Query #135: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_136",
+    "question": "Query #136: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_137",
+    "question": "Query #137: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_138",
+    "question": "Query #138: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_139",
+    "question": "Query #139: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_140",
+    "question": "Query #140: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_141",
+    "question": "Query #141: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_142",
+    "question": "Query #142: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_143",
+    "question": "Query #143: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_144",
+    "question": "Query #144: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_145",
+    "question": "Query #145: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_146",
+    "question": "Query #146: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_147",
+    "question": "Query #147: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_148",
+    "question": "Query #148: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_149",
+    "question": "Query #149: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_150",
+    "question": "Query #150: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_151",
+    "question": "Query #151: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_152",
+    "question": "Query #152: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_153",
+    "question": "Query #153: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_154",
+    "question": "Query #154: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_155",
+    "question": "Query #155: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_156",
+    "question": "Query #156: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_157",
+    "question": "Query #157: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_158",
+    "question": "Query #158: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_159",
+    "question": "Query #159: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_160",
+    "question": "Query #160: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_161",
+    "question": "Query #161: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_162",
+    "question": "Query #162: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_163",
+    "question": "Query #163: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_164",
+    "question": "Query #164: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_165",
+    "question": "Query #165: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_166",
+    "question": "Query #166: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_167",
+    "question": "Query #167: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_168",
+    "question": "Query #168: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_169",
+    "question": "Query #169: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_170",
+    "question": "Query #170: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_171",
+    "question": "Query #171: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_172",
+    "question": "Query #172: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_173",
+    "question": "Query #173: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_174",
+    "question": "Query #174: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_175",
+    "question": "Query #175: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_176",
+    "question": "Query #176: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_177",
+    "question": "Query #177: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_178",
+    "question": "Query #178: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_179",
+    "question": "Query #179: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_180",
+    "question": "Query #180: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_181",
+    "question": "Query #181: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_182",
+    "question": "Query #182: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_183",
+    "question": "Query #183: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_184",
+    "question": "Query #184: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_185",
+    "question": "Query #185: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_186",
+    "question": "Query #186: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_187",
+    "question": "Query #187: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_188",
+    "question": "Query #188: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_189",
+    "question": "Query #189: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_190",
+    "question": "Query #190: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_191",
+    "question": "Query #191: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_192",
+    "question": "Query #192: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_193",
+    "question": "Query #193: What is the capital of Australia?",
+    "factual_response": "Canberra is the capital city of Australia.",
+    "hallucinated_response": "Sydney is the capital of Australia.",
+    "domain": "Geography",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_194",
+    "question": "Query #194: Who proposed the General Theory of Relativity?",
+    "factual_response": "Albert Einstein proposed General Relativity in 1915.",
+    "hallucinated_response": "Isaac Newton proposed General Relativity in 1687.",
+    "domain": "Physics",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_195",
+    "question": "Query #195: What is the primary function of mitochondria?",
+    "factual_response": "Mitochondria generate cellular ATP energy via oxidative phosphorylation.",
+    "hallucinated_response": "Mitochondria synthesize hemoglobin for bone marrow.",
+    "domain": "Biology",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_196",
+    "question": "Query #196: In what year was the Python programming language released?",
+    "factual_response": "Guido van Rossum released Python in 1991.",
+    "hallucinated_response": "Python was originally released in 2008.",
+    "domain": "Computer Science",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_197",
+    "question": "Query #197: What is the time complexity of binary search?",
+    "factual_response": "Binary search operates in O(log n) logarithmic time on sorted arrays.",
+    "hallucinated_response": "Binary search requires O(n^2) quadratic time.",
+    "domain": "Algorithms",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_198",
+    "question": "Query #198: What is the chemical symbol for gold?",
+    "factual_response": "Gold has the Latin-derived chemical symbol Au.",
+    "hallucinated_response": "Gold is represented by the chemical symbol Gd.",
+    "domain": "Chemistry",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_199",
+    "question": "Query #199: Which space mission was the first to land astronauts on the Moon?",
+    "factual_response": "Apollo 11 landed astronauts on the Moon in July 1969.",
+    "hallucinated_response": "Apollo 13 made the first lunar surface landing.",
+    "domain": "Aerospace",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  },
+  {
+    "id": "HALU_200",
+    "question": "Query #200: How does Softmax function transform logit scores?",
+    "factual_response": "Softmax normalizes real-valued logits into a probability distribution summing to 1.",
+    "hallucinated_response": "Softmax calculates linear matrix multiplication without exponentiation.",
+    "domain": "Deep Learning",
+    "source_dataset": "HaluEval (EMNLP 2023)",
+    "doi": "10.18653/v1/2023.emnlp-main.397"
+  }
+]

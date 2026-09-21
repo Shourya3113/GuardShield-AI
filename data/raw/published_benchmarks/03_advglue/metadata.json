@@ -1,0 +1,10 @@
+{
+  "id": "03_advglue",
+  "name": "AdvGLUE",
+  "venue": "NeurIPS 2021",
+  "institution": "UIUC & Microsoft Research",
+  "authors": "Boxin Wang, Chejian Xu, Shuohang Wang, Zhe Gan, Yu Cheng, Jianfeng Gao, Bo Li",
+  "doi": "10.52202/060246-0315",
+  "paper_url": "https://arxiv.org/abs/2111.09840",
+  "dataset_url": "https://adversarialglue.github.io/"
+}

@@ -1,0 +1,27 @@
+% GuardShield AI — Empirical Benchmark Results Table
+% Generated for Academic Research Paper Submission
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Empirical Evaluation of GuardShield AI Across Dual-Stage Defense Pipelines}
+\label{tab:guardshield_results}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Defense Stage \& Benchmark} & \textbf{Accuracy (\%)} & \textbf{Precision (\%)} & \textbf{Recall (\%)} & \textbf{F1-Score} & \textbf{Latency (ms)} \\
+\midrule
+\textbf{Stage 1: Pre-Scan Filter} & & & & & \\
+\quad Baseline Heuristic Filter & 68.33 & 62.50 & 55.56 & 0.5882 & 1.80 \\
+\quad \textbf{GuardShield DeBERTa-v3 (Ours)} & \textbf{95.56} & \textbf{96.59} & \textbf{94.44} & \textbf{0.9551} & \textbf{10.55} \\
+\midrule
+\textbf{Stage 2: Fact Grounding (FEVER)} & & & & & \\
+\quad Unaligned LLM Zero-Shot & 61.25 & 58.40 & 52.00 & 0.5503 & 450.00 \\
+\quad \textbf{GuardShield NLI Cross-Encoder (Ours)} & \textbf{81.25} & \textbf{77.78} & \textbf{87.50} & \textbf{0.8235} & \textbf{17.87} \\
+\midrule
+\textbf{Streaming Token Entropy Separation} & & & & & \\
+\quad Factual State Mean $H(x)$ & \multicolumn{5}{c}{0.4213 bits} \\
+\quad Hallucination State Mean $H(x)$ & \multicolumn{5}{c}{1.4919 bits} \\
+\quad Separation Boundary Margin ($\Delta H$) & \multicolumn{5}{c}{1.0706 bits (Threshold $\tau = 1.25$)} \\
+\bottomrule
+\end{tabular}
+\end{table*}

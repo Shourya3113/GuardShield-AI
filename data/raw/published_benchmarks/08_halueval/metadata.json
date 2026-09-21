@@ -1,0 +1,10 @@
+{
+  "id": "08_halueval",
+  "name": "HaluEval",
+  "venue": "EMNLP 2023",
+  "institution": "Renmin University & Université de Montréal",
+  "authors": "Junyi Li, Xiaoxue Cheng, Wayne Xin Zhao, Jian-Yun Nie, Ji-Rong Wen",
+  "doi": "10.18653/v1/2023.emnlp-main.397",
+  "paper_url": "https://aclanthology.org/2023.emnlp-main.397/",
+  "dataset_url": "https://github.com/RUCAIBox/HaluEval"
+}

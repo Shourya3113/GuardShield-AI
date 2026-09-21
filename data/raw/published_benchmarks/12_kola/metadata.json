@@ -1,0 +1,10 @@
+{
+  "id": "12_kola",
+  "name": "KoLA (World Knowledge Hallucination)",
+  "venue": "ICLR 2024",
+  "institution": "Tsinghua University",
+  "authors": "Jifan Yu, Xiaozhi Wang, Shangqing Tu, Shulin Cao, Daniel Zhang-Li, Xin Lv, et al.",
+  "doi": "10.48550/arXiv.2306.09296",
+  "paper_url": "https://arxiv.org/abs/2306.09296",
+  "dataset_url": "https://github.com/THU-KEG/KoLA"
+}

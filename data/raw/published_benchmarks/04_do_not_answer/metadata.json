@@ -1,0 +1,10 @@
+{
+  "id": "04_do_not_answer",
+  "name": "Do-Not-Answer",
+  "venue": "NeurIPS 2023",
+  "institution": "MBZUAI & University of Melbourne",
+  "authors": "Yuxia Wang, Haonan Li, Xudong Han, Preslav Nakov, Timothy Baldwin",
+  "doi": "10.52202/075280-0442",
+  "paper_url": "https://arxiv.org/abs/2308.13387",
+  "dataset_url": "https://huggingface.co/datasets/LibrAI/do-not-answer"
+}

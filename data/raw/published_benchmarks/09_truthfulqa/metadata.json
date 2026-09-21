@@ -1,0 +1,10 @@
+{
+  "id": "09_truthfulqa",
+  "name": "TruthfulQA",
+  "venue": "ACL 2022",
+  "institution": "University of Oxford & OpenAI",
+  "authors": "Stephanie Lin, Jacob Hilton, Owain Evans",
+  "doi": "10.18653/v1/2022.acl-long.229",
+  "paper_url": "https://aclanthology.org/2022.acl-long.229/",
+  "dataset_url": "https://huggingface.co/datasets/truthfulqa/truthful_qa"
+}

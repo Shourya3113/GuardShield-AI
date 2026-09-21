@@ -1,0 +1,12 @@
+[
+  {
+    "claim": "The Roman Empire fell in the 5th century AD.",
+    "evidence": "The Western Roman Empire collapsed in 476 AD.",
+    "label": "SUPPORTS (Entailment)"
+  },
+  {
+    "claim": "Albert Einstein won the Nobel Prize in Literature.",
+    "evidence": "Albert Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "label": "REFUTES (Contradiction)"
+  }
+]

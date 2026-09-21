@@ -1,0 +1,12 @@
+[
+  {
+    "sentence": "The movie was extraordinarily wonderful with subtle acting.",
+    "perturbed_sentence": "The film was extraordinarily wonderful with subtle acting but the plot collapsed.",
+    "perturbation": "SemAttack"
+  },
+  {
+    "sentence": "The service was completely responsive.",
+    "perturbed_sentence": "The service was completely respons1ve.",
+    "perturbation": "TypoAttack"
+  }
+]

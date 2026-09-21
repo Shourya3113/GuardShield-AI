@@ -1,0 +1,23 @@
+% GuardShield AI — Empirical Multi-Stage Benchmark Progression Table
+% Formatted for IEEE / ACM Conference & Journal Submission
+
+\begin{table*}[t]
+\centering
+\small
+\caption{Empirical Scaling and Cross-Benchmark Generalization of GuardShield AI Across Dataset Generations}
+\label{tab:mega_benchmark_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Benchmark Tier \& Corpus} & \textbf{Sample Size ($N$)} & \textbf{Accuracy (\%)} & \textbf{Recall (\%)} & \textbf{Precision (\%)} & \textbf{F1-Score} & \textbf{Latency (ms)} \\
+\midrule
+\textbf{Tier 1: Initial Baseline (v1)} & 451 & 82.61 & 86.96 & 80.00 & 0.8333 & 29.28 \\
+\textbf{Tier 2: Expanded Research (v2)} & 1,182 & 95.56 & 94.44 & 96.59 & 0.9551 & 10.55 \\
+\midrule
+\textbf{Tier 3: Mega Suite (v3 Ours)} & & & & & & \\
+\quad In-Distribution Held-Out Test & 698 & \textbf{98.71} & \textbf{98.03} & \textbf{99.43} & \textbf{0.9872} & \textbf{10.10} \\
+\quad Out-of-Distribution Zero-Shot & 500 & \textbf{98.20} & \textbf{97.20} & \textbf{99.18} & \textbf{0.9818} & \textbf{12.04} \\
+\midrule
+\textbf{Stage 2: Fact Grounding (FEVER + HaluEval)} & 648 & \textbf{75.31} & \textbf{78.25} & \textbf{81.09} & \textbf{0.7964} & \textbf{16.45} \\
+\bottomrule
+\end{tabular}
+\end{table*}

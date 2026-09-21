@@ -1,0 +1,3602 @@
+[
+  {
+    "id": "FEVER_1",
+    "claim": "Fact Check #1: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_2",
+    "claim": "Fact Check #2: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_3",
+    "claim": "Fact Check #3: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_4",
+    "claim": "Fact Check #4: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_5",
+    "claim": "Fact Check #5: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_6",
+    "claim": "Fact Check #6: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_7",
+    "claim": "Fact Check #7: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_8",
+    "claim": "Fact Check #8: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_9",
+    "claim": "Falsehood Check #9: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_10",
+    "claim": "Falsehood Check #10: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_11",
+    "claim": "Falsehood Check #11: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_12",
+    "claim": "Falsehood Check #12: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_13",
+    "claim": "Falsehood Check #13: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_14",
+    "claim": "Falsehood Check #14: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_15",
+    "claim": "Falsehood Check #15: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_16",
+    "claim": "Falsehood Check #16: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_17",
+    "claim": "Fact Check #17: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_18",
+    "claim": "Fact Check #18: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_19",
+    "claim": "Fact Check #19: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_20",
+    "claim": "Fact Check #20: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_21",
+    "claim": "Fact Check #21: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_22",
+    "claim": "Fact Check #22: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_23",
+    "claim": "Fact Check #23: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_24",
+    "claim": "Fact Check #24: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_25",
+    "claim": "Falsehood Check #25: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_26",
+    "claim": "Falsehood Check #26: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_27",
+    "claim": "Falsehood Check #27: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_28",
+    "claim": "Falsehood Check #28: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_29",
+    "claim": "Falsehood Check #29: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_30",
+    "claim": "Falsehood Check #30: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_31",
+    "claim": "Falsehood Check #31: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_32",
+    "claim": "Falsehood Check #32: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_33",
+    "claim": "Fact Check #33: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_34",
+    "claim": "Fact Check #34: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_35",
+    "claim": "Fact Check #35: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_36",
+    "claim": "Fact Check #36: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_37",
+    "claim": "Fact Check #37: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_38",
+    "claim": "Fact Check #38: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_39",
+    "claim": "Fact Check #39: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_40",
+    "claim": "Fact Check #40: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_41",
+    "claim": "Falsehood Check #41: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_42",
+    "claim": "Falsehood Check #42: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_43",
+    "claim": "Falsehood Check #43: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_44",
+    "claim": "Falsehood Check #44: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_45",
+    "claim": "Falsehood Check #45: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_46",
+    "claim": "Falsehood Check #46: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_47",
+    "claim": "Falsehood Check #47: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_48",
+    "claim": "Falsehood Check #48: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_49",
+    "claim": "Fact Check #49: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_50",
+    "claim": "Fact Check #50: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_51",
+    "claim": "Fact Check #51: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_52",
+    "claim": "Fact Check #52: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_53",
+    "claim": "Fact Check #53: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_54",
+    "claim": "Fact Check #54: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_55",
+    "claim": "Fact Check #55: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_56",
+    "claim": "Fact Check #56: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_57",
+    "claim": "Falsehood Check #57: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_58",
+    "claim": "Falsehood Check #58: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_59",
+    "claim": "Falsehood Check #59: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_60",
+    "claim": "Falsehood Check #60: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_61",
+    "claim": "Falsehood Check #61: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_62",
+    "claim": "Falsehood Check #62: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_63",
+    "claim": "Falsehood Check #63: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_64",
+    "claim": "Falsehood Check #64: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_65",
+    "claim": "Fact Check #65: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_66",
+    "claim": "Fact Check #66: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_67",
+    "claim": "Fact Check #67: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_68",
+    "claim": "Fact Check #68: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_69",
+    "claim": "Fact Check #69: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_70",
+    "claim": "Fact Check #70: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_71",
+    "claim": "Fact Check #71: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_72",
+    "claim": "Fact Check #72: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_73",
+    "claim": "Falsehood Check #73: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_74",
+    "claim": "Falsehood Check #74: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_75",
+    "claim": "Falsehood Check #75: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_76",
+    "claim": "Falsehood Check #76: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_77",
+    "claim": "Falsehood Check #77: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_78",
+    "claim": "Falsehood Check #78: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_79",
+    "claim": "Falsehood Check #79: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_80",
+    "claim": "Falsehood Check #80: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_81",
+    "claim": "Fact Check #81: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_82",
+    "claim": "Fact Check #82: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_83",
+    "claim": "Fact Check #83: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_84",
+    "claim": "Fact Check #84: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_85",
+    "claim": "Fact Check #85: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_86",
+    "claim": "Fact Check #86: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_87",
+    "claim": "Fact Check #87: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_88",
+    "claim": "Fact Check #88: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_89",
+    "claim": "Falsehood Check #89: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_90",
+    "claim": "Falsehood Check #90: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_91",
+    "claim": "Falsehood Check #91: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_92",
+    "claim": "Falsehood Check #92: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_93",
+    "claim": "Falsehood Check #93: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_94",
+    "claim": "Falsehood Check #94: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_95",
+    "claim": "Falsehood Check #95: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_96",
+    "claim": "Falsehood Check #96: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_97",
+    "claim": "Fact Check #97: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_98",
+    "claim": "Fact Check #98: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_99",
+    "claim": "Fact Check #99: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_100",
+    "claim": "Fact Check #100: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_101",
+    "claim": "Fact Check #101: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_102",
+    "claim": "Fact Check #102: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_103",
+    "claim": "Fact Check #103: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_104",
+    "claim": "Fact Check #104: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_105",
+    "claim": "Falsehood Check #105: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_106",
+    "claim": "Falsehood Check #106: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_107",
+    "claim": "Falsehood Check #107: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_108",
+    "claim": "Falsehood Check #108: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_109",
+    "claim": "Falsehood Check #109: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_110",
+    "claim": "Falsehood Check #110: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_111",
+    "claim": "Falsehood Check #111: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_112",
+    "claim": "Falsehood Check #112: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_113",
+    "claim": "Fact Check #113: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_114",
+    "claim": "Fact Check #114: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_115",
+    "claim": "Fact Check #115: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_116",
+    "claim": "Fact Check #116: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_117",
+    "claim": "Fact Check #117: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_118",
+    "claim": "Fact Check #118: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_119",
+    "claim": "Fact Check #119: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_120",
+    "claim": "Fact Check #120: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_121",
+    "claim": "Falsehood Check #121: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_122",
+    "claim": "Falsehood Check #122: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_123",
+    "claim": "Falsehood Check #123: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_124",
+    "claim": "Falsehood Check #124: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_125",
+    "claim": "Falsehood Check #125: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_126",
+    "claim": "Falsehood Check #126: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_127",
+    "claim": "Falsehood Check #127: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_128",
+    "claim": "Falsehood Check #128: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_129",
+    "claim": "Fact Check #129: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_130",
+    "claim": "Fact Check #130: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_131",
+    "claim": "Fact Check #131: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_132",
+    "claim": "Fact Check #132: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_133",
+    "claim": "Fact Check #133: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_134",
+    "claim": "Fact Check #134: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_135",
+    "claim": "Fact Check #135: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_136",
+    "claim": "Fact Check #136: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_137",
+    "claim": "Falsehood Check #137: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_138",
+    "claim": "Falsehood Check #138: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_139",
+    "claim": "Falsehood Check #139: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_140",
+    "claim": "Falsehood Check #140: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_141",
+    "claim": "Falsehood Check #141: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_142",
+    "claim": "Falsehood Check #142: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_143",
+    "claim": "Falsehood Check #143: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_144",
+    "claim": "Falsehood Check #144: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_145",
+    "claim": "Fact Check #145: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_146",
+    "claim": "Fact Check #146: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_147",
+    "claim": "Fact Check #147: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_148",
+    "claim": "Fact Check #148: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_149",
+    "claim": "Fact Check #149: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_150",
+    "claim": "Fact Check #150: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_151",
+    "claim": "Fact Check #151: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_152",
+    "claim": "Fact Check #152: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_153",
+    "claim": "Falsehood Check #153: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_154",
+    "claim": "Falsehood Check #154: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_155",
+    "claim": "Falsehood Check #155: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_156",
+    "claim": "Falsehood Check #156: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_157",
+    "claim": "Falsehood Check #157: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_158",
+    "claim": "Falsehood Check #158: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_159",
+    "claim": "Falsehood Check #159: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_160",
+    "claim": "Falsehood Check #160: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_161",
+    "claim": "Fact Check #161: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_162",
+    "claim": "Fact Check #162: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_163",
+    "claim": "Fact Check #163: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_164",
+    "claim": "Fact Check #164: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_165",
+    "claim": "Fact Check #165: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_166",
+    "claim": "Fact Check #166: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_167",
+    "claim": "Fact Check #167: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_168",
+    "claim": "Fact Check #168: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_169",
+    "claim": "Falsehood Check #169: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_170",
+    "claim": "Falsehood Check #170: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_171",
+    "claim": "Falsehood Check #171: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_172",
+    "claim": "Falsehood Check #172: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_173",
+    "claim": "Falsehood Check #173: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_174",
+    "claim": "Falsehood Check #174: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_175",
+    "claim": "Falsehood Check #175: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_176",
+    "claim": "Falsehood Check #176: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_177",
+    "claim": "Fact Check #177: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_178",
+    "claim": "Fact Check #178: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_179",
+    "claim": "Fact Check #179: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_180",
+    "claim": "Fact Check #180: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_181",
+    "claim": "Fact Check #181: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_182",
+    "claim": "Fact Check #182: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_183",
+    "claim": "Fact Check #183: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_184",
+    "claim": "Fact Check #184: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_185",
+    "claim": "Falsehood Check #185: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_186",
+    "claim": "Falsehood Check #186: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_187",
+    "claim": "Falsehood Check #187: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_188",
+    "claim": "Falsehood Check #188: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_189",
+    "claim": "Falsehood Check #189: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_190",
+    "claim": "Falsehood Check #190: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_191",
+    "claim": "Falsehood Check #191: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_192",
+    "claim": "Falsehood Check #192: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_193",
+    "claim": "Fact Check #193: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_194",
+    "claim": "Fact Check #194: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_195",
+    "claim": "Fact Check #195: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_196",
+    "claim": "Fact Check #196: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_197",
+    "claim": "Fact Check #197: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_198",
+    "claim": "Fact Check #198: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_199",
+    "claim": "Fact Check #199: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_200",
+    "claim": "Fact Check #200: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_201",
+    "claim": "Falsehood Check #201: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_202",
+    "claim": "Falsehood Check #202: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_203",
+    "claim": "Falsehood Check #203: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_204",
+    "claim": "Falsehood Check #204: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_205",
+    "claim": "Falsehood Check #205: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_206",
+    "claim": "Falsehood Check #206: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_207",
+    "claim": "Falsehood Check #207: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_208",
+    "claim": "Falsehood Check #208: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_209",
+    "claim": "Fact Check #209: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_210",
+    "claim": "Fact Check #210: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_211",
+    "claim": "Fact Check #211: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_212",
+    "claim": "Fact Check #212: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_213",
+    "claim": "Fact Check #213: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_214",
+    "claim": "Fact Check #214: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_215",
+    "claim": "Fact Check #215: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_216",
+    "claim": "Fact Check #216: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_217",
+    "claim": "Falsehood Check #217: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_218",
+    "claim": "Falsehood Check #218: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_219",
+    "claim": "Falsehood Check #219: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_220",
+    "claim": "Falsehood Check #220: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_221",
+    "claim": "Falsehood Check #221: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_222",
+    "claim": "Falsehood Check #222: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_223",
+    "claim": "Falsehood Check #223: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_224",
+    "claim": "Falsehood Check #224: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_225",
+    "claim": "Fact Check #225: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_226",
+    "claim": "Fact Check #226: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_227",
+    "claim": "Fact Check #227: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_228",
+    "claim": "Fact Check #228: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_229",
+    "claim": "Fact Check #229: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_230",
+    "claim": "Fact Check #230: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_231",
+    "claim": "Fact Check #231: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_232",
+    "claim": "Fact Check #232: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_233",
+    "claim": "Falsehood Check #233: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_234",
+    "claim": "Falsehood Check #234: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_235",
+    "claim": "Falsehood Check #235: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_236",
+    "claim": "Falsehood Check #236: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_237",
+    "claim": "Falsehood Check #237: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_238",
+    "claim": "Falsehood Check #238: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_239",
+    "claim": "Falsehood Check #239: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_240",
+    "claim": "Falsehood Check #240: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_241",
+    "claim": "Fact Check #241: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_242",
+    "claim": "Fact Check #242: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_243",
+    "claim": "Fact Check #243: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_244",
+    "claim": "Fact Check #244: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_245",
+    "claim": "Fact Check #245: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_246",
+    "claim": "Fact Check #246: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_247",
+    "claim": "Fact Check #247: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_248",
+    "claim": "Fact Check #248: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_249",
+    "claim": "Falsehood Check #249: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_250",
+    "claim": "Falsehood Check #250: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_251",
+    "claim": "Falsehood Check #251: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_252",
+    "claim": "Falsehood Check #252: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_253",
+    "claim": "Falsehood Check #253: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_254",
+    "claim": "Falsehood Check #254: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_255",
+    "claim": "Falsehood Check #255: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_256",
+    "claim": "Falsehood Check #256: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_257",
+    "claim": "Fact Check #257: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_258",
+    "claim": "Fact Check #258: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_259",
+    "claim": "Fact Check #259: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_260",
+    "claim": "Fact Check #260: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_261",
+    "claim": "Fact Check #261: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_262",
+    "claim": "Fact Check #262: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_263",
+    "claim": "Fact Check #263: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_264",
+    "claim": "Fact Check #264: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_265",
+    "claim": "Falsehood Check #265: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_266",
+    "claim": "Falsehood Check #266: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_267",
+    "claim": "Falsehood Check #267: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_268",
+    "claim": "Falsehood Check #268: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_269",
+    "claim": "Falsehood Check #269: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_270",
+    "claim": "Falsehood Check #270: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_271",
+    "claim": "Falsehood Check #271: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_272",
+    "claim": "Falsehood Check #272: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_273",
+    "claim": "Fact Check #273: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_274",
+    "claim": "Fact Check #274: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_275",
+    "claim": "Fact Check #275: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_276",
+    "claim": "Fact Check #276: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_277",
+    "claim": "Fact Check #277: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_278",
+    "claim": "Fact Check #278: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_279",
+    "claim": "Fact Check #279: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_280",
+    "claim": "Fact Check #280: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_281",
+    "claim": "Falsehood Check #281: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_282",
+    "claim": "Falsehood Check #282: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_283",
+    "claim": "Falsehood Check #283: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_284",
+    "claim": "Falsehood Check #284: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_285",
+    "claim": "Falsehood Check #285: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_286",
+    "claim": "Falsehood Check #286: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_287",
+    "claim": "Falsehood Check #287: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_288",
+    "claim": "Falsehood Check #288: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_289",
+    "claim": "Fact Check #289: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_290",
+    "claim": "Fact Check #290: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_291",
+    "claim": "Fact Check #291: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_292",
+    "claim": "Fact Check #292: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_293",
+    "claim": "Fact Check #293: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_294",
+    "claim": "Fact Check #294: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_295",
+    "claim": "Fact Check #295: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_296",
+    "claim": "Fact Check #296: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_297",
+    "claim": "Falsehood Check #297: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_298",
+    "claim": "Falsehood Check #298: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_299",
+    "claim": "Falsehood Check #299: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_300",
+    "claim": "Falsehood Check #300: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_301",
+    "claim": "Falsehood Check #301: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_302",
+    "claim": "Falsehood Check #302: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_303",
+    "claim": "Falsehood Check #303: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_304",
+    "claim": "Falsehood Check #304: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_305",
+    "claim": "Fact Check #305: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_306",
+    "claim": "Fact Check #306: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_307",
+    "claim": "Fact Check #307: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_308",
+    "claim": "Fact Check #308: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_309",
+    "claim": "Fact Check #309: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_310",
+    "claim": "Fact Check #310: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_311",
+    "claim": "Fact Check #311: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_312",
+    "claim": "Fact Check #312: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_313",
+    "claim": "Falsehood Check #313: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_314",
+    "claim": "Falsehood Check #314: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_315",
+    "claim": "Falsehood Check #315: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_316",
+    "claim": "Falsehood Check #316: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_317",
+    "claim": "Falsehood Check #317: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_318",
+    "claim": "Falsehood Check #318: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_319",
+    "claim": "Falsehood Check #319: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_320",
+    "claim": "Falsehood Check #320: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_321",
+    "claim": "Fact Check #321: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_322",
+    "claim": "Fact Check #322: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_323",
+    "claim": "Fact Check #323: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_324",
+    "claim": "Fact Check #324: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_325",
+    "claim": "Fact Check #325: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_326",
+    "claim": "Fact Check #326: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_327",
+    "claim": "Fact Check #327: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_328",
+    "claim": "Fact Check #328: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_329",
+    "claim": "Falsehood Check #329: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_330",
+    "claim": "Falsehood Check #330: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_331",
+    "claim": "Falsehood Check #331: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_332",
+    "claim": "Falsehood Check #332: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_333",
+    "claim": "Falsehood Check #333: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_334",
+    "claim": "Falsehood Check #334: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_335",
+    "claim": "Falsehood Check #335: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_336",
+    "claim": "Falsehood Check #336: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_337",
+    "claim": "Fact Check #337: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_338",
+    "claim": "Fact Check #338: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_339",
+    "claim": "Fact Check #339: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_340",
+    "claim": "Fact Check #340: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_341",
+    "claim": "Fact Check #341: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_342",
+    "claim": "Fact Check #342: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_343",
+    "claim": "Fact Check #343: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_344",
+    "claim": "Fact Check #344: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_345",
+    "claim": "Falsehood Check #345: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_346",
+    "claim": "Falsehood Check #346: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_347",
+    "claim": "Falsehood Check #347: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_348",
+    "claim": "Falsehood Check #348: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_349",
+    "claim": "Falsehood Check #349: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_350",
+    "claim": "Falsehood Check #350: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_351",
+    "claim": "Falsehood Check #351: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_352",
+    "claim": "Falsehood Check #352: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_353",
+    "claim": "Fact Check #353: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_354",
+    "claim": "Fact Check #354: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_355",
+    "claim": "Fact Check #355: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_356",
+    "claim": "Fact Check #356: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_357",
+    "claim": "Fact Check #357: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_358",
+    "claim": "Fact Check #358: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_359",
+    "claim": "Fact Check #359: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_360",
+    "claim": "Fact Check #360: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_361",
+    "claim": "Falsehood Check #361: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_362",
+    "claim": "Falsehood Check #362: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_363",
+    "claim": "Falsehood Check #363: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_364",
+    "claim": "Falsehood Check #364: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_365",
+    "claim": "Falsehood Check #365: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_366",
+    "claim": "Falsehood Check #366: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_367",
+    "claim": "Falsehood Check #367: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_368",
+    "claim": "Falsehood Check #368: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_369",
+    "claim": "Fact Check #369: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_370",
+    "claim": "Fact Check #370: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_371",
+    "claim": "Fact Check #371: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_372",
+    "claim": "Fact Check #372: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_373",
+    "claim": "Fact Check #373: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_374",
+    "claim": "Fact Check #374: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_375",
+    "claim": "Fact Check #375: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_376",
+    "claim": "Fact Check #376: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_377",
+    "claim": "Falsehood Check #377: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_378",
+    "claim": "Falsehood Check #378: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_379",
+    "claim": "Falsehood Check #379: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_380",
+    "claim": "Falsehood Check #380: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_381",
+    "claim": "Falsehood Check #381: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_382",
+    "claim": "Falsehood Check #382: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_383",
+    "claim": "Falsehood Check #383: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_384",
+    "claim": "Falsehood Check #384: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_385",
+    "claim": "Fact Check #385: The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.",
+    "evidence": "Historical records verify Augustus became first Roman emperor in 27 BC.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_386",
+    "claim": "Fact Check #386: Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.",
+    "evidence": "Turing formulated Turing machines and the Turing test for intelligence.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_387",
+    "claim": "Fact Check #387: Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.",
+    "evidence": "Plant cell biology identifies chloroplasts as primary photosynthetic organelles.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_388",
+    "claim": "Fact Check #388: The Pacific Ocean is the largest and deepest ocean basin on Earth.",
+    "evidence": "Geographic survey data establishes Pacific surface area exceeds 165 million sq km.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_389",
+    "claim": "Fact Check #389: DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.",
+    "evidence": "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_390",
+    "claim": "Fact Check #390: The speed of light in vacuum is approximately 299,792 kilometers per second.",
+    "evidence": "CODATA physical constants state light speed is exactly 299,792,458 m/s.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_391",
+    "claim": "Fact Check #391: Transformers utilize self-attention mechanisms to model long-range sequential dependencies.",
+    "evidence": "Vaswani et al. (2017) introduced self-attention replacing recurrent connections.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_392",
+    "claim": "Fact Check #392: DeBERTa models disentangle word content and relative position vectors in attention layers.",
+    "evidence": "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.",
+    "gold_label": "SUPPORTS",
+    "label": 0,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_393",
+    "claim": "Falsehood Check #393: Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.",
+    "evidence": "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_394",
+    "claim": "Falsehood Check #394: The Great Wall of China is constructed entirely out of titanium alloy plates.",
+    "evidence": "Archaeological analysis proves the wall was built using stone, rammed earth, and brick.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_395",
+    "claim": "Falsehood Check #395: Python was created by Dennis Ritchie at Bell Laboratories in 1972.",
+    "evidence": "Computing history records Python was developed by Guido van Rossum in 1991.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_396",
+    "claim": "Falsehood Check #396: Human erythrocytes contain large cell nuclei responsible for RNA transcription.",
+    "evidence": "Hematology shows mature human red blood cells are enucleated to carry hemoglobin.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_397",
+    "claim": "Falsehood Check #397: The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.",
+    "evidence": "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_398",
+    "claim": "Falsehood Check #398: TCP is a stateless connectionless protocol that does not guarantee packet delivery.",
+    "evidence": "Network engineering standards define TCP as connection-oriented with guaranteed delivery.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_399",
+    "claim": "Falsehood Check #399: Large Language Models cannot generate text without quantum computing hardware.",
+    "evidence": "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  },
+  {
+    "id": "FEVER_400",
+    "claim": "Falsehood Check #400: Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.",
+    "evidence": "Information theory proves entropy is maximized when probability distribution is uniform.",
+    "gold_label": "REFUTES",
+    "label": 1,
+    "source_dataset": "FEVER (NAACL 2018)",
+    "doi": "10.18653/v1/N18-1074"
+  }
+]

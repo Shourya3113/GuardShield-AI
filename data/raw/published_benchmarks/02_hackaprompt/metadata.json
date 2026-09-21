@@ -1,0 +1,10 @@
+{
+  "id": "02_hackaprompt",
+  "name": "HackAPrompt",
+  "venue": "EMNLP 2023",
+  "institution": "University of Maryland (UMD) & Scale AI",
+  "authors": "Sander Schulhoff, Jeremy Pinto, Anaum Khan, Louis-François Bouchard, et al.",
+  "doi": "10.18653/v1/2023.emnlp-main.982",
+  "paper_url": "https://aclanthology.org/2023.emnlp-main.982/",
+  "dataset_url": "https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset"
+}

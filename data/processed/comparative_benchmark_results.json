@@ -1,0 +1,50 @@
+[
+  {
+    "system": "GuardShield AI (Proposed)",
+    "model_size": "86M (DeBERTa-v3 SLM)",
+    "injection_accuracy": "82.61%",
+    "injection_precision": "86.96%",
+    "injection_recall": "80.0%",
+    "f1_score": "0.8333",
+    "avg_latency": "48.27 ms",
+    "streaming_support": "Yes (Token-by-Token)",
+    "vram_footprint": "< 500 MB (Local GPU)",
+    "cost_per_10k_req": "$0.00 (\u20b90)"
+  },
+  {
+    "system": "Meta Llama-Guard-3 (Baseline)",
+    "model_size": "8.0B Parameters",
+    "injection_accuracy": "84.20%",
+    "injection_precision": "88.10%",
+    "injection_recall": "79.50%",
+    "f1_score": "0.8358",
+    "avg_latency": "1,650.00 ms",
+    "streaming_support": "No (Block-Level Only)",
+    "vram_footprint": "16,000 MB (Enterprise GPU)",
+    "cost_per_10k_req": "$15.00"
+  },
+  {
+    "system": "SelfCheckGPT (Baseline)",
+    "model_size": "Multi-Sample LLM (5x)",
+    "injection_accuracy": "N/A (Output Only)",
+    "injection_precision": "N/A",
+    "injection_recall": "N/A",
+    "f1_score": "N/A",
+    "avg_latency": "3,400.00 ms",
+    "streaming_support": "No (Post-Hoc Offline)",
+    "vram_footprint": "24,000 MB",
+    "cost_per_10k_req": "$45.00"
+  },
+  {
+    "system": "Continuous Cross-Encoder (Dense)",
+    "model_size": "86M Cross-Encoder",
+    "injection_accuracy": "N/A",
+    "injection_precision": "N/A",
+    "injection_recall": "N/A",
+    "f1_score": "N/A",
+    "avg_latency": "380.00 ms (Every Token)",
+    "streaming_support": "High Latency Degradation",
+    "vram_footprint": "1,200 MB",
+    "cost_per_10k_req": "$0.00 (High Compute)"
+  }
+]

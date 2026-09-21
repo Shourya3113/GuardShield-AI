@@ -1,0 +1,17 @@
+{
+  "model_architecture": "DeBERTa-v3-small (86M)",
+  "train_samples": 3253,
+  "val_samples": 697,
+  "epochs": 3,
+  "validation_metrics": {
+    "eval_loss": 0.1024160087108612,
+    "eval_accuracy": 0.9828,
+    "eval_precision": 0.9941,
+    "eval_recall": 0.9713,
+    "eval_f1": 0.9826,
+    "eval_runtime": 2.8945,
+    "eval_samples_per_second": 240.799,
+    "eval_steps_per_second": 7.601,
+    "epoch": 3.0
+  }
+}

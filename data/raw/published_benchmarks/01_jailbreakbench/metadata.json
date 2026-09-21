@@ -1,0 +1,10 @@
+{
+  "id": "01_jailbreakbench",
+  "name": "JailbreakBench",
+  "venue": "NeurIPS 2024",
+  "institution": "University of Pennsylvania (UPenn)",
+  "authors": "Patrick Chao, Alexander Robey, Edgar Dobriban, Hamed Hassani, George J. Pappas, Eric Wong",
+  "doi": "10.52202/079017-1745",
+  "paper_url": "https://arxiv.org/abs/2404.01318",
+  "dataset_url": "https://huggingface.co/datasets/JailbreakBench/JBA-Artifacts"
+}
