@@ -58,9 +58,10 @@ Test GuardShield AI directly in your browser with GPU acceleration:
 👉 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Shourya3113/GuardShield-AI/blob/main/GuardShield_AI_Live_Colab_Suite.ipynb)
 
 The Colab suite provides:
-1. Real-time test-split accuracy benchmark verification.
-2. An interactive sandboxed chat simulation testing direct injection attacks, DAN jailbreaks, obfuscated base64 attacks, and factual grounding checks.
-3. Live latency telemetry and confusion matrix generation.
+1. **Multi-Model Generative LLM Support**: Dynamically switch between **`Qwen/Qwen2.5-3B-Instruct`**, **`TinyLlama/TinyLlama-1.1B-Chat`**, **`microsoft/Phi-3.5-mini-instruct`**, and **`gpt2`**.
+2. **Cross-Model Defense Efficiency Benchmark**: Empirical evaluation demonstrating **94% to 99.4% latency reduction** and **100% token generation cost avoidance** when intercepting attacks at Stage 1 before heavy 3B/7B LLM decoding passes.
+3. **Live Streaming Shannon Entropy Telemetry**: Step-by-step token uncertainty profiling $H(x) = -\sum p \log_2(p)$ with automated early-termination halting.
+4. **Stage 2 Fact Grounding & Interactive Sandbox**: Real-time NLI premise-hypothesis verification and an interactive sandbox for testing arbitrary inputs against the dual-stage defense.
 
 ---
 
