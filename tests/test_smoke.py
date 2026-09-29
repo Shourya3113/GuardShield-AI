@@ -24,17 +24,24 @@ def test_data_splits_exist():
 
 def test_streaming_entropy_engine():
     from src.streaming_entropy_engine import StreamingEntropyEngine
-    engine = StreamingEntropyEngine(spike_threshold=1.20, consecutive_spike_limit=2)
+    engine = StreamingEntropyEngine(spike_threshold=1.25, consecutive_spike_limit=2)
     
-    # 1. Deterministic / confident distribution -> Low entropy
+    # 1. Deterministic / confident distribution -> Low entropy (~0.33 bits)
     res_low = engine.process_token("Paris", [0.95, 0.03, 0.02])
-    assert res_low["entropy"] < 1.20
+    assert res_low["entropy"] < 1.25
     assert not res_low["should_terminate"]
     assert res_low["status"] == "OK"
+
+    # 2. Realistic top-3 distribution (60% top token) -> ~1.22 bits (Must NOT trigger false alarm)
+    res_mid = engine.process_token("capital", [0.60, 0.20, 0.10])
+    assert res_mid["entropy"] < 1.25
+    assert not res_mid["is_spike"]
+    assert res_mid["status"] == "OK"
     
-    # 2. Uniform / uncertain distribution -> High entropy
+    # 3. Flat / uncertain distribution -> High entropy (~1.58 bits, Spike 1)
     res_high = engine.process_token("quantum", [0.34, 0.33, 0.33])
-    assert res_high["entropy"] > 1.20
+    assert res_high["entropy"] > 1.25
+    assert res_high["is_spike"]
     assert res_high["status"] == "WARN_SPIKE"
     
     # Second consecutive spike -> Early termination

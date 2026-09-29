@@ -102,7 +102,7 @@ async def chat_completions(req: ChatCompletionRequest):
     if req.stream:
         async def event_generator():
             # Per-request entropy engine to ensure concurrency isolation across client sessions
-            session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.20, consecutive_spike_limit=2)
+            session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.25, consecutive_spike_limit=2)
             chunks = ["GuardShield", " AI", " sidecar", " proxy", " successfully", " verified", " user", " query."]
             for chunk in chunks:
                 # High-confidence token probabilities for factual response chunks

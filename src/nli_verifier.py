@@ -47,6 +47,10 @@ class WindowedNLIVerifier:
             self.model(**warmup)
         logger.info("NLIVerifier Ready (GPU Warmup Completed).")
 
+    def verify_claim(self, premise: str, hypothesis: str) -> Dict[str, Any]:
+        """Alias for verify_entailment."""
+        return self.verify_entailment(premise, hypothesis)
+
     def verify_entailment(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
         Verify if the hypothesis is factually entailed by the premise.
@@ -76,6 +80,7 @@ class WindowedNLIVerifier:
             "hypothesis": hypothesis,
             "decision": decision,
             "is_hallucination": is_hallucination,
+            "is_contradiction": is_hallucination,
             "entailment_prob": round(p_entailment, 4),
             "contradiction_prob": round(p_contradiction, 4),
             "latency_ms": round(elapsed_ms, 2)

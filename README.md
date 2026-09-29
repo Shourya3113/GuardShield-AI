@@ -20,7 +20,7 @@ Modern Large Language Models (LLMs) deployed in production environments face two
 **GuardShield AI** provides a synchronous dual-stage defense pipeline combining:
 - **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44.3M backbone, 142.6M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~13.09 ms (p50)** with sliding-window chunking, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
 - **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~13.89 ms p50**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
-- **Measured End-to-End Pipeline Latency**: Sequential Stage 1 + Stage 2 execution overhead measures **57.45 ms (p50)** / **59.24 ms (mean)**.
+- **Measured End-to-End Pipeline Latency**: Sequential Stage 1 + Stage 2 execution overhead measures **65.86 ms (p50)** / **68.47 ms (mean)** across 100 sequential queries on CUDA, logged per-sample in [`raw_eval_pipeline_e2e.json`](docs/01%20Reports/raw_eval_pipeline_e2e.json).
 
 ```mermaid
 graph LR
@@ -50,12 +50,12 @@ GuardShield AI has been empirically evaluated across **7 published academic and 
 
 | Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Median Latency (ms) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.42%** | **99.14%** | **97.75%** | **0.9844** | **0.87%** | **13.09 ms** |
-| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **98.79%** | **97.60%** | **0.9819** | **1.20%** | **12.52 ms** |
-| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **72.50%** | **76.63%** | **64.75%** | **0.7019** | **19.75%** | **13.89 ms** |
-| **Dual-Stage Pipeline** | **Empirical Measured Sequential Overhead** | — | — | — | — | — | — | **57.45 ms** |
+| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.42%** | **99.14%** | **97.75%** | **0.9844** | **0.87%** | **32.95 ms** |
+| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **98.79%** | **97.60%** | **0.9819** | **1.20%** | **18.48 ms** |
+| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **73.25%** | **76.88%** | **66.50%** | **0.7131** | **20.00%** | **18.91 ms** |
+| **Dual-Stage Pipeline** | **Empirical Measured Sequential Overhead** | — | — | — | — | — | — | **65.86 ms** |
 
-*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 authentic, non-duplicated academic benchmark pairs: FEVER (86.50% Accuracy, 88.50% Recall, 15.50% FPR) and HaluEval QA (58.50% Accuracy, 41.00% Recall, 24.00% FPR). Complete prediction-level logs with per-sample scores and latencies are committed in `docs/01 Reports/raw_eval_*.json` for independent verification without GPU hardware.*
+*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 authentic, non-duplicated academic benchmark pairs with declarative statement formulation: FEVER (86.50% Accuracy, 88.50% Recall, 15.50% FPR) and HaluEval QA (60.00% Accuracy, 44.50% Recall, 24.50% FPR). Complete prediction-level logs with per-sample scores and latencies are committed in `docs/01 Reports/raw_eval_*.json` for independent verification without GPU hardware.*
 
 ---
 
@@ -68,9 +68,12 @@ To assess whether the transformer representation provides genuine advantages ove
 | **TF-IDF + Logistic Regression (Baseline)** | 94.56% | 91.55% | 80.00% | 62.40% | **-29.15% Recall Collapse** |
 | **GuardShield DeBERTa-v3 (Ours)** | **98.42%** | **97.75%** | **98.20%** | **97.60%** | **-0.15% Robust Generalization** |
 
-**Granular Generalization Breakdown**:
-- **Human-Written DAN Jailbreaks (76 prompts)**: TF-IDF achieves **90.79% recall** (vs. DeBERTa's **92.11%**), because colloquial jailbreak prompts share explicit lexical markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`).
-- **Novel Obfuscation & Structural Template Shifts (174 prompts)**: TF-IDF drops to **50.00% recall**, failing on unfamiliar phrasing. In contrast, GuardShield's contextual representation maintains **100.00% recall**, demonstrating true semantic generalization rather than surface memorization.
+**Granular Zero-Shot OOD Generalization Breakdown**:
+- **Authentic Human DAN Jailbreaks (76 prompts)**: On real, human-authored ChatGPT jailbreaks, GuardShield achieves **85.53% to 92.11% recall** (65 to 70 of 76 detected) against TF-IDF's **90.79%**. Because colloquial jailbreak prompts share explicit keyword markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`), bag-of-words baselines detect them effectively.
+- **Controlled Structural Template Shifts (174 prompts)**: Evaluated on 174 injection variations derived from 5 fixed structural templates with slot variations, TF-IDF drops to **50.00% recall**, while GuardShield's contextual transformer representation maintains **100.00% recall** (174 of 174 detected).
+- **Overall OOD Attack Recall**: Across all 250 zero-shot attacks, GuardShield achieves **97.60% recall** (244 of 250) with a low false positive rate of **1.20%**.
+- **In-Distribution Domain Breakdown**: Held-out in-distribution recall varies across provenance sources: Stanford SPML (**99.19%**, 301/303), Jayavibhav (**98.46%**, 128/130), and Deepset (**88.37%**, 38/43), reflecting natural cross-domain variability.
+- **Statistical Rigor & Controls**: 95% Wilson score confidence intervals ($98.42\% \pm 0.96\%$), length-matched control experiments (length heuristic 60.61% vs. GuardShield 98.48%), and long-prompt sliding-window audits (66 prompts $\ge 200$ chars, 4.55% FPR) are detailed in [`statistical_rigor_and_controls.md`](docs/03%20Research%20and%20Catalogs/statistical_rigor_and_controls.md).
 
 ---
 
@@ -139,21 +142,34 @@ cd GuardShield-AI
 pip install -r requirements.txt
 ```
 
-### 2. Run the Full V3 Benchmark Suite
+### 2. Model Checkpoints & Pre-Trained Weights
+Because binary model checkpoints exceed 500MB, they are not committed to git. Set them up via either option:
+
+- **Option A (Train weights locally on your GPU in ~5 mins)**:
+  ```bash
+  python src/train_prescan_v3.py
+  ```
+- **Option B (Verify or download checkpoints using the weight manager)**:
+  ```bash
+  python scripts/download_weights.py
+  ```
+*(Note: Automated CI runs in lightweight verification mode using `GUARDSHIELD_ALLOW_UNTRAINED_FALLBACK=1`.)*
+
+### 3. Run the Full V3 Benchmark Suite
 Evaluate both Stage 1 and Stage 2 across in-distribution test sets, zero-shot out-of-distribution attacks, and factuality benchmarks:
 
 ```bash
 python src/evaluate_full_suite_v3.py
 ```
 
-### 3. Run the Sidecar Proxy Server
+### 4. Run the Sidecar Proxy Server
 Launch the FastAPI sidecar proxy on `http://127.0.0.1:8000`:
 
 ```bash
 python src/proxy_server.py
 ```
 
-### 4. Interactive Command-Line Demonstration
+### 5. Interactive Command-Line Demonstration
 Test custom prompts against the dual-stage defense in real-time:
 
 ```bash

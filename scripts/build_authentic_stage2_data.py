@@ -65,13 +65,12 @@ def build_authentic_halueval():
         if not knowledge or not right_ans or not hallu_ans:
             continue
             
-        premise = f"{knowledge} Question: {question}"
-        
-        # Grounded factual response
+        # Formulate hypotheses as complete declarative statements answering the question
+        # Eliminates length and syntactic confounders between extractive entities and full hallucinated sentences
         pairs.append({
             "id": f"HALU_{count}_G",
-            "premise": premise,
-            "claim": right_ans,
+            "premise": knowledge,
+            "claim": f"The answer to the question '{question}' is {right_ans}.",
             "label": 0,
             "label_name": "Supported / Grounded",
             "source": "HaluEval (EMNLP 2023)"
@@ -79,8 +78,8 @@ def build_authentic_halueval():
         # Hallucinated response
         pairs.append({
             "id": f"HALU_{count}_H",
-            "premise": premise,
-            "claim": hallu_ans,
+            "premise": knowledge,
+            "claim": f"The answer to the question '{question}' is {hallu_ans}.",
             "label": 1,
             "label_name": "Hallucination / Contradiction",
             "source": "HaluEval (EMNLP 2023)"
