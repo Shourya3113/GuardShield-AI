@@ -1,8 +1,11 @@
+import os
+from pathlib import Path
 import docx
 
 def build_wpr2():
-    template_path = r'C:\Users\Peter\Downloads\Format WPR Minor Project.docx'
-    out_docx_path = r'd:\projects\GuardShield_AI\GuardShield_AI_WPR_Week_2.docx'
+    template_path = Path.home() / "Downloads" / "Format WPR Minor Project.docx"
+    base_dir = Path(__file__).resolve().parent.parent
+    out_docx_path = base_dir / "docs" / "02 Weekly WPRs" / "WPR Week 2.docx"
     
     doc = docx.Document(template_path)
     

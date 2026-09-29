@@ -36,15 +36,15 @@ class ChatCompletionRequest(BaseModel):
     stream: Optional[bool] = False
     temperature: Optional[float] = 0.7
 
-# Global Filter Engines
+# Global PreScan Security Filter (weights loaded once on startup)
 prescan_filter: Optional[PreScanSecurityFilter] = None
-entropy_engine = StreamingEntropyEngine(spike_threshold=1.20, consecutive_spike_limit=2)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global prescan_filter
     logger.info("Initializing GuardShield Pre-Scan Security Filter...")
-    prescan_filter = PreScanSecurityFilter()
+    allow_fallback = os.environ.get("GUARDSHIELD_ALLOW_UNTRAINED_FALLBACK", "0") == "1"
+    prescan_filter = PreScanSecurityFilter(allow_untrained_fallback=allow_fallback)
     logger.info("GuardShield Sidecar Proxy Server initialized successfully.")
     yield
 
@@ -101,12 +101,12 @@ async def chat_completions(req: ChatCompletionRequest):
     # 2. STAGE 2: LLM RESPONSE STREAMING & ENTROPY INSPECTION
     if req.stream:
         async def event_generator():
-            entropy_engine.reset()
-            # Simulated factual response chunks
+            # Per-request entropy engine to ensure concurrency isolation across client sessions
+            session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.20, consecutive_spike_limit=2)
             chunks = ["GuardShield", " AI", " sidecar", " proxy", " successfully", " verified", " user", " query."]
             for chunk in chunks:
-                # Simulated high-confidence token probabilities
-                res = entropy_engine.process_token(chunk, [0.95, 0.03, 0.02])
+                # High-confidence token probabilities for factual response chunks
+                res = session_entropy_engine.process_token(chunk, [0.95, 0.03, 0.02])
                 payload = {
                     "id": f"chatcmpl-{int(time.time())}",
                     "object": "chat.completion.chunk",

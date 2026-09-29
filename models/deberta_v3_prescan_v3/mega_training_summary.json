@@ -1,5 +1,5 @@
 {
-  "model_architecture": "DeBERTa-v3-small (86M)",
+  "model_architecture": "DeBERTa-v3-small (44.3M backbone, 142.6M total params)",
   "train_samples": 3253,
   "val_samples": 697,
   "epochs": 3,

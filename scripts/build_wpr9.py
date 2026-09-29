@@ -12,15 +12,15 @@ def build_wpr9():
     print("=" * 75)
     print("  [GuardShield AI] Generating Official WPR Week 9 (DOCX, PDF, Markdown)")
     print("=" * 75)
+    base_dir = Path(__file__).resolve().parent.parent
+    template_path = Path.home() / "Downloads" / "Format WPR Minor Project.docx"
+    out_docx_docs = base_dir / "docs" / "02 Weekly WPRs" / "WPR Week 9.docx"
+    out_docx_downloads = Path.home() / "Downloads" / "GuardShield_AI_WPR_Week_9.docx"
     
-    template_path = os.path.expanduser(r"~\Downloads\Format WPR Minor Project.docx")
-    out_docx_docs = r"d:\projects\GuardShield_AI\docs\02 Weekly WPRs\WPR Week 9.docx"
-    out_docx_downloads = os.path.expanduser(r"~\Downloads\GuardShield_AI_WPR_Week_9.docx")
+    out_pdf_docs = base_dir / "docs" / "02 Weekly WPRs" / "WPR Week 9.pdf"
+    out_pdf_downloads = Path.home() / "Downloads" / "GuardShield_AI_WPR_Week_9.pdf"
     
-    out_pdf_docs = r"d:\projects\GuardShield_AI\docs\02 Weekly WPRs\WPR Week 9.pdf"
-    out_pdf_downloads = os.path.expanduser(r"~\Downloads\GuardShield_AI_WPR_Week_9.pdf")
-    
-    out_md_docs = r"d:\projects\GuardShield_AI\docs\02 Weekly WPRs\WPR Week 9.md"
+    out_md_docs = base_dir / "docs" / "02 Weekly WPRs" / "WPR Week 9.md"
     
     doc = docx.Document(template_path)
     

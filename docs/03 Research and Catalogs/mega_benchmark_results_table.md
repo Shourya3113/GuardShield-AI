@@ -8,12 +8,14 @@
 
 ## 1. Multi-Stage Benchmark Progression Across Dataset Generations
 
-| Benchmark Tier | Evaluated Corpus Size | Stage 1 Accuracy | Stage 1 Attack Recall | Stage 1 Precision | Stage 1 Latency (p50) | Stage 2 Fact Grounding |
+| Benchmark Tier & Component | Evaluated Sample Size ($N$) | Accuracy (%) | Recall (%) | Precision (%) | Latency p50 (ms) | Defense Scope |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Tier 1: Initial Baseline (v1)** | 451 samples | 82.61% | 86.96% | 80.00% | 29.28 ms | N/A |
-| **Tier 2: Expanded Research (v2)** | 1,182 samples | 95.56% | 94.44% | 96.59% | 10.55 ms | 81.25% |
-| **Tier 3: Mega Suite (v3 — In-Dist)** | **4,648 samples** | **98.57%** | **97.75%** | **99.43%** | **10.98 ms** | **76.38%** |
-| **Tier 3: Mega Suite (v3 — OOD Zero-Shot)** | **500 samples** | **98.20%** | **97.20%** | **99.18%** | **21.24 ms** | Robust Generalization |
+| **Tier 1: Initial Baseline (v1)** | 451 samples | 82.61% | 86.96% | 80.00% | 29.28 ms | Single-Prompt Security |
+| **Tier 2: Expanded Research (v2)** | 1,182 samples | 95.56% | 94.44% | 96.59% | 10.55 ms | Dual-Stage Proof-of-Concept |
+| **Tier 3: Mega Stage 1 (In-Dist Test Split)** | **698 samples** | **98.42%** | **97.75%** | **99.14%** | **28.06 ms** | Held-Out Prompt Defense |
+| **Tier 3: Mega Stage 1 (Zero-Shot OOD)** | **500 samples** | **98.20%** | **97.60%** | **98.79%** | **21.44 ms** | Cross-Dataset Generalization |
+| **Tier 3: Stage 2 Grounding (FEVER + HaluEval)** | **800 pairs** | **72.50%** | **64.75%** | **76.63%** | **21.02 ms** | Authentic Fact Verification |
+| **Complete Dual-Stage Pipeline (Measured E2E)** | **Sequential E2E** | — | — | — | **57.45 ms** | End-to-End Guardrail Overhead |
 
 ---
 
@@ -22,17 +24,17 @@
 *Trained on Stanford SPML + Jayavibhav $\rightarrow$ Evaluated Zero-Shot on novel ChatGPT JailbreakBench & Obfuscated Injections*
 
 - **Total OOD Evaluation Samples**: 500 (250 Novel Attacks, 250 Held-Out Safe)
-- **Zero-Shot Attack Detection Recall**: **97.20%** (Caught 243 of 250 zero-shot attacks)
-- **Zero-Shot Precision**: **99.18%**
-- **False Positive Rate**: **0.80%**
-- **Inference Latency**: **21.24 ms**
+- **Zero-Shot Attack Detection Recall**: **97.60%** (Catches 244 of 250 zero-shot attacks)
+- **Zero-Shot Precision**: **98.79%**
+- **False Positive Rate**: **1.20%**
+- **Inference Latency (p50)**: **21.44 ms**
 
 ---
 
-## 3. Stage 2 Mega Fact Grounding (FEVER NAACL + HaluEval EMNLP)
+## 3. Stage 2 Authentic Fact Grounding (FEVER NAACL + HaluEval EMNLP)
 
-- **Total Grounding Claims Evaluated**: 800
-- **Hallucination Contradiction Recall**: **59.25%** (Intercepts 237 false assertions)
-- **Factual Entailment Specificity**: **93.50%**
-- **Overall Grounding Accuracy**: **76.38%**
-- **Median Verification Latency**: **20.47 ms**
+- **Total Authentic Grounding Claims Evaluated**: 800 (100% Non-Duplicated)
+- **Hallucination Contradiction Recall**: **64.75%** (Intercepts 259 false assertions)
+- **Factual Entailment Specificity**: **80.25%**
+- **Overall Grounding Accuracy**: **72.50%**
+- **Median Verification Latency (p50)**: **21.02 ms**

@@ -22,19 +22,26 @@ class StreamingEntropyEngine:
         self.consecutive_spikes = 0
         self.history = []
 
-    def compute_entropy(self, probabilities: List[float]) -> float:
+    def compute_entropy(self, probabilities: List[float], vocab_size: int = 32000) -> float:
         """
         Calculate Shannon Entropy in bits: H(x) = -sum(p * log2(p)).
-        Normalizes probabilities to ensure a valid discrete distribution.
+        Accurately accounts for unobserved tail probability mass when top-k truncation is present.
         """
-        total = sum(probabilities)
-        if total <= 0:
-            return 0.0
-        normalized = [p / total for p in probabilities]
+        valid_probs = [max(1e-12, float(p)) for p in probabilities if p > 0]
+        known_mass = sum(valid_probs)
+        
+        # Base entropy from observed top-k tokens
         entropy = 0.0
-        for p in normalized:
-            if p > 1e-7:
-                entropy -= p * math.log2(p)
+        for p in valid_probs:
+            entropy -= p * math.log2(p)
+            
+        # Account for tail probability mass beyond top-k
+        tail_mass = max(0.0, 1.0 - known_mass)
+        if tail_mass > 1e-4 and vocab_size > len(valid_probs):
+            remaining_tokens = max(1, vocab_size - len(valid_probs))
+            p_tail_avg = tail_mass / remaining_tokens
+            entropy -= tail_mass * math.log2(p_tail_avg)
+            
         return round(entropy, 4)
 
     def process_token(self, token: str, top_probabilities: List[float]) -> Dict[str, Any]:

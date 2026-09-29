@@ -26,5 +26,7 @@ jobs:
           pip install pytest
 
       - name: Run Smoke Tests
+        env:
+          GUARDSHIELD_ALLOW_UNTRAINED_FALLBACK: "1"
         run: |
           python -m pytest tests/test_smoke.py -v

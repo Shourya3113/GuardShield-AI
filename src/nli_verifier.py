@@ -23,8 +23,9 @@ class WindowedNLIVerifier:
     Triggered during entropy spikes to evaluate factual consistency against reference premises.
     Outputs: Entailment (Factual), Neutral (Uncertain), or Contradiction (Hallucination).
     """
-    def __init__(self, model_name: str = "cross-encoder/nli-deberta-v3-small"):
+    def __init__(self, model_name: str = "cross-encoder/nli-deberta-v3-small", threshold: float = 0.50):
         self.model_name = model_name
+        self.threshold = threshold
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
         logger.info(f"Initializing NLIVerifier on {self.device.upper()}...")
@@ -49,6 +50,7 @@ class WindowedNLIVerifier:
     def verify_entailment(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
         Verify if the hypothesis is factually entailed by the premise.
+        Evaluates contradiction probability against the decision threshold.
         """
         start_time = time.perf_counter()
         
@@ -64,7 +66,7 @@ class WindowedNLIVerifier:
         p_entailment = float(probs[1].item()) if len(probs) > 1 else 0.5
         p_neutral = float(probs[2].item()) if len(probs) > 2 else 0.0
         
-        is_hallucination = p_contradiction > 0.5 or (p_entailment < 0.3 and p_neutral < 0.5)
+        is_hallucination = p_contradiction >= self.threshold
         decision = "HALLUCINATION_CONTRADICTION" if is_hallucination else "FACTUAL_ENTAILMENT"
         
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0

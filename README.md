@@ -18,8 +18,9 @@ Modern Large Language Models (LLMs) deployed in production environments face two
 2. **Hallucinatory Egress**: Fabricated assertions, unsupported extrapolations, and factual inconsistencies generated during open-ended decoding.
 
 **GuardShield AI** provides a synchronous dual-stage defense pipeline combining:
-- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44M backbone, ~142M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~10.98 ms**, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
-- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~20.47 ms**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
+- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44.3M backbone, 142.6M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~13.09 ms (p50)** with sliding-window chunking, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
+- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~13.89 ms p50**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
+- **Measured End-to-End Pipeline Latency**: Sequential Stage 1 + Stage 2 execution overhead measures **57.45 ms (p50)** / **59.24 ms (mean)**.
 
 ```mermaid
 graph LR
@@ -47,14 +48,14 @@ GuardShield AI has been empirically evaluated across **7 published academic and 
 
 ### Empirical Evaluation Summary
 
-| Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Mean Latency (ms) |
+| Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Median Latency (ms) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.57%** | **99.43%** | **97.75%** | **0.9858** | **0.58%** | **10.98 ms** |
-| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **99.18%** | **97.20%** | **0.9818** | **0.80%** | **21.24 ms** |
-| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **76.38%** | **90.11%** | **59.25%** | **0.7149** | **6.50%** | **20.47 ms** |
-| **Dual-Stage Pipeline** | **Empirical Combined Overhead** | — | — | — | — | — | — | **~31.45 ms** |
+| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.42%** | **99.14%** | **97.75%** | **0.9844** | **0.87%** | **13.09 ms** |
+| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **98.79%** | **97.60%** | **0.9819** | **1.20%** | **12.52 ms** |
+| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **72.50%** | **76.63%** | **64.75%** | **0.7019** | **19.75%** | **13.89 ms** |
+| **Dual-Stage Pipeline** | **Empirical Measured Sequential Overhead** | — | — | — | — | — | — | **57.45 ms** |
 
-*Note: Stage 1 metrics reflect pure neural inference without keyword-based heuristics. Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 unique, non-duplicated academic benchmark pairs.*
+*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 authentic, non-duplicated academic benchmark pairs: FEVER (86.50% Accuracy, 88.50% Recall, 15.50% FPR) and HaluEval QA (58.50% Accuracy, 41.00% Recall, 24.00% FPR). Complete prediction-level logs with per-sample scores and latencies are committed in `docs/01 Reports/raw_eval_*.json` for independent verification without GPU hardware.*
 
 ---
 
@@ -65,9 +66,11 @@ To assess whether the transformer representation provides genuine advantages ove
 | Model Architecture | In-Distribution Accuracy | In-Distribution Recall | OOD Zero-Shot Accuracy | OOD Zero-Shot Recall | Generalization Delta |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **TF-IDF + Logistic Regression (Baseline)** | 94.56% | 91.55% | 80.00% | 62.40% | **-29.15% Recall Collapse** |
-| **GuardShield DeBERTa-v3 (Ours)** | **98.57%** | **97.75%** | **98.20%** | **97.20%** | **-0.55% Robust Generalization** |
+| **GuardShield DeBERTa-v3 (Ours)** | **98.42%** | **97.75%** | **98.20%** | **97.60%** | **-0.15% Robust Generalization** |
 
-**Key Finding**: While bag-of-words classifiers detect familiar keyword patterns on in-distribution data, they suffer a severe **29.15 percentage point drop in attack recall** when confronted with unseen zero-shot jailbreak templates. GuardShield's contextual transformer maintains **97.20% recall** out-of-distribution with a minimal false positive rate of **0.80%**.
+**Granular Generalization Breakdown**:
+- **Human-Written DAN Jailbreaks (76 prompts)**: TF-IDF achieves **90.79% recall** (vs. DeBERTa's **92.11%**), because colloquial jailbreak prompts share explicit lexical markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`).
+- **Novel Obfuscation & Structural Template Shifts (174 prompts)**: TF-IDF drops to **50.00% recall**, failing on unfamiliar phrasing. In contrast, GuardShield's contextual representation maintains **100.00% recall**, demonstrating true semantic generalization rather than surface memorization.
 
 ---
 
@@ -171,30 +174,32 @@ python src/demo_master.py
 | **W6** | Dual-Stage Pipeline Integration & Streaming Proxy | ✅ Completed | WPR 6, End-to-End Orchestrator |
 | **W7** | Multi-Dataset Benchmarking (Stanford, Jayavibhav, Deepset) | ✅ Completed | WPR 7, 2,166-Sample Comparative Study |
 | **W8** | Publication Preparation & Formal Research Catalogs | ✅ Completed | WPR 8, IEEE/ACM Ready LaTeX Tables |
-| **W9** | V3 Mega Benchmark Scaling (5,948 Samples) & Colab Live Suite | ✅ Completed | WPR 9, 98.57% In-Dist Acc, 98.20% OOD Acc |
+| **W9** | V3 Mega Benchmark Scaling (5,948 Samples) & Colab Live Suite | ✅ Completed | WPR 9, 98.42% In-Dist Acc, 98.20% OOD Acc |
 
 ---
 
 ## 📚 Datasets & Attribution
 
 GuardShield AI evaluates against open research datasets curated from the academic community:
-- **Stanford Online Safety (SPML)**: [Stanford Safety Prompts](https://huggingface.co/datasets/stanford-crfm/spml) (CC-BY-4.0)
-- **ChatGPT JailbreakBench**: [JailbreakBench](https://github.com/JailbreakBench/jailbreakbench) (MIT)
+- **Stanford Online Safety (SPML)**: [reshabhs/SPML_Chatbot_Prompt_Injection](https://huggingface.co/datasets/reshabhs/SPML_Chatbot_Prompt_Injection) (CC-BY-SA-4.0)
+- **Jayavibhav Prompt Injection**: [jayavibhav/prompt-injection](https://huggingface.co/datasets/jayavibhav/prompt-injection) (Apache-2.0 / MIT)
 - **Deepset Prompt Injections**: [deepset/prompt-injections](https://huggingface.co/datasets/deepset/prompt-injections) (Apache-2.0)
-- **FEVER Fact Extraction & VERification**: Thorne et al., NAACL 2018 (CC-BY-SA 3.0)
-- **HaluEval Hallucination Benchmark**: Wang et al., EMNLP 2023 (MIT)
-- **TruthfulQA**: Lin et al., ACL 2022 (Apache-2.0)
+- **ChatGPT Jailbreak Prompts**: [rubend18/ChatGPT-Jailbreak-Prompts](https://huggingface.co/datasets/rubend18/ChatGPT-Jailbreak-Prompts) (MIT / Open Source)
+- **FEVER Fact Extraction & VERification**: [copenlu/fever_gold_evidence](https://huggingface.co/datasets/copenlu/fever_gold_evidence) (Thorne et al., NAACL 2018, CC-BY-SA-3.0)
+- **HaluEval Hallucination Benchmark**: [pminervini/HaluEval](https://huggingface.co/datasets/pminervini/HaluEval) (Wang et al., EMNLP 2023, MIT)
+- **TruthfulQA**: [TruthfulQA](https://huggingface.co/datasets/truthful_qa) (Lin et al., ACL 2022, Apache-2.0)
 
 ---
 
 ## 👥 Research Team & Affiliation
 
-**Capstone Project Group 50 | B.Tech Computer Science & Engineering**
+**Capstone Project Group 50 | B.Tech (Computer Science & Engineering - AIML)**  
+**Amity School of Engineering & Technology (ASET), Amity University**
 
 - **Shourya Solanki** (Lead Architect — Pipeline Implementation, Model Training & Benchmarking)
-- **Dhruv Sharma** (Data Engineer — Ingestion, Preprocessing & Corpus Curation)
-- **Rachit Garg** (Research Analyst — Literature Survey, Gap Formulation & Verification)
-- **Faculty Guide**: Dr. Abhishek Kaushik
+- **Rachit Ryan Chug** (Research Analyst — Literature Survey, Gap Formulation & Verification)
+- **Dhruv Raj Singh** (Data Engineer — Ingestion, Preprocessing & Corpus Curation)
+- **Faculty Guide**: Dr. Abhishek Kaushal
 
 ---
 

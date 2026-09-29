@@ -26,7 +26,7 @@ class PreScanSecurityFilter:
     Evaluates incoming prompts for prompt injections, jailbreaks, and policy violations.
     Target latency overhead: < 25ms.
     """
-    def __init__(self, model_dir: Path = None, threshold: float = 0.5):
+    def __init__(self, model_dir: Path = None, threshold: float = 0.5, allow_untrained_fallback: bool = False):
         self.threshold = threshold
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
@@ -37,29 +37,37 @@ class PreScanSecurityFilter:
         resolved_path = None
         if model_dir and Path(model_dir).exists():
             resolved_path = Path(model_dir)
-        elif v3_path.exists() and any(v3_path.glob("*.safetensors")):
+        elif v3_path.exists() and (any(v3_path.glob("*.safetensors")) or any(v3_path.glob("*.bin"))):
             resolved_path = v3_path
-        elif v1_path.exists() and any(v1_path.glob("*.safetensors")):
+        elif v1_path.exists() and (any(v1_path.glob("*.safetensors")) or any(v1_path.glob("*.bin"))):
             resolved_path = v1_path
 
         logger.info(f"Initializing PreScanSecurityFilter on {self.device.upper()}...")
-        try:
-            if resolved_path:
-                logger.info(f"Loading fine-tuned model checkpoint from: {resolved_path}")
-                self.tokenizer = AutoTokenizer.from_pretrained(str(resolved_path), use_fast=False)
-                self.model = AutoModelForSequenceClassification.from_pretrained(str(resolved_path))
-                self.model_dir = resolved_path
+        if resolved_path:
+            logger.info(f"Loading fine-tuned model checkpoint from: {resolved_path}")
+            self.tokenizer = AutoTokenizer.from_pretrained(str(resolved_path), use_fast=False)
+            self.model = AutoModelForSequenceClassification.from_pretrained(str(resolved_path))
+            self.model_dir = resolved_path
+        else:
+            if allow_untrained_fallback:
+                logger.warning(
+                    "FINE-TUNED WEIGHTS NOT FOUND. Initializing base 'microsoft/deberta-v3-small' with an UNTRAINED head (TEST/MOCK MODE ONLY). "
+                    "Decisions will be unaligned. Train weights locally with 'python src/train_prescan_v3.py'."
+                )
+                self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=2)
+                self.model_dir = Path("microsoft/deberta-v3-small")
             else:
-                raise FileNotFoundError("No local fine-tuned weights found in models/.")
-        except Exception as e:
-            logger.warning(
-                f"Could not load local weights ({e}). "
-                f"Falling back to base 'microsoft/deberta-v3-small' from Hugging Face Hub. "
-                f"To train or evaluate fine-tuned weights, run 'python src/train_prescan_v3_mega.py'."
-            )
-            self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
-            self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=2)
-            self.model_dir = Path("microsoft/deberta-v3-small")
+                raise FileNotFoundError(
+                    f"Fine-tuned model weights not found in '{v3_path}' or '{v1_path}'.\n"
+                    "GuardShield AI requires trained classifier weights to make secure ingress decisions.\n"
+                    "Please do one of the following:\n"
+                    "  1. Train weights locally using your GPU:\n"
+                    "         python src/train_prescan_v3.py\n"
+                    "  2. Or download pre-trained weights:\n"
+                    "         python scripts/download_weights.py\n"
+                    "  3. For CI or unit test verification only, initialize with allow_untrained_fallback=True."
+                )
 
         self.model.to(self.device)
         self.model.eval()

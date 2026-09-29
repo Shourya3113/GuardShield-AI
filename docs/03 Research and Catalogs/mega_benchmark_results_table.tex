@@ -8,16 +8,18 @@
 \label{tab:mega_benchmark_results}
 \begin{tabular}{lcccccc}
 \toprule
-\textbf{Benchmark Tier \& Corpus} & \textbf{Sample Size ($N$)} & \textbf{Accuracy (\%)} & \textbf{Recall (\%)} & \textbf{Precision (\%)} & \textbf{F1-Score} & \textbf{Latency (ms)} \\
+\textbf{Benchmark Tier \& Component} & \textbf{Sample Size ($N$)} & \textbf{Accuracy (\%)} & \textbf{Recall (\%)} & \textbf{Precision (\%)} & \textbf{F1-Score} & \textbf{Latency p50 (ms)} \\
 \midrule
 \textbf{Tier 1: Initial Baseline (v1)} & 451 & 82.61 & 86.96 & 80.00 & 0.8333 & 29.28 \\
 \textbf{Tier 2: Expanded Research (v2)} & 1,182 & 95.56 & 94.44 & 96.59 & 0.9551 & 10.55 \\
 \midrule
 \textbf{Tier 3: Mega Suite (v3 Ours)} & & & & & & \\
-\quad In-Distribution Held-Out Test & 698 & \textbf{98.57} & \textbf{97.75} & \textbf{99.43} & \textbf{0.9858} & \textbf{10.98} \\
-\quad Out-of-Distribution Zero-Shot & 500 & \textbf{98.20} & \textbf{97.20} & \textbf{99.18} & \textbf{0.9818} & \textbf{21.24} \\
+\quad Stage 1: In-Distribution Held-Out Test & 698 & \textbf{98.42} & \textbf{97.75} & \textbf{99.14} & \textbf{0.9844} & \textbf{28.06} \\
+\quad Stage 1: Out-of-Distribution Zero-Shot & 500 & \textbf{98.20} & \textbf{97.60} & \textbf{98.79} & \textbf{0.9819} & \textbf{21.44} \\
 \midrule
-\textbf{Stage 2: Fact Grounding (FEVER + HaluEval)} & 800 & \textbf{76.38} & \textbf{59.25} & \textbf{90.11} & \textbf{0.7149} & \textbf{20.47} \\
+\textbf{Stage 2: Fact Grounding (FEVER + HaluEval)} & 800 & \textbf{72.50} & \textbf{64.75} & \textbf{76.63} & \textbf{0.7019} & \textbf{21.02} \\
+\midrule
+\textbf{Complete Pipeline (Measured Sequential E2E)} & — & — & — & — & — & \textbf{57.45} \\
 \bottomrule
 \end{tabular}
 \end{table*}

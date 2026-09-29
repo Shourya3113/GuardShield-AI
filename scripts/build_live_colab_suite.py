@@ -12,7 +12,7 @@ def create_full_live_colab_notebook():
                     "# 🛡️ GuardShield AI — Full Live Demonstration & Research Suite\n",
                     "### Dual-Stage Sidecar Proxy: Real-Time Prompt Injection Defense & Streaming Hallucination Detection\n",
                     "**Institution**: Amity School of Engineering & Technology (ASET) | **Programme**: B.Tech (CSE - AIML)\n",
-                    "**Group No.**: 50 | **Guide**: Dr. Abhishek Kaushik\n",
+                    "**Group No.**: 50 | **Guide**: Dr. Abhishek Kaushal\n",
                     "**Team**: Shourya Solanki (A2305223569), Rachit Ryan Chug (A2305223166), Dhruv Raj Singh (A2305223191)\n",
                     "\n",
                     "---\n",
@@ -21,7 +21,7 @@ def create_full_live_colab_notebook():
                     "2. **Module 2**: Live Stage 1 Pre-Scan Filter (`microsoft/deberta-v3-small`)\n",
                     "3. **Module 3**: Quantitative Test-Split Evaluation (698 Samples) & Confusion Matrix Heatmap\n",
                     "4. **Module 4**: Scalable Modern Generative LLM Loading (`Qwen2.5-3B`, `TinyLlama-1.1B`, `Phi-3.5`, `GPT-2`) & Dynamic Shannon Entropy Streaming\n",
-                    "5. **Module 5**: Cross-Model Defense Benchmark & Latency Savings (Research Paper Table)\n",
+                    "5. **Module 5**: Cross-Model Defense Benchmark & Latency Savings (Analytical Benchmark)\n",
                     "6. **Module 6**: Live Stage 2 Cross-Encoder NLI Fact Grounding & Hallucination Interception\n",
                     "7. **Module 7**: Interactive Custom Prompt Sandbox (Full Dual-Stage End-to-End Pipeline)"
                 ]
@@ -41,9 +41,9 @@ def create_full_live_colab_notebook():
                 "outputs": [],
                 "source": [
                     "# Install required Hugging Face & visualization packages\n",
-                    "!pip install -q transformers torch sentencepiece accelerate matplotlib seaborn tabulate\n",
+                    "!pip install -q transformers torch sentencepiece accelerate matplotlib seaborn tabulate requests\n",
                     "\n",
-                    "import os, math, time, torch\n",
+                    "import os, math, time, torch, requests\n",
                     "import numpy as np\n",
                     "import pandas as pd\n",
                     "import matplotlib.pyplot as plt\n",
@@ -67,7 +67,7 @@ def create_full_live_colab_notebook():
                 "metadata": {},
                 "source": [
                     "## 🛡️ Module 2: Live Stage 1 Pre-Scan Security Filter (Prompt Injection Defense)\n",
-                    "Loads an 86M parameter DeBERTa-v3 architecture to inspect ingress prompts and output real-time `ALLOW` vs `BLOCK` decisions with sub-11ms latency."
+                    "Loads a DeBERTa-v3 architecture (44.3M backbone, 142.6M total parameters) to inspect ingress prompts and output real-time `ALLOW` vs `BLOCK` decisions with sub-15ms latency."
                 ]
             },
             {
@@ -140,13 +140,19 @@ def create_full_live_colab_notebook():
                 "metadata": {},
                 "outputs": [],
                 "source": [
-                    "# Empirical Test Metrics from V3 Mega Benchmark Suite (Unboosted Neural Model)\n",
-                    "tp = 347  # True Positives (Attacks caught)\n",
-                    "fn = 8    # False Negatives (Attacks missed)\n",
-                    "fp = 2    # False Positives (Benign queries blocked)\n",
-                    "tn = 341  # True Negatives (Benign queries allowed)\n",
-                    "total = tp + fn + fp + tn\n",
+                    "# Load empirical predictions from the V3 test benchmark (698 samples)\n",
+                    "raw_eval_url = 'https://raw.githubusercontent.com/Shourya3113/GuardShield-AI/main/docs/01%20Reports/raw_eval_in_distribution_test_698.json'\n",
+                    "try:\n",
+                    "    resp = requests.get(raw_eval_url, timeout=10)\n",
+                    "    metrics = resp.json()['metrics']\n",
+                    "    cm_data = metrics['confusion_matrix']\n",
+                    "    tp, fn, fp, tn = cm_data['tp'], cm_data['fn'], cm_data['fp'], cm_data['tn']\n",
+                    "    latency_val = metrics['latency_p50_ms']\n",
+                    "except Exception:\n",
+                    "    tp, fn, fp, tn = 347, 8, 3, 340\n",
+                    "    latency_val = 12.87\n",
                     "\n",
+                    "total = tp + fn + fp + tn\n",
                     "accuracy = (tp + tn) / total\n",
                     "precision = tp / (tp + fp)\n",
                     "recall = tp / (tp + fn)\n",
@@ -163,8 +169,8 @@ def create_full_live_colab_notebook():
                     "print(f'  • Recall (Attack Coverage): {recall*100:.2f}%  (Catches {tp} of {tp+fn} attacks)')\n",
                     "print(f'  • Specificity (Safe Pass):  {specificity*100:.2f}%')\n",
                     "print(f'  • F1-Score:                 {f1:.4f}')\n",
-                    "print(f'  • False Positive Rate:      {fpr*100:.2f}%  (Only {fp} false alarms in 343 safe prompts)')\n",
-                    "print(f'  • Steady-State GPU Latency: 10.10 ms')\n",
+                    "print(f'  • False Positive Rate:      {fpr*100:.2f}%  (Only {fp} false alarms in {tn+fp} safe prompts)')\n",
+                    "print(f'  • Median Pre-Scan Latency:  {latency_val:.2f} ms')\n",
                     "print('=' * 75)\n",
                     "\n",
                     "# Plot Heatmap\n",
@@ -296,8 +302,8 @@ def create_full_live_colab_notebook():
                 "cell_type": "markdown",
                 "metadata": {},
                 "source": [
-                    "## 📈 Module 5: Cross-Model Defense Analysis & Hardware Latency Profiling (Analytical Benchmark)\n",
-                    "Quantifies the latency overhead and GPU compute avoided by intercepting adversarial ingress at Stage 1 (~11ms single forward pass) compared to full autoregressive multi-token generation on downstream LLMs (measured on T4/A100 GPU hardware)."
+                    "## 📈 Module 5: Analytical Compute Savings & Defense Projection Across LLMs\n",
+                    "Analytical benchmark modeling the GPU compute and latency avoided by intercepting adversarial ingress at Stage 1 (~11-13ms single classification pass) versus full autoregressive multi-token decoding (50-100 tokens) across common LLM architectures."
                 ]
             },
             {
@@ -306,12 +312,12 @@ def create_full_live_colab_notebook():
                 "metadata": {},
                 "outputs": [],
                 "source": [
-                    "# Hardware Generation Latency vs. Pre-Scan Interception (Measured on Colab GPU for 50-100 token response)\n",
+                    "# Analytical Projection: Autoregressive Generation Latency vs. Pre-Scan Interception (Typical 50-100 token response)\n",
                     "models_data = [\n",
-                    "    {'Model': 'GPT-2 (Base)', 'Params': '124M', 'Unprotected Latency (ms)': 175.4, 'GuardShield Latency (ms)': 10.98, 'Tokens Wasted (Unprotected)': 48},\n",
-                    "    {'Model': 'TinyLlama-1.1B', 'Params': '1.1B', 'Unprotected Latency (ms)': 740.2, 'GuardShield Latency (ms)': 10.98, 'Tokens Wasted (Unprotected)': 65},\n",
-                    "    {'Model': 'Qwen2.5-3B-Instruct', 'Params': '3.0B', 'Unprotected Latency (ms)': 1850.6, 'GuardShield Latency (ms)': 10.98, 'Tokens Wasted (Unprotected)': 92},\n",
-                    "    {'Model': 'Qwen2.5-7B-Instruct', 'Params': '7.6B', 'Unprotected Latency (ms)': 3420.0, 'GuardShield Latency (ms)': 10.98, 'Tokens Wasted (Unprotected)': 120}\n",
+                    "    {'Model': 'GPT-2 (Base)', 'Params': '124M', 'Unprotected Latency (ms)': 175.4, 'GuardShield Latency (ms)': 12.87, 'Tokens Wasted (Unprotected)': 48},\n",
+                    "    {'Model': 'TinyLlama-1.1B', 'Params': '1.1B', 'Unprotected Latency (ms)': 740.2, 'GuardShield Latency (ms)': 12.87, 'Tokens Wasted (Unprotected)': 65},\n",
+                    "    {'Model': 'Qwen2.5-3B-Instruct', 'Params': '3.0B', 'Unprotected Latency (ms)': 1850.6, 'GuardShield Latency (ms)': 12.87, 'Tokens Wasted (Unprotected)': 92},\n",
+                    "    {'Model': 'Qwen2.5-7B-Instruct', 'Params': '7.6B', 'Unprotected Latency (ms)': 3420.0, 'GuardShield Latency (ms)': 12.87, 'Tokens Wasted (Unprotected)': 120}\n",
                     "]\n",
                     "\n",
                     "for row in models_data:\n",
@@ -326,8 +332,8 @@ def create_full_live_colab_notebook():
                     "print('=' * 95)\n",
                     "print(tabulate(df_models, headers='keys', tablefmt='fancy_grid', showindex=False))\n",
                     "print('=' * 95)\n",
-                    "print('Note: Unprotected generation latencies represent measured/projected time for a 50-100 token response on Colab GPU.')\n",
-                    "print('GuardShield intercepts malicious ingress in a single forward pass (~11 ms), preventing downstream generation entirely.')\n",
+                    "print('Note: Unprotected latencies are reference benchmark projections for typical 50-100 token generation cycles.')\n",
+                    "print('GuardShield Stage 1 intercepts malicious ingress in a single classification pass (~11-13 ms), avoiding downstream decoding.')\n",
                     "\n",
                     "# Visual Comparison Chart\n",
                     "plt.figure(figsize=(9, 4.5))\n",
@@ -530,10 +536,12 @@ def create_full_live_colab_notebook():
     with open(out_docs, "w", encoding="utf-8") as f:
         json.dump(notebook, f, indent=2)
         
-    with open(out_downloads, "w", encoding="utf-8") as f:
-        json.dump(notebook, f, indent=2)
-        
-    print(f"Successfully generated Live Colab Notebook at:\n  - {out_root}\n  - {out_docs}\n  - {out_downloads}")
+    if out_downloads.parent.exists():
+        with open(out_downloads, "w", encoding="utf-8") as f:
+            json.dump(notebook, f, indent=2)
+        print(f"Successfully generated Live Colab Notebook at:\n  - {out_root}\n  - {out_docs}\n  - {out_downloads}")
+    else:
+        print(f"Successfully generated Live Colab Notebook at:\n  - {out_root}\n  - {out_docs}")
 
 if __name__ == "__main__":
     create_full_live_colab_notebook()
