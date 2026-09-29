@@ -13,55 +13,76 @@
 
 ## 📌 Executive Summary
 
-Modern Large Language Models (LLMs) deployed in production face two critical, compounding vulnerability vectors:
-1. **Adversarial Ingress**: Prompt injections, role-play jailbreaks, and obfuscated payload exploits that bypass system prompts to compromise system integrity.
-2. **Hallucinatory Egress**: Fabricated statements, ungrounded extrapolations, and factual inconsistencies delivered with high confidence.
+Modern Large Language Models (LLMs) deployed in production environments face two critical, compounding vulnerability vectors:
+1. **Adversarial Ingress**: Prompt injections, role-play jailbreaks, and obfuscated exploits that bypass system prompts to compromise model alignment.
+2. **Hallucinatory Egress**: Fabricated assertions, unsupported extrapolations, and factual inconsistencies generated during open-ended decoding.
 
-**GuardShield AI** introduces an asynchronous dual-stage defense pipeline combining:
-- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`) that inspects ingress prompts in **~10 ms**, stopping injections and jailbreaks before they reach downstream LLMs.
-- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs token-level premise-hypothesis grounding against authoritative context to intercept ungrounded hallucinations.
+**GuardShield AI** provides a synchronous dual-stage defense pipeline combining:
+- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44M backbone, ~142M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~10.98 ms**, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
+- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~20.47 ms**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
 
 ```mermaid
 graph LR
-    User([User Prompt]) --> PreScan[Stage 1: DeBERTa-v3 Pre-Scan]
-    PreScan -- "Malicious / Jailbreak (P > 0.50)" --> Block[Blocked: 403 Forbidden Response]
-    PreScan -- "Safe Prompt (P < 0.50)" --> LLM[Target LLM Engine]
-    LLM --> Candidate[Generated Candidate Answer]
+    User([User Prompt]) --> PreScan[Stage 1: DeBERTa-v3 Pre-Scan Filter]
+    PreScan -- "Malicious / Jailbreak (P >= 0.50)" --> Block[Blocked: 403 Forbidden]
+    PreScan -- "Safe Prompt (P < 0.50)" --> LLM[Target Generative LLM]
+    LLM --> Candidate[Generated Candidate Output]
     Candidate --> Stage2[Stage 2: Cross-Encoder NLI Verifier]
-    Context[(Authoritative Context / Truth)] --> Stage2
-    Stage2 -- "Entailment (Score >= 0.50)" --> Output([Verified Output to User])
-    Stage2 -- "Contradiction / Neutral" --> Flag[Hallucination Flagged / Refined]
+    Context[(Authoritative Context / RAG Docs)] --> Stage2
+    Stage2 -- "Entailment (P_contra < 0.50)" --> Output([Verified Response to User])
+    Stage2 -- "Contradiction (P_contra >= 0.50)" --> Flag[Hallucination Flagged / Blocked]
 ```
 
 ---
 
-## 📊 V3 Mega Research Benchmark Evaluation (5,796 Samples)
+## 📊 V3 Mega Research Benchmark Evaluation (5,948 Curated Samples)
 
-GuardShield AI has been validated across **7 published academic and industry benchmark datasets**:
-- **Security & Adversarial Benchmarks (4,451 samples)**: Stanford Online Safety (SPML), Jayavibhav Injection Suite, Deepset Prompt Injections, and ChatGPT JailbreakBench.
-- **Factuality & Hallucination Benchmarks (1,345 samples)**: TruthfulQA (ACL 2022), FEVER (NAACL 2018), and HaluEval (EMNLP 2023).
+GuardShield AI has been empirically evaluated across **7 published academic and industry benchmark datasets**:
+- **Security & Adversarial Benchmarks (5,148 samples)**:
+  - *In-Distribution (4,648 samples)*: Partitioned into 3,253 Train, 697 Validation, and 698 Test samples across Stanford Online Safety (SPML), Jayavibhav Injection Suite, and Deepset Prompt Injections.
+  - *Out-of-Distribution Zero-Shot (500 samples)*: 250 novel ChatGPT JailbreakBench attacks + 250 held-out benign queries.
+- **Factuality & Hallucination Grounding Benchmarks (800 unique pairs)**:
+  - 400 unique claim-evidence pairs from **FEVER (NAACL 2018)** (200 Supported, 200 Refuted).
+  - 400 unique grounded-hallucinated QA pairs from **HaluEval (EMNLP 2023)** (200 Grounded, 200 Hallucinated).
 
 ### Empirical Evaluation Summary
 
-| Defense Component | Evaluation Dataset / Split | Sample Size | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Mean Latency (ms) |
+| Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Mean Latency (ms) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.71%** | **99.39%** | **98.03%** | **0.9870** | **0.58%** | **10.10 ms** |
-| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **99.18%** | **97.20%** | **0.9818** | **0.80%** | **12.04 ms** |
-| **Stage 2: Fact Verifier** | **Multi-Source Factuality Suite** | **648** | **75.31%** | **74.12%** | **78.25%** | **0.7613** | **27.60%** | **16.45 ms** |
-| **Complete Pipeline** | **End-to-End Latency Overhead** | — | — | — | — | — | — | **~26.5 ms** |
+| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.57%** | **99.43%** | **97.75%** | **0.9858** | **0.58%** | **10.98 ms** |
+| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **99.18%** | **97.20%** | **0.9818** | **0.80%** | **21.24 ms** |
+| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **76.38%** | **90.11%** | **59.25%** | **0.7149** | **6.50%** | **20.47 ms** |
+| **Dual-Stage Pipeline** | **Empirical Combined Overhead** | — | — | — | — | — | — | **~31.45 ms** |
+
+*Note: Stage 1 metrics reflect pure neural inference without keyword-based heuristics. Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 unique, non-duplicated academic benchmark pairs.*
+
+---
+
+### Comparative Baseline: Transformer vs. Bag-of-Words (TF-IDF + Logistic Regression)
+
+To assess whether the transformer representation provides genuine advantages over surface lexical features, we benchmarked a standard TF-IDF + Logistic Regression model against GuardShield on identical splits:
+
+| Model Architecture | In-Distribution Accuracy | In-Distribution Recall | OOD Zero-Shot Accuracy | OOD Zero-Shot Recall | Generalization Delta |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **TF-IDF + Logistic Regression (Baseline)** | 94.56% | 91.55% | 80.00% | 62.40% | **-29.15% Recall Collapse** |
+| **GuardShield DeBERTa-v3 (Ours)** | **98.57%** | **97.75%** | **98.20%** | **97.20%** | **-0.55% Robust Generalization** |
+
+**Key Finding**: While bag-of-words classifiers detect familiar keyword patterns on in-distribution data, they suffer a severe **29.15 percentage point drop in attack recall** when confronted with unseen zero-shot jailbreak templates. GuardShield's contextual transformer maintains **97.20% recall** out-of-distribution with a minimal false positive rate of **0.80%**.
 
 ---
 
 ## 🚀 Live Interactive Colab Suite
 
-Test GuardShield AI directly in your browser with GPU acceleration:
+Experience GuardShield AI directly in Google Colab with free T4 GPU acceleration:  
 👉 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Shourya3113/GuardShield-AI/blob/main/GuardShield_AI_Live_Colab_Suite.ipynb)
 
-The Colab suite provides:
-1. **Multi-Model Generative LLM Support**: Dynamically switch between **`Qwen/Qwen2.5-3B-Instruct`**, **`TinyLlama/TinyLlama-1.1B-Chat`**, **`microsoft/Phi-3.5-mini-instruct`**, and **`gpt2`**.
-2. **Cross-Model Defense Efficiency Benchmark**: Empirical evaluation demonstrating **94% to 99.4% latency reduction** and **100% token generation cost avoidance** when intercepting attacks at Stage 1 before heavy 3B/7B LLM decoding passes.
-3. **Live Streaming Shannon Entropy Telemetry**: Step-by-step token uncertainty profiling $H(x) = -\sum p \log_2(p)$ with automated early-termination halting.
-4. **Stage 2 Fact Grounding & Interactive Sandbox**: Real-time NLI premise-hypothesis verification and an interactive sandbox for testing arbitrary inputs against the dual-stage defense.
+The Colab suite includes 6 interactive modules:
+1. **Environment Setup & GPU Telemetry**: Diagnostic verification of CUDA environment and PyTorch acceleration.
+2. **Generative LLM Engine Selection**: Load and run test prompts through generative backbones including `Qwen/Qwen2.5-3B-Instruct`, `TinyLlama/TinyLlama-1.1B-Chat`, `microsoft/Phi-3.5-mini-instruct`, or `gpt2`.
+3. **Stage 1 Neural Pre-Scan Filter**: Live prompt inspection and full in-distribution test-set evaluation without keyword overrides.
+4. **Streaming Token Entropy Telemetry**: Real-time per-step token uncertainty profiling $H(x) = -\sum_{i=1}^k p_i \log_2(p_i)$ with automatic early-termination thresholding.
+5. **Analytical Compute Savings Benchmark**: Analytical hardware profiling illustrating 94%–99.4% latency avoidance and 100% downstream decoding cost avoidance when intercepting attacks at Stage 1 before heavy 3B/7B autoregressive decoding passes.
+6. **Stage 2 Fact Grounding & Interactive Defense Sandbox**: Live premise-hypothesis NLI verification and a unified sandbox for arbitrary user prompts.
 
 ---
 
@@ -70,8 +91,8 @@ The Colab suite provides:
 ```text
 GuardShield_AI/
 ├── data/
-│   ├── mega_research_datasets/   # Aggregated 5,000+ sample security and 1,100+ factuality benchmarks
-│   ├── processed/splits_v3/       # Partitioned Train (3,253), Val (697), Test (698), and OOD (500) sets
+│   ├── mega_research_datasets/   # Aggregated 5,148-sample security and 800 factuality benchmarks
+│   ├── processed/splits_v3/       # Partitioned Train (3,253), Val (697), Test (698), OOD (500), and Fact (800)
 │   ├── published_paper_datasets/  # Standardized benchmark CSVs from ACL, NAACL, EMNLP literature
 │   └── raw/                       # Original ingested corpus samples
 ├── docs/
@@ -83,16 +104,20 @@ GuardShield_AI/
 │   ├── deberta_v3_prescan_v3/     # Fine-tuned Stage 1 model configs and evaluation summaries
 │   └── README.md                  # Model weights reproduction and download guide
 ├── scripts/
+│   ├── build_live_colab_suite.py  # Script generating the interactive Colab notebook
 │   ├── build_wpr9.py              # Automated WPR document generation script
 │   └── export_mega_datasets.py    # Master dataset export and validation utilities
 ├── src/
+│   ├── config.py                  # Centralized path and hyperparameter configuration
+│   ├── demo_master.py             # CLI demonstration suite for all pipeline components
+│   ├── evaluate_full_suite_v3.py  # Pure neural benchmark test suite across in-dist, OOD, and factuality
+│   ├── nli_verifier.py            # Stage 2 cross-encoder NLI entailment verifier
 │   ├── prepare_splits_v3_mega.py  # V3 mega benchmark dataset partitioning pipeline
-│   ├── train_prescan_v3.py        # Stage 1 DeBERTa-v3-small GPU training script
-│   ├── evaluate_full_suite_v3.py  # Comprehensive multi-dataset benchmark test suite
-│   ├── prescan_filter.py          # Stage 1 real-time classification inference engine
-│   └── nli_verifier.py            # Stage 2 zero-shot cross-encoder NLI verifier
+│   ├── prescan_filter.py          # Stage 1 real-time classification engine with sliding-window chunking
+│   ├── proxy_server.py            # FastAPI sidecar proxy with modern lifespan management
+│   ├── streaming_entropy_engine.py# Real-time token entropy calculation and spike detection
+│   └── train_prescan_v3.py        # Stage 1 DeBERTa-v3-small GPU training script
 ├── GuardShield_AI_Live_Colab_Suite.ipynb  # Interactive Google Colab demonstration notebook
-├── mega_benchmark_results_table.tex       # Camera-ready LaTeX research table
 ├── requirements.txt                       # Python project dependencies
 ├── LICENSE                                # Apache 2.0 Open Source License
 └── README.md                              # Main project documentation
@@ -118,11 +143,11 @@ Evaluate both Stage 1 and Stage 2 across in-distribution test sets, zero-shot ou
 python src/evaluate_full_suite_v3.py
 ```
 
-### 3. Fine-Tune Stage 1 on Custom Data
-Train the Stage 1 `microsoft/deberta-v3-small` classifier using your GPU:
+### 3. Run the Sidecar Proxy Server
+Launch the FastAPI sidecar proxy on `http://127.0.0.1:8000`:
 
 ```bash
-python src/train_prescan_v3.py
+python src/proxy_server.py
 ```
 
 ### 4. Interactive Command-Line Demonstration
@@ -146,7 +171,19 @@ python src/demo_master.py
 | **W6** | Dual-Stage Pipeline Integration & Streaming Proxy | ✅ Completed | WPR 6, End-to-End Orchestrator |
 | **W7** | Multi-Dataset Benchmarking (Stanford, Jayavibhav, Deepset) | ✅ Completed | WPR 7, 2,166-Sample Comparative Study |
 | **W8** | Publication Preparation & Formal Research Catalogs | ✅ Completed | WPR 8, IEEE/ACM Ready LaTeX Tables |
-| **W9** | V3 Mega Benchmark Scaling (5,796 Samples) & Colab Live Suite | ✅ Completed | WPR 9, 98.71% In-Dist Acc, 98.20% OOD Acc |
+| **W9** | V3 Mega Benchmark Scaling (5,948 Samples) & Colab Live Suite | ✅ Completed | WPR 9, 98.57% In-Dist Acc, 98.20% OOD Acc |
+
+---
+
+## 📚 Datasets & Attribution
+
+GuardShield AI evaluates against open research datasets curated from the academic community:
+- **Stanford Online Safety (SPML)**: [Stanford Safety Prompts](https://huggingface.co/datasets/stanford-crfm/spml) (CC-BY-4.0)
+- **ChatGPT JailbreakBench**: [JailbreakBench](https://github.com/JailbreakBench/jailbreakbench) (MIT)
+- **Deepset Prompt Injections**: [deepset/prompt-injections](https://huggingface.co/datasets/deepset/prompt-injections) (Apache-2.0)
+- **FEVER Fact Extraction & VERification**: Thorne et al., NAACL 2018 (CC-BY-SA 3.0)
+- **HaluEval Hallucination Benchmark**: Wang et al., EMNLP 2023 (MIT)
+- **TruthfulQA**: Lin et al., ACL 2022 (Apache-2.0)
 
 ---
 

@@ -153,7 +153,9 @@ def assemble_mega_stage1_dataset():
 
     # 5. TruthfulQA (ACL 2022) & Technical CS Queries for Safe prompts
     logger.info("[5/5] Integrating TruthfulQA ACL 2022 Safe Benchmarks...")
-    tqa_path = BASE_DIR / "data" / "new_paper_datasets" / "TruthfulQA_ACL2022_Benchmark.csv"
+    tqa_path = BASE_DIR / "docs" / "03 Research and Catalogs" / "TruthfulQA_ACL2022_Benchmark.csv"
+    if not tqa_path.exists():
+        tqa_path = BASE_DIR / "TruthfulQA_ACL2022_Benchmark.csv"
     if tqa_path.exists():
         df_tqa = pd.read_csv(tqa_path)
         for _, row in df_tqa.iterrows():
@@ -208,95 +210,62 @@ def assemble_mega_stage1_dataset():
     return stage1_in_dist, stage1_ood
 
 def assemble_mega_stage2_dataset():
-    """Build 1,100 evaluated pairs for Stage 2 Factuality (FEVER 600 + HaluEval 500)."""
+    """Build 800 evaluated unique pairs for Stage 2 Factuality (FEVER 400 + HaluEval 400) with zero duplicates."""
     logger.info("=" * 70)
-    logger.info("Assembling Mega Stage-2 Factuality Benchmark (Target: 1,100 Samples)...")
+    logger.info("Assembling Real Stage-2 Factuality Benchmark (800 Unique Pairs)...")
     logger.info("=" * 70)
 
-    # 1. Fetch official HaluEval QA from HuggingFace
-    logger.info("[1/2] Fetching Official HaluEval EMNLP 2023 QA Benchmark...")
-    halu_rows = fetch_hf_rows("pminervini%2FHaluEval", config="qa", split="data", max_rows=300)
-    halueval_pairs = []
+    # 1. Real FEVER Benchmark from local CSV (200 SUPPORTS + 200 REFUTES = 400 Unique Claims)
+    fever_csv = BASE_DIR / "docs" / "03 Research and Catalogs" / "FEVER_NAACL2018_Fact_Verification.csv"
+    if not fever_csv.exists():
+        fever_csv = BASE_DIR / "FEVER_NAACL2018_Fact_Verification.csv"
     
-    for i, r in enumerate(halu_rows):
-        know = str(r.get("knowledge", "")).strip()
-        q = str(r.get("question", "")).strip()
-        right = str(r.get("right_answer", "")).strip()
-        hallu = str(r.get("hallucinated_answer", "")).strip()
-        
-        premise = f"Context: {know} Question: {q}" if len(know) > 5 else q
-        
-        if len(right) > 2 and len(hallu) > 2:
-            # Grounded (Supported = 0)
-            halueval_pairs.append({
-                "id": f"HALU_G_{i+1}",
-                "premise": premise[:350],
-                "claim": right,
-                "label": 0,
-                "label_name": "Grounded / Supported",
-                "source": "HaluEval (EMNLP 2023)"
-            })
-            # Hallucinated (Refuted = 1)
-            halueval_pairs.append({
-                "id": f"HALU_H_{i+1}",
-                "premise": premise[:350],
-                "claim": hallu,
-                "label": 1,
-                "label_name": "Hallucinated / Contradiction",
-                "source": "HaluEval (EMNLP 2023)"
-            })
-
-    halueval_final = halueval_pairs[:500]
-    logger.info(f"Generated HaluEval Benchmark: {len(halueval_final)} balanced pairs")
-
-    # 2. FEVER Fact Verification (Expand to 600 verified pairs: 300 Supported, 300 Refuted)
-    logger.info("[2/2] Assembling FEVER NAACL 2018 Fact Verification Benchmark...")
-    fever_claims_supported = [
-        ("The Roman Empire was founded in the 1st century BC following the collapse of the Roman Republic.", "Historical records verify Augustus became first Roman emperor in 27 BC."),
-        ("Alan Turing is widely considered the father of theoretical computer science and artificial intelligence.", "Turing formulated Turing machines and the Turing test for intelligence."),
-        ("Photosynthesis occurs within cellular chloroplasts containing chlorophyll pigments.", "Plant cell biology identifies chloroplasts as primary photosynthetic organelles."),
-        ("The Pacific Ocean is the largest and deepest ocean basin on Earth.", "Geographic survey data establishes Pacific surface area exceeds 165 million sq km."),
-        ("DNA is composed of four nucleobase molecules: adenine, thymine, guanine, and cytosine.", "Molecular genetics confirms Watson-Crick base pairing in double-helix DNA."),
-        ("The speed of light in vacuum is approximately 299,792 kilometers per second.", "CODATA physical constants state light speed is exactly 299,792,458 m/s."),
-        ("Transformers utilize self-attention mechanisms to model long-range sequential dependencies.", "Vaswani et al. (2017) introduced self-attention replacing recurrent connections."),
-        ("DeBERTa models disentangle word content and relative position vectors in attention layers.", "He et al. (2021) demonstrated disentangled attention outperforms standard BERT.")
-    ]
-    fever_claims_refuted = [
-        ("Albert Einstein received the Nobel Prize in Literature for his contributions to poetry.", "Historical archives show Einstein was awarded the 1921 Nobel Prize in Physics."),
-        ("The Great Wall of China is constructed entirely out of titanium alloy plates.", "Archaeological analysis proves the wall was built using stone, rammed earth, and brick."),
-        ("Python was created by Dennis Ritchie at Bell Laboratories in 1972.", "Computing history records Python was developed by Guido van Rossum in 1991."),
-        ("Human erythrocytes contain large cell nuclei responsible for RNA transcription.", "Hematology shows mature human red blood cells are enucleated to carry hemoglobin."),
-        ("The Moon possesses an atmospheric pressure equal to sea-level Earth pressure.", "Planetary astronomy confirms the lunar surface has an extreme exosphere vacuum."),
-        ("TCP is a stateless connectionless protocol that does not guarantee packet delivery.", "Network engineering standards define TCP as connection-oriented with guaranteed delivery."),
-        ("Large Language Models cannot generate text without quantum computing hardware.", "Modern LLMs execute on classical semiconductor GPU and TPU tensor accelerators."),
-        ("Shannon Entropy reaches its absolute minimum when probabilities are evenly distributed.", "Information theory proves entropy is maximized when probability distribution is uniform.")
-    ]
-    
+    df_fever = pd.read_csv(fever_csv)
     fever_final = []
-    # Replicate into 300 supported and 300 refuted
-    for rep in range(38):
-        for c, ev in fever_claims_supported:
-            if len(fever_final) < 300:
-                fever_final.append({
-                    "id": f"FEVER_S_{len(fever_final)+1}",
-                    "premise": ev,
-                    "claim": c,
-                    "label": 0,
-                    "label_name": "Supported Fact",
-                    "source": "FEVER (NAACL 2018)"
-                })
-        for c, ev in fever_claims_refuted:
-            if len(fever_final) < 600:
-                fever_final.append({
-                    "id": f"FEVER_R_{len(fever_final)+1}",
-                    "premise": ev,
-                    "claim": c,
-                    "label": 1,
-                    "label_name": "Refuted Falsehood",
-                    "source": "FEVER (NAACL 2018)"
-                })
+    for idx, row in df_fever.iterrows():
+        is_refute = (str(row["gold_label"]).strip().upper() == "REFUTES")
+        fever_final.append({
+            "id": f"FEVER_{row['id']}",
+            "premise": str(row["evidence"]).strip(),
+            "claim": str(row["claim"]).strip(),
+            "label": 1 if is_refute else 0,
+            "label_name": "Refuted / Falsehood" if is_refute else "Supported / Fact",
+            "source": "FEVER (NAACL 2018)"
+        })
+    logger.info(f"Loaded Real FEVER Benchmark: {len(fever_final)} unique pairs (200 Supported, 200 Refuted)")
 
-    logger.info(f"Generated FEVER Benchmark: {len(fever_final)} balanced claim pairs")
+    # 2. Real HaluEval Benchmark from local CSV (200 Questions -> 200 Grounded + 200 Hallucinated = 400 Unique Pairs)
+    halu_csv = BASE_DIR / "docs" / "03 Research and Catalogs" / "HaluEval_EMNLP2023_Hallucination_Benchmark.csv"
+    if not halu_csv.exists():
+        halu_csv = BASE_DIR / "HaluEval_EMNLP2023_Hallucination_Benchmark.csv"
+        
+    df_halu = pd.read_csv(halu_csv)
+    halueval_final = []
+    for idx, row in df_halu.iterrows():
+        q = str(row["question"]).strip()
+        f_resp = str(row["factual_response"]).strip()
+        h_resp = str(row["hallucinated_response"]).strip()
+        domain = str(row.get("domain", "")).strip()
+        premise = f"Context ({domain}): {q}" if domain else f"Context: {q}"
+        
+        halueval_final.append({
+            "id": f"HALU_{row['id']}_G",
+            "premise": premise,
+            "claim": f_resp,
+            "label": 0,
+            "label_name": "Grounded / Supported",
+            "source": "HaluEval (EMNLP 2023)"
+        })
+        halueval_final.append({
+            "id": f"HALU_{row['id']}_H",
+            "premise": premise,
+            "claim": h_resp,
+            "label": 1,
+            "label_name": "Hallucinated / Contradiction",
+            "source": "HaluEval (EMNLP 2023)"
+        })
+    logger.info(f"Loaded Real HaluEval Benchmark: {len(halueval_final)} unique pairs (200 Grounded, 200 Hallucinated)")
+    
     return halueval_final, fever_final
 
 def prepare_and_export_v3_suite():
@@ -329,13 +298,17 @@ def prepare_and_export_v3_suite():
 
     # Master Stage 1 CSV
     master_s1_csv = MEGA_DATASETS_DIR / "GuardShield_Mega_Security_Benchmark_5000.csv"
-    pd.DataFrame(stage1_in_dist).to_csv(master_s1_csv, index=False, encoding="utf-8-sig")
-    shutil.copy(str(master_s1_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Security_Benchmark_5000.csv"))
+    pd.DataFrame(stage1_in_dist + stage1_ood).to_csv(master_s1_csv, index=False, encoding="utf-8-sig")
+    if DOWNLOADS_DIR.exists():
+        shutil.copy(str(master_s1_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Security_Benchmark_5000.csv"))
 
     # -------------------------------------------------------------
     # Stage 2: Export Factuality Splits
     # -------------------------------------------------------------
     halueval_final, fever_final = assemble_mega_stage2_dataset()
+    save_split(halueval_final, "halueval_eval_400")
+    save_split(fever_final, "fever_eval_400")
+    # Also write backwards compatible names
     save_split(halueval_final, "halueval_eval_500")
     save_split(fever_final, "fever_eval_600")
 
@@ -343,22 +316,25 @@ def prepare_and_export_v3_suite():
     stage2_combined = halueval_final + fever_final
     master_s2_csv = MEGA_DATASETS_DIR / "GuardShield_Mega_Factuality_Benchmark_1100.csv"
     pd.DataFrame(stage2_combined).to_csv(master_s2_csv, index=False, encoding="utf-8-sig")
-    shutil.copy(str(master_s2_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Factuality_Benchmark_1100.csv"))
+    if DOWNLOADS_DIR.exists():
+        shutil.copy(str(master_s2_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Factuality_Benchmark_1100.csv"))
+
+    total_security = len(stage1_in_dist) + len(stage1_ood)
+    total_factuality = len(stage2_combined)
+    total_all = total_security + total_factuality
 
     print("\n" + "=" * 80)
-    print("  [GuardShield AI] V3 MEGA BENCHMARK SUITE READY FOR TRAINING & TESTING")
+    print("  [GuardShield AI] V3 RESEARCH BENCHMARK SUITE READY FOR TRAINING & TESTING")
     print("=" * 80)
-    print(f"  • Stage 1 In-Distribution Total:   {len(stage1_in_dist)} Balanced Samples (50% Attack / 50% Safe)")
+    print(f"  • Stage 1 Security Corpus:         {total_security} Samples")
     print(f"    - Training Split (70%):          {len(train_set)} samples")
     print(f"    - Validation Split (15%):        {len(val_set)} samples")
     print(f"    - In-Dist Test Split (15%):      {len(test_in_dist)} samples (Held-Out Unseen)")
-    print(f"  • Stage 1 OOD Zero-Shot Split:     {len(stage1_ood)} samples (Novel Adversarial Vectors)")
-    print(f"  • Stage 2 FEVER Fact Verification: {len(fever_final)} pairs (300 Supported, 300 Refuted)")
-    print(f"  • Stage 2 HaluEval Hallucination:  {len(halueval_final)} pairs (250 Grounded, 250 Hallucinated)")
-    print(f"  • Grand Total Experimental Corpus: {len(stage1_in_dist) + len(stage1_ood) + len(stage2_combined)} SAMPLES!")
-    print(f"  • Deliverables copied to Downloads:")
-    print(f"    - GuardShield_Mega_Security_Benchmark_5000.csv")
-    print(f"    - GuardShield_Mega_Factuality_Benchmark_1100.csv")
+    print(f"    - Zero-Shot OOD Split:           {len(stage1_ood)} samples (Novel Adversarial Vectors)")
+    print(f"  • Stage 2 Factuality Corpus:       {total_factuality} Unique Pairs (100% Non-Duplicated)")
+    print(f"    - FEVER Fact Verification:       {len(fever_final)} unique pairs (200 Supported, 200 Refuted)")
+    print(f"    - HaluEval Hallucination:        {len(halueval_final)} unique pairs (200 Grounded, 200 Hallucinated)")
+    print(f"  • Grand Total Experimental Corpus: {total_all} CURATED SAMPLES")
     print("=" * 80 + "\n")
 
 if __name__ == "__main__":

@@ -27,13 +27,40 @@ class PreScanSecurityFilter:
     Target latency overhead: < 25ms.
     """
     def __init__(self, model_dir: Path = None, threshold: float = 0.5):
-        self.model_dir = model_dir or (config.BASE_DIR / "models" / "deberta_v3_prescan")
         self.threshold = threshold
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
+        # Resolve model directory with graceful fallbacks
+        v3_path = config.BASE_DIR / "models" / "deberta_v3_prescan_v3"
+        v1_path = config.BASE_DIR / "models" / "deberta_v3_prescan"
+        
+        resolved_path = None
+        if model_dir and Path(model_dir).exists():
+            resolved_path = Path(model_dir)
+        elif v3_path.exists() and any(v3_path.glob("*.safetensors")):
+            resolved_path = v3_path
+        elif v1_path.exists() and any(v1_path.glob("*.safetensors")):
+            resolved_path = v1_path
+
         logger.info(f"Initializing PreScanSecurityFilter on {self.device.upper()}...")
-        self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_dir), use_fast=False)
-        self.model = AutoModelForSequenceClassification.from_pretrained(str(self.model_dir))
+        try:
+            if resolved_path:
+                logger.info(f"Loading fine-tuned model checkpoint from: {resolved_path}")
+                self.tokenizer = AutoTokenizer.from_pretrained(str(resolved_path), use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained(str(resolved_path))
+                self.model_dir = resolved_path
+            else:
+                raise FileNotFoundError("No local fine-tuned weights found in models/.")
+        except Exception as e:
+            logger.warning(
+                f"Could not load local weights ({e}). "
+                f"Falling back to base 'microsoft/deberta-v3-small' from Hugging Face Hub. "
+                f"To train or evaluate fine-tuned weights, run 'python src/train_prescan_v3_mega.py'."
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
+            self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=2)
+            self.model_dir = Path("microsoft/deberta-v3-small")
+
         self.model.to(self.device)
         self.model.eval()
         
@@ -42,23 +69,49 @@ class PreScanSecurityFilter:
         with torch.no_grad():
             self.model(**warmup_inputs)
             
-        logger.info("PreScanSecurityFilter Ready (GPU Warmup Completed).")
+        logger.info(f"PreScanSecurityFilter Ready ({self.model_dir.name}).")
 
-    def inspect_prompt(self, prompt: str) -> Dict[str, Any]:
+    def inspect_prompt(self, prompt: str, max_chunk_tokens: int = 126, stride: int = 64) -> Dict[str, Any]:
         """
         Inspect a prompt in real time with sub-25ms latency.
+        Applies sliding-window chunking to prevent adversarial length-padding bypasses.
         """
         start_time = time.perf_counter()
         
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=128).to(self.device)
+        tokens = self.tokenizer.encode(prompt, add_special_tokens=False)
         
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-            logits = outputs.logits
-            probs = torch.softmax(logits, dim=-1)[0]
+        if len(tokens) <= max_chunk_tokens:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=max_chunk_tokens + 2).to(self.device)
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                probs = torch.softmax(outputs.logits, dim=-1)[0]
+                risk_score = float(probs[1].item())
+        else:
+            # Long prompt defense: Evaluate sliding windows and take maximum injection probability
+            cls_id = self.tokenizer.cls_token_id or 1
+            sep_id = self.tokenizer.sep_token_id or 2
+            chunks = []
+            for start_idx in range(0, len(tokens), stride):
+                sub = tokens[start_idx : start_idx + max_chunk_tokens]
+                chunk_ids = [cls_id] + sub + [sep_id]
+                chunks.append(chunk_ids)
+                if start_idx + max_chunk_tokens >= len(tokens):
+                    break
+            
+            max_len = max(len(c) for c in chunks)
+            input_ids = [c + [self.tokenizer.pad_token_id or 0] * (max_len - len(c)) for c in chunks]
+            att_mask = [[1] * len(c) + [0] * (max_len - len(c)) for c in chunks]
+            
+            batch = {
+                "input_ids": torch.tensor(input_ids, dtype=torch.long, device=self.device),
+                "attention_mask": torch.tensor(att_mask, dtype=torch.long, device=self.device)
+            }
+            with torch.no_grad():
+                outputs = self.model(**batch)
+                probs = torch.softmax(outputs.logits, dim=-1)
+                risk_score = float(torch.max(probs[:, 1]).item())
             
         # Class 1 = Injection / Malicious, Class 0 = Safe
-        risk_score = float(probs[1].item())
         is_safe = risk_score < self.threshold
         decision = "ALLOW" if is_safe else "BLOCK"
         

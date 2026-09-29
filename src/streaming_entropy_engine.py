@@ -24,10 +24,15 @@ class StreamingEntropyEngine:
 
     def compute_entropy(self, probabilities: List[float]) -> float:
         """
-        Calculate Shannon Entropy in bits: H(x) = -sum(p * log2(p))
+        Calculate Shannon Entropy in bits: H(x) = -sum(p * log2(p)).
+        Normalizes probabilities to ensure a valid discrete distribution.
         """
+        total = sum(probabilities)
+        if total <= 0:
+            return 0.0
+        normalized = [p / total for p in probabilities]
         entropy = 0.0
-        for p in probabilities:
+        for p in normalized:
             if p > 1e-7:
                 entropy -= p * math.log2(p)
         return round(entropy, 4)

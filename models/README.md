@@ -8,7 +8,7 @@ This directory tracks architecture configurations, tokenizer settings, and train
 
 ## 1. Stage 1: Pre-Scan Prompt Injection & Jailbreak Classifier
 
-- **Backbone Architecture**: `microsoft/deberta-v3-small` (44M parameters, 12 layers, 768 hidden dimension).
+- **Backbone Architecture**: `microsoft/deberta-v3-small` (44.3M backbone transformer parameters + 98.3M SentencePiece vocabulary embeddings = ~142.6M total parameters, 6 layers, 12 attention heads, 768 hidden dimension).
 - **Classification Head**: Binary sequence classification (`SAFE` vs `INJECTION` / `ATTACK`).
 - **Current Version**: `v3` (Trained on 3,253 multi-benchmark prompts from Stanford SPML, Jayavibhav, Deepset, and ChatGPT JailbreakBench).
 

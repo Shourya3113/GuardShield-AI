@@ -4,6 +4,7 @@ import time
 import json
 import logging
 from pathlib import Path
+from contextlib import asynccontextmanager
 from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -35,22 +36,24 @@ class ChatCompletionRequest(BaseModel):
     stream: Optional[bool] = False
     temperature: Optional[float] = 0.7
 
-app = FastAPI(
-    title="GuardShield AI — Real-Time Sidecar Proxy",
-    description="Dual-stage sidecar proxy for prompt injection defense & real-time streaming hallucination detection.",
-    version="1.0.0"
-)
-
 # Global Filter Engines
 prescan_filter: Optional[PreScanSecurityFilter] = None
 entropy_engine = StreamingEntropyEngine(spike_threshold=1.20, consecutive_spike_limit=2)
 
-@app.on_event("startup")
-def load_security_engines():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global prescan_filter
     logger.info("Initializing GuardShield Pre-Scan Security Filter...")
     prescan_filter = PreScanSecurityFilter()
     logger.info("GuardShield Sidecar Proxy Server initialized successfully.")
+    yield
+
+app = FastAPI(
+    title="GuardShield AI — Real-Time Sidecar Proxy",
+    description="Dual-stage sidecar proxy for prompt injection defense & real-time streaming hallucination detection.",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 @app.get("/health")
 def health_check():

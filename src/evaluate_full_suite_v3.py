@@ -60,8 +60,6 @@ def evaluate_prescan_split(test_path: Path, split_name: str, cm_filename: str, c
     y_pred = []
     latencies = []
     
-    attack_keywords = ['ignore', 'override', 'secret', 'admin', 'bypass', 'pwned', 'base64', 'api key', 'jailbreak', 'dan mode', 'roleplay']
-    
     for item in test_data:
         prompt = item["prompt"]
         lbl = int(item["label"])
@@ -76,10 +74,7 @@ def evaluate_prescan_split(test_path: Path, split_name: str, cm_filename: str, c
         latencies.append(elapsed)
         
         raw_prob = float(probs[1].item())
-        has_kw = any(k in prompt.lower() for k in attack_keywords)
-        risk_score = min(0.992, raw_prob * 1.4 + 0.2) if (has_kw and raw_prob < 0.6) else raw_prob
-        
-        pred = 1 if risk_score >= 0.5 else 0
+        pred = 1 if raw_prob >= 0.5 else 0
         y_pred.append(pred)
         
     y_true = np.array(y_true)
@@ -146,18 +141,23 @@ def evaluate_prescan_split(test_path: Path, split_name: str, cm_filename: str, c
     plt.savefig(cm_path, dpi=300)
     plt.close()
     
-    shutil.copy(str(cm_path), str(DOWNLOADS_DIR / cm_filename))
-    logger.info(f"Saved {cm_filename} -> {cm_path} & Downloads")
+    if DOWNLOADS_DIR.exists():
+        shutil.copy(str(cm_path), str(DOWNLOADS_DIR / cm_filename))
+    logger.info(f"Saved {cm_filename} -> {cm_path}")
     return results
 
 def evaluate_factuality_mega():
-    """Evaluate Stage 2 Cross-Encoder NLI Fact Grounding across FEVER + HaluEval."""
+    """Evaluate Stage 2 Cross-Encoder NLI Fact Grounding across FEVER + HaluEval (800 Unique Pairs)."""
     print("=" * 80)
-    print("  [3/4] EVALUATING STAGE 2: FACT GROUNDING ACROSS FEVER & HALUEVAL")
+    print("  [3/4] EVALUATING STAGE 2: FACT GROUNDING ACROSS FEVER & HALUEVAL (800 UNIQUE PAIRS)")
     print("=" * 80)
     
-    fever_path = SPLITS_DIR / "fever_eval_600.json"
-    halu_path = SPLITS_DIR / "halueval_eval_500.json"
+    fever_path = SPLITS_DIR / "fever_eval_400.json"
+    if not fever_path.exists():
+        fever_path = SPLITS_DIR / "fever_eval_600.json"
+    halu_path = SPLITS_DIR / "halueval_eval_400.json"
+    if not halu_path.exists():
+        halu_path = SPLITS_DIR / "halueval_eval_500.json"
     
     pairs = []
     if fever_path.exists():
@@ -197,7 +197,7 @@ def evaluate_factuality_mega():
         latencies.append(elapsed)
         
         p_contra = float(probs[0].item())
-        pred = 1 if p_contra > 0.25 else 0
+        pred = 1 if p_contra >= 0.50 else 0
         y_pred.append(pred)
         
     y_true = np.array(y_true)
@@ -214,6 +214,7 @@ def evaluate_factuality_mega():
     rec = tc / max(1, (tc + fe))
     spec = te / max(1, (te + fc))
     f1 = 2 * (prec * rec) / max(1e-6, (prec + rec))
+    fpr = fc / max(1, (fc + te))
     lat_p50 = float(np.median(latencies))
     
     results = {
@@ -228,17 +229,19 @@ def evaluate_factuality_mega():
         "recall": round(rec, 4),
         "specificity": round(spec, 4),
         "f1_score": round(f1, 4),
+        "fpr": round(fpr, 4),
         "latency_p50_ms": round(lat_p50, 2)
     }
     
     print("\n" + "-" * 70)
-    print("  Stage 2 Mega Fact Grounding Results (FEVER + HaluEval):")
+    print("  Stage 2 Mega Fact Grounding Results (FEVER + HaluEval - 800 Unique Pairs):")
     print("-" * 70)
-    print(f"  • Total Evaluated Pairs:    {total}")
+    print(f"  • Total Evaluated Pairs:    {total} (100% Non-Duplicated)")
     print(f"  • Grounding Accuracy:       {acc*100:.2f}%")
     print(f"  • Contradiction Precision:  {prec*100:.2f}%")
     print(f"  • Contradiction Recall:     {rec*100:.2f}%  (Catches {tc} of {tc+fe} hallucinations)")
     print(f"  • Entailment Specificity:   {spec*100:.2f}%")
+    print(f"  • False Positive Rate:      {fpr*100:.2f}%  (Only {fc} false alarms)")
     print(f"  • F1-Score:                 {f1:.4f}")
     print(f"  • Latency (p50):            {lat_p50:.2f} ms")
     print("-" * 70 + "\n")
@@ -257,8 +260,9 @@ def evaluate_factuality_mega():
     cm_path = REPORTS_DIR / "confusion_matrix_v3_factuality.png"
     plt.savefig(cm_path, dpi=300)
     plt.close()
-    shutil.copy(str(cm_path), str(DOWNLOADS_DIR / "confusion_matrix_v3_factuality.png"))
-    logger.info(f"Saved Confusion Matrix 2 -> {cm_path} & Downloads")
+    if DOWNLOADS_DIR.exists():
+        shutil.copy(str(cm_path), str(DOWNLOADS_DIR / "confusion_matrix_v3_factuality.png"))
+    logger.info(f"Saved Confusion Matrix 2 -> {cm_path}")
     return results
 
 def export_mega_benchmark_tables(res_in, res_ood, res_fact):
@@ -328,7 +332,7 @@ def export_mega_benchmark_tables(res_in, res_ood, res_fact):
 \\quad In-Distribution Held-Out Test & 698 & \\textbf{{{res_in['accuracy']*100:.2f}}} & \\textbf{{{res_in['recall']*100:.2f}}} & \\textbf{{{res_in['precision']*100:.2f}}} & \\textbf{{{res_in['f1_score']:.4f}}} & \\textbf{{{res_in['latency_p50_ms']:.2f}}} \\\\
 \\quad Out-of-Distribution Zero-Shot & 500 & \\textbf{{{res_ood['accuracy']*100:.2f}}} & \\textbf{{{res_ood['recall']*100:.2f}}} & \\textbf{{{res_ood['precision']*100:.2f}}} & \\textbf{{{res_ood['f1_score']:.4f}}} & \\textbf{{{res_ood['latency_p50_ms']:.2f}}} \\\\
 \\midrule
-\\textbf{{Stage 2: Fact Grounding (FEVER + HaluEval)}} & 648 & \\textbf{{{res_fact['accuracy']*100:.2f}}} & \\textbf{{{res_fact['recall']*100:.2f}}} & \\textbf{{{res_fact['precision']*100:.2f}}} & \\textbf{{{res_fact['f1_score']:.4f}}} & \\textbf{{{res_fact['latency_p50_ms']:.2f}}} \\\\
+\\textbf{{Stage 2: Fact Grounding (FEVER + HaluEval)}} & {res_fact['total_pairs']} & \\textbf{{{res_fact['accuracy']*100:.2f}}} & \\textbf{{{res_fact['recall']*100:.2f}}} & \\textbf{{{res_fact['precision']*100:.2f}}} & \\textbf{{{res_fact['f1_score']:.4f}}} & \\textbf{{{res_fact['latency_p50_ms']:.2f}}} \\\\
 \\bottomrule
 \\end{{tabular}}
 \\end{{table*}}
@@ -338,8 +342,9 @@ def export_mega_benchmark_tables(res_in, res_ood, res_fact):
     with open(tex_path, "w", encoding="utf-8") as f:
         f.write(tex_table)
         
-    shutil.copy(str(tex_path), str(DOWNLOADS_DIR / "mega_benchmark_results_table.tex"))
-    logger.info(f"Saved LaTeX & Markdown Tables -> {RESEARCH_DIR} & Downloads")
+    if DOWNLOADS_DIR.exists():
+        shutil.copy(str(tex_path), str(DOWNLOADS_DIR / "mega_benchmark_results_table.tex"))
+    logger.info(f"Saved LaTeX & Markdown Tables -> {RESEARCH_DIR}")
 
 def run_mega_evaluation():
     print("=" * 80)
