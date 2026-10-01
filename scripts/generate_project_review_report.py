@@ -75,7 +75,7 @@ def build_project_review_report():
     p_rep = doc.add_paragraph()
     p_rep.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_rep.paragraph_format.space_after = Pt(2)
-    r_rep = p_rep.add_run('PROJECT REVIEW & PROGRESS REPORT')
+    r_rep = p_rep.add_run('PROJECT PROGRESS REPORT')
     r_rep.font.name = 'Calibri'
     r_rep.font.size = Pt(14)
     r_rep.font.bold = True
@@ -406,27 +406,31 @@ def build_project_review_report():
 
     # Output Paths
     base_dir = Path(__file__).resolve().parent.parent
-    docs_docx = base_dir / "docs" / "01 Reports" / "Project Review Report.docx"
-    docs_pdf = base_dir / "docs" / "01 Reports" / "Project Review Report.pdf"
-    docs_md = base_dir / "docs" / "01 Reports" / "Project Review Report.md"
+    docs_review_docx = base_dir / "docs" / "01 Reports" / "Project Review Report.docx"
+    docs_review_pdf = base_dir / "docs" / "01 Reports" / "Project Review Report.pdf"
+    docs_review_md = base_dir / "docs" / "01 Reports" / "Project Review Report.md"
     
-    downloads_docx = Path.home() / "Downloads" / "GuardShield_AI_Project_Review_Report.docx"
-    downloads_pdf = Path.home() / "Downloads" / "GuardShield_AI_Project_Review_Report.pdf"
+    docs_progress_docx = base_dir / "docs" / "01 Reports" / "Project Progress Report.docx"
+    docs_progress_pdf = base_dir / "docs" / "01 Reports" / "Project Progress Report.pdf"
+    docs_progress_md = base_dir / "docs" / "01 Reports" / "Project Progress Report.md"
 
-    # Also update the existing Project Progress Report files so both names are fully synchronized
-    legacy_docx = base_dir / "docs" / "01 Reports" / "Project Progress Report.docx"
-    legacy_pdf = base_dir / "docs" / "01 Reports" / "Project Progress Report.pdf"
+    downloads_dir = Path.home() / "Downloads"
+    dl_progress_docx = downloads_dir / "GuardShield_AI_Project_Progress_Report.docx"
+    dl_progress_pdf = downloads_dir / "GuardShield_AI_Project_Progress_Report.pdf"
+    dl_review_docx = downloads_dir / "GuardShield_AI_Project_Review_Report.docx"
+    dl_review_pdf = downloads_dir / "GuardShield_AI_Project_Review_Report.pdf"
 
     # Save Word DOCX
-    doc.save(docs_docx)
-    doc.save(legacy_docx)
-    if downloads_docx.parent.exists():
-        doc.save(downloads_docx)
-    print(f"✅ Saved Project Review DOCX at:\n   - {docs_docx}\n   - {downloads_docx}")
+    doc.save(docs_review_docx)
+    doc.save(docs_progress_docx)
+    if downloads_dir.exists():
+        doc.save(dl_progress_docx)
+        doc.save(dl_review_docx)
+    print(f"✅ Saved Project Progress Report DOCX at:\n   - {docs_progress_docx}\n   - {dl_progress_docx}")
 
     # Generate Markdown Version
     md_content = f"""# AMITY SCHOOL OF ENGINEERING & TECHNOLOGY
-## PROJECT REVIEW & PROGRESS REPORT
+## PROJECT PROGRESS REPORT
 **B. Tech (Computer Science and Engineering - AIML) | 4th Year / 7th Semester**
 **Academic Session:** 2026–2027
 
@@ -502,9 +506,11 @@ Faculty Guide, Dept. of Computer Science & Engineering
 Amity School of Engineering & Technology (ASET)  
 Date: ________________________  
 """
-    with open(docs_md, "w", encoding="utf-8") as f:
+    with open(docs_progress_md, "w", encoding="utf-8") as f:
         f.write(md_content)
-    print(f"✅ Saved Project Review Markdown at:\n   - {docs_md}")
+    with open(docs_review_md, "w", encoding="utf-8") as f:
+        f.write(md_content)
+    print(f"✅ Saved Project Progress Report Markdown at:\n   - {docs_progress_md}")
 
     # Convert to PDF via MS Word COM Automation
     try:
@@ -512,15 +518,16 @@ Date: ________________________
         word = win32com.client.Dispatch("Word.Application")
         word.Visible = False
         
-        doc_in = word.Documents.Open(os.path.abspath(docs_docx))
-        doc_in.SaveAs(os.path.abspath(docs_pdf), FileFormat=17) # 17 = wdFormatPDF
-        doc_in.SaveAs(os.path.abspath(legacy_pdf), FileFormat=17)
+        doc_in = word.Documents.Open(os.path.abspath(docs_progress_docx))
+        doc_in.SaveAs(os.path.abspath(docs_progress_pdf), FileFormat=17) # 17 = wdFormatPDF
+        doc_in.SaveAs(os.path.abspath(docs_review_pdf), FileFormat=17)
         doc_in.Close()
         
-        if downloads_pdf.parent.exists():
-            shutil.copy(docs_pdf, downloads_pdf)
+        if dl_progress_pdf.parent.exists():
+            shutil.copy(docs_progress_pdf, dl_progress_pdf)
+            shutil.copy(docs_progress_pdf, dl_review_pdf)
         word.Quit()
-        print(f"✅ Successfully converted and saved Project Review PDF at:\n   - {docs_pdf}\n   - {downloads_pdf}")
+        print(f"✅ Successfully converted and saved Project Progress Report PDF at:\n   - {docs_progress_pdf}\n   - {dl_progress_pdf}")
     except Exception as e:
         print(f"⚠️ PDF Conversion note: {e}")
 

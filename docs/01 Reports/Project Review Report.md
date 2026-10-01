@@ -1,5 +1,5 @@
 # AMITY SCHOOL OF ENGINEERING & TECHNOLOGY
-## PROJECT REVIEW & PROGRESS REPORT
+## PROJECT PROGRESS REPORT
 **B. Tech (Computer Science and Engineering - AIML) | 4th Year / 7th Semester**
 **Academic Session:** 2026–2027
 
