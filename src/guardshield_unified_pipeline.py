@@ -642,7 +642,11 @@ class GuardShieldPipeline:
                 }
             }
         else:
-            print("\n✅ [SAFE & FACTUALLY VERIFIED OUTPUT DELIVERED]")
+            if nli_decision == "FACTUALLY_CONSISTENT_REFUTATION":
+                print("\n✅ [SAFE & FACTUALLY CONSISTENT REFUTATION DELIVERED]")
+                print("  The model correctly identified and refuted a false presupposition without contradicting verified facts.")
+            else:
+                print("\n✅ [SAFE & FACTUALLY VERIFIED OUTPUT DELIVERED]")
             print(f"  Output: {raw_output_text}")
             print("=" * 80)
 

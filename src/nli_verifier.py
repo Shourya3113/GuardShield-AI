@@ -77,10 +77,13 @@ class WindowedNLIVerifier:
             worst["hypothesis"] = hypothesis
             return worst
 
-        # 2. At least one sentence entails the premise, and no contradictions exist
-        entailments = [r for r in sent_results if r["decision"] == "FACTUAL_ENTAILMENT"]
-        if entailments:
-            best = max(entailments, key=lambda r: r["entailment_prob"])
+        # 2. At least one sentence entails the premise or is a valid refutation, and no contradictions exist
+        valid_factual = [
+            r for r in sent_results 
+            if r["decision"] in ("FACTUAL_ENTAILMENT", "FACTUALLY_CONSISTENT_REFUTATION")
+        ]
+        if valid_factual:
+            best = max(valid_factual, key=lambda r: (r["decision"] == "FACTUAL_ENTAILMENT", r["entailment_prob"]))
             best["latency_ms"] = round((time.perf_counter() - start_time) * 1000.0, 2)
             best["hypothesis"] = hypothesis
             return best
@@ -122,9 +125,10 @@ class WindowedNLIVerifier:
         p_neutral = float(probs[2].item()) if len(probs) > 2 else 0.0
 
         # Rigorous Factual Verification:
-        # A claim is only Factual if p_entailment meets threshold.
+        # A claim is Factual if p_entailment meets threshold.
         # If contradiction >= threshold -> Direct Contradiction
-        # If neutral is dominant & entailment < 0.40 -> Ungrounded Speculation / Hallucination
+        # If negative refutation of a non-existent entity with low contradiction -> Factually Consistent Refutation
+        # If neutral is dominant & ungrounded affirmative speculation -> Ungrounded Neutral Hallucination
         if p_contradiction >= self.threshold:
             decision = "HALLUCINATION_CONTRADICTION"
             is_hallucination = True
@@ -132,9 +136,20 @@ class WindowedNLIVerifier:
             decision = "FACTUAL_ENTAILMENT"
             is_hallucination = False
         else:
-            # Ungrounded / Neutral claim not substantiated by premise (e.g., "Capital of Mars is Alhussein")
-            decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
-            is_hallucination = True
+            # Check for negative refutation of false presuppositions
+            # (e.g., "There is no capital of Mars as it is a planet, not a country")
+            import re
+            is_refutation = bool(re.search(
+                r'\b(?:there is no|there are no|has no|have no|does not have|do not have|is not a|are not a|not a country|no capital|doesn\'t have|isn\'t a|cannot have|no evidence)\b',
+                hypothesis,
+                re.IGNORECASE
+            ))
+            if is_refutation and p_contradiction < 0.15:
+                decision = "FACTUALLY_CONSISTENT_REFUTATION"
+                is_hallucination = False
+            else:
+                decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
+                is_hallucination = True
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 
