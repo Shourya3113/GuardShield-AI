@@ -285,13 +285,25 @@ class GuardShieldPipeline:
         clean_prompt = re.sub(r'[^\w\s]', '', clean_prompt).strip()
 
         search_candidates = []
-        if clean_prompt:
+        # Extract named entities from prompt (e.g. 'ChatGPT' in 'Is ChatGPT made by Anthropic?')
+        prompt_entities = [w for w in re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b', prompt) if len(w) > 2 and w.lower() not in ['what', 'where', 'when', 'which', 'who', 'how', 'why']]
+        if prompt_entities:
+            search_candidates.append(prompt_entities[0])
+
+        if clean_prompt and clean_prompt not in search_candidates:
             search_candidates.append(clean_prompt)
+
+        for pe in prompt_entities[1:]:
+            if pe not in search_candidates:
+                search_candidates.append(pe)
+
         if generated_text:
             words = [w for w in re.findall(r'\b[A-Z][a-zA-Z]+\b', generated_text) if len(w) > 2]
             if words:
-                search_candidates.append(words[-1])
-                search_candidates.append(" ".join(words[-2:]))
+                if words[0] not in search_candidates:
+                    search_candidates.append(words[0])
+                if words[-1] not in search_candidates:
+                    search_candidates.append(words[-1])
 
         headers = {'User-Agent': 'GuardShieldAI-Sidecar/1.0 (Academic Verification Tool)'}
 
