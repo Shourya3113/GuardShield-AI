@@ -33,6 +33,16 @@ if hasattr(sys.stdout, 'reconfigure'):
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+# Compatibility patch for remote code models (e.g. Phi-3.5) on newer transformers (>= 4.44)
+try:
+    from transformers.cache_utils import Cache, DynamicCache
+    if not hasattr(DynamicCache, "get_usable_length"):
+        DynamicCache.get_usable_length = lambda self, new_seq_length=None, layer_idx=0: self.get_seq_length(layer_idx)
+    if not hasattr(Cache, "get_usable_length"):
+        Cache.get_usable_length = lambda self, new_seq_length=None, layer_idx=0: self.get_seq_length(layer_idx)
+except Exception:
+    pass
+
 # Add src to path
 SRC_DIR = Path(__file__).resolve().parent
 if str(SRC_DIR) not in sys.path:
@@ -183,25 +193,59 @@ class GuardShieldPipeline:
         print(f"\n[2/3] Loading Generative Backbone ({resolved_name}) with Entropy Hooks...")
         t0 = time.time()
         dtype = torch.float16 if self.device == "cuda" else torch.float32
+        tok_kwargs = {"trust_remote_code": True}
+        try:
+            from huggingface_hub import try_to_load_from_cache
+            if isinstance(try_to_load_from_cache(resolved_name, "tokenizer_config.json"), str):
+                tok_kwargs["local_files_only"] = True
+        except Exception:
+            pass
 
-        self.gen_tokenizer = AutoTokenizer.from_pretrained(resolved_name, trust_remote_code=True)
+        self.gen_tokenizer = AutoTokenizer.from_pretrained(resolved_name, **tok_kwargs)
         if self.gen_tokenizer.pad_token_id is None:
             self.gen_tokenizer.pad_token = self.gen_tokenizer.eos_token
+
+        model_kwargs = {
+            "trust_remote_code": True,
+        }
+        if "phi" in resolved_name.lower():
+            model_kwargs["attn_implementation"] = "eager"
+
+        try:
+            from huggingface_hub import try_to_load_from_cache
+            if isinstance(try_to_load_from_cache(resolved_name, "config.json"), str):
+                model_kwargs["local_files_only"] = True
+        except Exception:
+            pass
 
         try:
             self.gen_model = AutoModelForCausalLM.from_pretrained(
                 resolved_name,
-                torch_dtype=dtype,
-                trust_remote_code=True
+                dtype=dtype,
+                **model_kwargs
             ).to(self.device)
-        except Exception as e:
-            print(f"      Direct VRAM note: {e}. Attempting auto device mapping...")
+        except TypeError:
             self.gen_model = AutoModelForCausalLM.from_pretrained(
                 resolved_name,
                 torch_dtype=dtype,
-                device_map="auto",
-                trust_remote_code=True
-            )
+                **model_kwargs
+            ).to(self.device)
+        except Exception as e:
+            print(f"      Direct VRAM note: {e}. Attempting auto device mapping...")
+            try:
+                self.gen_model = AutoModelForCausalLM.from_pretrained(
+                    resolved_name,
+                    dtype=dtype,
+                    device_map="auto",
+                    **model_kwargs
+                )
+            except TypeError:
+                self.gen_model = AutoModelForCausalLM.from_pretrained(
+                    resolved_name,
+                    torch_dtype=dtype,
+                    device_map="auto",
+                    **model_kwargs
+                )
 
         self.gen_model.eval()
         self.gen_model_name = resolved_name
@@ -406,7 +450,8 @@ class GuardShieldPipeline:
         else:
             formatted_prompt = prompt
 
-        input_ids = self.gen_tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(self.device)
+        gen_device = getattr(self.gen_model, "device", None) or next(self.gen_model.parameters()).device
+        input_ids = self.gen_tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(gen_device)
         current_ids = input_ids
 
         generated_tokens = []
@@ -419,7 +464,7 @@ class GuardShieldPipeline:
 
         for step in range(max_new_tokens):
             with torch.no_grad():
-                outputs = self.gen_model(current_ids)
+                outputs = self.gen_model(current_ids, use_cache=False)
                 next_logits = outputs.logits[:, -1, :]
                 probs = torch.softmax(next_logits, dim=-1)[0]
                 top3_p, top3_idx = torch.topk(probs, 3)
@@ -436,7 +481,7 @@ class GuardShieldPipeline:
 
                 status_str = "TERMINATE_EARLY" if consecutive_spikes >= self.consecutive_spikes_limit else ("WARN_SPIKE" if is_spike else "OK")
 
-                next_token_id = top3_idx[0].view(1, 1)
+                next_token_id = top3_idx[0].view(1, 1).to(gen_device)
                 token_str = self.gen_tokenizer.decode(next_token_id[0])
                 clean_tok = token_str.replace("\n", "\\n").strip() or "<sp>"
 
@@ -454,11 +499,23 @@ class GuardShieldPipeline:
                     early_terminated = True
                     break
 
-                if next_token_id.item() == self.gen_tokenizer.eos_token_id or "<|im_end|>" in token_str:
+                if next_token_id.item() == self.gen_tokenizer.eos_token_id or any(eos in token_str for eos in ["<|im_end|>", "<|end|>", "<|endoftext|>"]):
                     break
 
         gen_latency = (time.perf_counter() - gen_start) * 1000.0
-        raw_output_text = "".join(generated_tokens).replace("<|im_end|>", "").strip()
+
+        # Decode the generated token ids as a cohesive sequence to preserve proper token spacing across architectures
+        new_token_ids = current_ids[0][input_ids.shape[1]:]
+        raw_output_text = self.gen_tokenizer.decode(new_token_ids, skip_special_tokens=True).strip()
+        if not raw_output_text:
+            raw_output_text = "".join(generated_tokens).replace("<|im_end|>", "").replace("<|end|>", "").replace("<|endoftext|>", "").strip()
+
+        # If generation halted due to max_token budget leaving an incomplete trailing snippet, trim to last complete sentence
+        last_punct = max(raw_output_text.rfind('.'), raw_output_text.rfind('!'), raw_output_text.rfind('?'))
+        if last_punct > 0 and len(raw_output_text) - last_punct < 30:
+            trailing = raw_output_text[last_punct + 1:].strip()
+            if len(trailing.split()) < 4:
+                raw_output_text = raw_output_text[:last_punct + 1].strip()
 
         # Optional synthetic test injection to demonstrate hallucination suppression
         if inject_synthetic_hallucination:
@@ -482,8 +539,8 @@ class GuardShieldPipeline:
 
         if premise:
             print(f"  • Grounding Premise:    {repr(premise[:120])}{'...' if len(premise) > 120 else ''}")
-            # Verify hypothesis against reference premise
-            nli_res = self.nli.verify_entailment(premise, raw_output_text)
+            # Verify hypothesis against reference premise using claim-level windowed NLI
+            nli_res = self.nli.verify_claim(premise, raw_output_text)
             is_hallucination = nli_res["is_hallucination"]
             entail_prob = nli_res["entailment_prob"]
             contra_prob = nli_res["contradiction_prob"]

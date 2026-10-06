@@ -48,8 +48,59 @@ class WindowedNLIVerifier:
         logger.info("NLIVerifier Ready (GPU Warmup Completed).")
 
     def verify_claim(self, premise: str, hypothesis: str) -> Dict[str, Any]:
-        """Alias for verify_entailment."""
-        return self.verify_entailment(premise, hypothesis)
+        """
+        Runs claim-level windowed NLI verification.
+        Splits multi-sentence hypotheses into declarative windows so that
+        the core answer is verified even if additional context or elaboration follows.
+        """
+        import re
+        raw_sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', hypothesis) if s.strip()]
+        # Discard fragments that have fewer than 3 words and lack terminal punctuation
+        sentences = [
+            s for s in raw_sentences 
+            if len(s.split()) >= 3 or s.endswith(('.', '!', '?'))
+        ]
+        if not sentences:
+            sentences = raw_sentences
+
+        if len(sentences) <= 1:
+            return self.verify_entailment(premise, sentences[0] if sentences else hypothesis)
+
+        start_time = time.perf_counter()
+        sent_results = [self.verify_entailment(premise, s) for s in sentences]
+
+        # 1. Any sentence directly contradicting the premise marks a hallucination
+        contradictions = [r for r in sent_results if r["is_contradiction"]]
+        if contradictions:
+            worst = max(contradictions, key=lambda r: r["contradiction_prob"])
+            worst["latency_ms"] = round((time.perf_counter() - start_time) * 1000.0, 2)
+            worst["hypothesis"] = hypothesis
+            return worst
+
+        # 2. At least one sentence entails the premise, and no contradictions exist
+        entailments = [r for r in sent_results if r["decision"] == "FACTUAL_ENTAILMENT"]
+        if entailments:
+            best = max(entailments, key=lambda r: r["entailment_prob"])
+            best["latency_ms"] = round((time.perf_counter() - start_time) * 1000.0, 2)
+            best["hypothesis"] = hypothesis
+            return best
+
+        # 3. None entail and none contradict -> Ungrounded Neutral
+        avg_contra = sum(r["contradiction_prob"] for r in sent_results) / len(sent_results)
+        avg_entail = sum(r["entailment_prob"] for r in sent_results) / len(sent_results)
+        avg_neutral = sum(r["neutral_prob"] for r in sent_results) / len(sent_results)
+        elapsed_ms = (time.perf_counter() - start_time) * 1000.0
+        return {
+            "premise": premise,
+            "hypothesis": hypothesis,
+            "decision": "UNGROUNDED_NEUTRAL_HALLUCINATION",
+            "is_hallucination": True,
+            "is_contradiction": False,
+            "entailment_prob": round(avg_entail, 4),
+            "contradiction_prob": round(avg_contra, 4),
+            "neutral_prob": round(avg_neutral, 4),
+            "latency_ms": round(elapsed_ms, 2)
+        }
 
     def verify_entailment(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
