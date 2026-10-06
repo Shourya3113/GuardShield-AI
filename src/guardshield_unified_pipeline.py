@@ -151,8 +151,8 @@ class GuardShieldPipeline:
     def __init__(
         self,
         gen_model_name: str = "Qwen/Qwen2.5-0.5B-Instruct",
-        entropy_threshold: float = 1.35,
-        consecutive_spikes_limit: int = 2,
+        entropy_threshold: float = 1.40,
+        consecutive_spikes_limit: int = 3,
         prescan_threshold: float = 0.50,
         nli_threshold: float = 0.50,
         device: Optional[str] = None
@@ -746,15 +746,20 @@ def print_available_models(current_model: Optional[str] = None):
     print("  (You can also pass any custom HuggingFace model repo ID)")
 
 
-def run_interactive_mode(initial_model: Optional[str] = None):
+def run_interactive_mode(
+    initial_model: Optional[str] = None,
+    entropy_threshold: float = 1.40,
+    consecutive_spikes: int = 3
+):
     """Runs an interactive CLI loop where the user can test any prompt live with model selection."""
     print("\n" + "=" * 80)
     print("  GuardShield AI — Interactive Real-Time Sidecar Shell")
     print("  Type any prompt to run through Ingress Pre-Scan -> Entropy -> Fact-Check")
     print("  Commands:")
-    print("    • /model <name|#|alias> -> Switch active generative model (e.g. /model gpt2)")
-    print("    • /models               -> List available model presets")
-    print("    • exit / quit           -> Exit shell")
+    print("    • /model <name|#|alias>    -> Switch active generative model (e.g. /model gpt2)")
+    print("    • /models                  -> List available model presets")
+    print("    • /tune <threshold> [spk]  -> Tune entropy limit & consecutive spikes (e.g. /tune 1.45 3)")
+    print("    • exit / quit              -> Exit shell")
     print("=" * 80)
 
     selected_model = initial_model
@@ -765,12 +770,16 @@ def run_interactive_mode(initial_model: Optional[str] = None):
     else:
         selected_model = resolve_model_name(selected_model)
 
-    pipeline = GuardShieldPipeline(gen_model_name=selected_model)
+    pipeline = GuardShieldPipeline(
+        gen_model_name=selected_model,
+        entropy_threshold=entropy_threshold,
+        consecutive_spikes_limit=consecutive_spikes
+    )
 
     while True:
         try:
             print("\n" + "-" * 80)
-            print(f"🤖 [Active Generative Model: {pipeline.gen_model_name}]")
+            print(f"🤖 [Active Model: {pipeline.gen_model_name} | Entropy H(x) limit: {pipeline.entropy_threshold} bits, Spikes: {pipeline.consecutive_spikes_limit}]")
             user_input = input("Enter prompt > ").strip()
             if not user_input:
                 continue
@@ -790,6 +799,18 @@ def run_interactive_mode(initial_model: Optional[str] = None):
                 print_available_models(pipeline.gen_model_name)
                 continue
 
+            # Command: Tune entropy threshold on the fly
+            if user_input.startswith("/tune "):
+                parts = user_input.split()[1:]
+                try:
+                    pipeline.entropy_threshold = float(parts[0])
+                    if len(parts) > 1:
+                        pipeline.consecutive_spikes_limit = int(parts[1])
+                    print(f"✅ Tuned: entropy_threshold = {pipeline.entropy_threshold} bits, consecutive_spikes_limit = {pipeline.consecutive_spikes_limit}")
+                except Exception as ex:
+                    print(f"⚠️ Usage: /tune <threshold_float> [consecutive_spikes_int] (Error: {ex})")
+                continue
+
             context_input = input("Optional reference context (press Enter to auto-retrieve) > ").strip()
             ctx = context_input if context_input else None
 
@@ -805,6 +826,8 @@ if __name__ == "__main__":
     parser.add_argument("--context", type=str, default=None, help="Optional reference context premise")
     parser.add_argument("--model", "-m", type=str, default=None, help="Generative model name or alias (e.g. qwen, gpt2, phi3, tinyllama)")
     parser.add_argument("--list-models", action="store_true", help="List available generative model presets and exit")
+    parser.add_argument("--entropy-threshold", type=float, default=1.40, help="Normalized Shannon entropy spike threshold in bits (default: 1.40)")
+    parser.add_argument("--consecutive-spikes", type=int, default=3, help="Consecutive entropy spikes to trigger early termination (default: 3)")
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive prompt shell")
     parser.add_argument("--suite", action="store_true", help="Run full 4-scenario demonstration suite")
     parser.add_argument("--inject-hallucination", action="store_true", help="Simulate a hallucination to test correction")
@@ -818,9 +841,17 @@ if __name__ == "__main__":
     chosen_model = resolve_model_name(args.model) if args.model else "Qwen/Qwen2.5-0.5B-Instruct"
 
     if args.interactive:
-        run_interactive_mode(initial_model=args.model)
+        run_interactive_mode(
+            initial_model=args.model,
+            entropy_threshold=args.entropy_threshold,
+            consecutive_spikes=args.consecutive_spikes
+        )
     elif args.prompt:
-        pipeline = GuardShieldPipeline(gen_model_name=chosen_model)
+        pipeline = GuardShieldPipeline(
+            gen_model_name=chosen_model,
+            entropy_threshold=args.entropy_threshold,
+            consecutive_spikes_limit=args.consecutive_spikes
+        )
         pipeline.run(
             prompt=args.prompt,
             reference_context=args.context,
