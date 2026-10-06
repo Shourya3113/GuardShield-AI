@@ -218,32 +218,47 @@ class GuardShieldPipeline:
         except Exception:
             pass
 
+        # Proactively apply device_map="auto" on GPUs with < 6GB VRAM for models > 2B params
+        # This prevents an initial OutOfMemory crash and eliminates 60+ seconds of retry overhead
+        need_auto_map = False
+        if self.device == "cuda" and torch.cuda.is_available():
+            total_vram_gb = torch.cuda.get_device_properties(0).total_memory / (1024 ** 3)
+            is_large_model = any(k in resolved_name.lower() for k in ["3b", "7b", "8b", "phi-3", "llama"])
+            if total_vram_gb < 6.0 and is_large_model:
+                need_auto_map = True
+
+        if need_auto_map:
+            model_kwargs["device_map"] = "auto"
+
         try:
             self.gen_model = AutoModelForCausalLM.from_pretrained(
                 resolved_name,
                 dtype=dtype,
                 **model_kwargs
-            ).to(self.device)
+            )
+            if not need_auto_map:
+                self.gen_model = self.gen_model.to(self.device)
         except TypeError:
             self.gen_model = AutoModelForCausalLM.from_pretrained(
                 resolved_name,
                 torch_dtype=dtype,
                 **model_kwargs
-            ).to(self.device)
+            )
+            if not need_auto_map:
+                self.gen_model = self.gen_model.to(self.device)
         except Exception as e:
             print(f"      Direct VRAM note: {e}. Attempting auto device mapping...")
+            model_kwargs["device_map"] = "auto"
             try:
                 self.gen_model = AutoModelForCausalLM.from_pretrained(
                     resolved_name,
                     dtype=dtype,
-                    device_map="auto",
                     **model_kwargs
                 )
             except TypeError:
                 self.gen_model = AutoModelForCausalLM.from_pretrained(
                     resolved_name,
                     torch_dtype=dtype,
-                    device_map="auto",
                     **model_kwargs
                 )
 
