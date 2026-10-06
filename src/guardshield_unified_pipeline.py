@@ -90,6 +90,47 @@ DEFAULT_KNOWLEDGE_BASE = {
 }
 
 
+# ------------------------------------------------------------------------------
+# Available Generative Backbone Model Presets
+# ------------------------------------------------------------------------------
+AVAILABLE_MODELS = {
+    "1": {
+        "id": "Qwen/Qwen2.5-0.5B-Instruct",
+        "name": "Qwen2.5-0.5B-Instruct",
+        "desc": "Default: High speed, low VRAM (~1.0GB), high chat precision",
+        "aliases": ["qwen", "qwen2.5", "qwen-0.5b", "1"]
+    },
+    "2": {
+        "id": "gpt2",
+        "name": "GPT-2 Base (124M)",
+        "desc": "Ultra-lightweight baseline (~0.3GB VRAM, raw completion)",
+        "aliases": ["gpt2", "gpt-2", "2"]
+    },
+    "3": {
+        "id": "microsoft/Phi-3.5-mini-instruct",
+        "name": "Phi-3.5-mini-instruct (3.8B)",
+        "desc": "Deep reasoning backbone (auto device-mapped for laptops)",
+        "aliases": ["phi", "phi3", "phi-3.5", "3"]
+    },
+    "4": {
+        "id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+        "name": "TinyLlama-1.1B-Chat",
+        "desc": "Compact 1.1B parameter open-source chat model (~2.0GB VRAM)",
+        "aliases": ["tinyllama", "tiny-llama", "llama-1b", "4"]
+    }
+}
+
+def resolve_model_name(name_or_alias: Optional[str]) -> str:
+    """Resolves friendly alias (e.g. 'gpt2', 'qwen', '1') to full HuggingFace model ID."""
+    if not name_or_alias or not str(name_or_alias).strip():
+        return "Qwen/Qwen2.5-0.5B-Instruct"
+    query = str(name_or_alias).strip()
+    for key, info in AVAILABLE_MODELS.items():
+        if query.lower() in info["aliases"] or query.lower() == info["id"].lower():
+            return info["id"]
+    return query
+
+
 class GuardShieldPipeline:
     """
     Unified GuardShield AI Pipeline.
@@ -124,20 +165,7 @@ class GuardShieldPipeline:
         print(f"      Stage 1 Pre-Scan Ready in {time.time() - t0:.2f}s.")
 
         # 2. Load Generative LLM with Logits Access
-        print(f"\n[2/3] Loading Generative Backbone ({gen_model_name}) with Entropy Hooks...")
-        t0 = time.time()
-        dtype = torch.float16 if self.device == "cuda" else torch.float32
-        self.gen_tokenizer = AutoTokenizer.from_pretrained(gen_model_name)
-        if self.gen_tokenizer.pad_token_id is None:
-            self.gen_tokenizer.pad_token = self.gen_tokenizer.eos_token
-
-        self.gen_model = AutoModelForCausalLM.from_pretrained(
-            gen_model_name,
-            torch_dtype=dtype
-        ).to(self.device)
-        self.gen_model.eval()
-        self.gen_model_name = gen_model_name
-        print(f"      Generative LLM Ready in {time.time() - t0:.2f}s.")
+        self._load_generative_model(gen_model_name)
 
         # 3. Load Stage 2 NLI Fact Verifier
         print("\n[3/3] Loading Stage 2 Windowed NLI Fact Verifier (Cross-Encoder)...")
@@ -148,6 +176,53 @@ class GuardShieldPipeline:
         print("\n" + "=" * 80)
         print("  Pipeline Ready. All subsystems initialized.")
         print("=" * 80 + "\n")
+
+    def _load_generative_model(self, model_name: str):
+        """Loads or initializes a generative model by name or alias."""
+        resolved_name = resolve_model_name(model_name)
+        print(f"\n[2/3] Loading Generative Backbone ({resolved_name}) with Entropy Hooks...")
+        t0 = time.time()
+        dtype = torch.float16 if self.device == "cuda" else torch.float32
+
+        self.gen_tokenizer = AutoTokenizer.from_pretrained(resolved_name, trust_remote_code=True)
+        if self.gen_tokenizer.pad_token_id is None:
+            self.gen_tokenizer.pad_token = self.gen_tokenizer.eos_token
+
+        try:
+            self.gen_model = AutoModelForCausalLM.from_pretrained(
+                resolved_name,
+                torch_dtype=dtype,
+                trust_remote_code=True
+            ).to(self.device)
+        except Exception as e:
+            print(f"      Direct VRAM note: {e}. Attempting auto device mapping...")
+            self.gen_model = AutoModelForCausalLM.from_pretrained(
+                resolved_name,
+                torch_dtype=dtype,
+                device_map="auto",
+                trust_remote_code=True
+            )
+
+        self.gen_model.eval()
+        self.gen_model_name = resolved_name
+        print(f"      Generative LLM Ready in {time.time() - t0:.2f}s.")
+
+    def switch_generative_model(self, new_model_name: str):
+        """Switches the active generative model on the fly during a session."""
+        resolved = resolve_model_name(new_model_name)
+        if hasattr(self, 'gen_model_name') and resolved == self.gen_model_name:
+            print(f"  [i] Model is already set to {resolved}.")
+            return
+        print(f"\n[🔄 MODEL SWITCH] Changing generative backbone to: {resolved}")
+        if hasattr(self, 'gen_model'):
+            del self.gen_model
+        if hasattr(self, 'gen_tokenizer'):
+            del self.gen_tokenizer
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        self._load_generative_model(resolved)
+        print(f"✅ Active model updated to: {resolved}\n")
+
 
     def _retrieve_wikipedia_grounding(self, prompt: str, generated_text: Optional[str] = None) -> Optional[Tuple[str, str]]:
         """
@@ -576,25 +651,60 @@ def run_pipeline_suite():
     print("=" * 80 + "\n")
 
 
-def run_interactive_mode():
-    """Runs an interactive CLI loop where the user can test any prompt live."""
+def print_available_models(current_model: Optional[str] = None):
+    """Prints a styled list of available model presets."""
+    print("\nAvailable Generative Backbone Models:")
+    print("-" * 80)
+    for k, info in AVAILABLE_MODELS.items():
+        is_active = f"  👉 [ACTIVE]" if current_model and current_model == info["id"] else ""
+        print(f"  [{k}] {info['name']:<28} | {info['desc']}{is_active}")
+    print("-" * 80)
+    print("  (You can also pass any custom HuggingFace model repo ID)")
+
+
+def run_interactive_mode(initial_model: Optional[str] = None):
+    """Runs an interactive CLI loop where the user can test any prompt live with model selection."""
     print("\n" + "=" * 80)
     print("  GuardShield AI — Interactive Real-Time Sidecar Shell")
     print("  Type any prompt to run through Ingress Pre-Scan -> Entropy -> Fact-Check")
-    print("  (Type 'exit', 'quit', or 'q' to stop)")
+    print("  Commands:")
+    print("    • /model <name|#|alias> -> Switch active generative model (e.g. /model gpt2)")
+    print("    • /models               -> List available model presets")
+    print("    • exit / quit           -> Exit shell")
     print("=" * 80)
 
-    pipeline = GuardShieldPipeline()
+    selected_model = initial_model
+    if not selected_model:
+        print_available_models()
+        choice = input(f"\nSelect model [1-{len(AVAILABLE_MODELS)}, press Enter for default '1']: ").strip()
+        selected_model = resolve_model_name(choice) if choice else "Qwen/Qwen2.5-0.5B-Instruct"
+    else:
+        selected_model = resolve_model_name(selected_model)
+
+    pipeline = GuardShieldPipeline(gen_model_name=selected_model)
 
     while True:
         try:
             print("\n" + "-" * 80)
+            print(f"🤖 [Active Generative Model: {pipeline.gen_model_name}]")
             user_input = input("Enter prompt > ").strip()
             if not user_input:
                 continue
             if user_input.lower() in ["exit", "quit", "q"]:
                 print("Exiting GuardShield interactive shell. Goodbye!")
                 break
+
+            # Command: Switch model
+            if user_input.startswith("/model ") or user_input.startswith("/switch "):
+                parts = user_input.split(" ", 1)
+                new_m = parts[1].strip()
+                pipeline.switch_generative_model(new_m)
+                continue
+
+            # Command: List models
+            if user_input.lower() in ["/models", "/list"]:
+                print_available_models(pipeline.gen_model_name)
+                continue
 
             context_input = input("Optional reference context (press Enter to auto-retrieve) > ").strip()
             ctx = context_input if context_input else None
@@ -609,16 +719,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GuardShield AI — Unified Pipeline")
     parser.add_argument("--prompt", type=str, default=None, help="Input prompt to evaluate")
     parser.add_argument("--context", type=str, default=None, help="Optional reference context premise")
+    parser.add_argument("--model", "-m", type=str, default=None, help="Generative model name or alias (e.g. qwen, gpt2, phi3, tinyllama)")
+    parser.add_argument("--list-models", action="store_true", help="List available generative model presets and exit")
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive prompt shell")
     parser.add_argument("--suite", action="store_true", help="Run full 4-scenario demonstration suite")
     parser.add_argument("--inject-hallucination", action="store_true", help="Simulate a hallucination to test correction")
 
     args = parser.parse_args()
 
+    if args.list_models:
+        print_available_models()
+        sys.exit(0)
+
+    chosen_model = resolve_model_name(args.model) if args.model else "Qwen/Qwen2.5-0.5B-Instruct"
+
     if args.interactive:
-        run_interactive_mode()
+        run_interactive_mode(initial_model=args.model)
     elif args.prompt:
-        pipeline = GuardShieldPipeline()
+        pipeline = GuardShieldPipeline(gen_model_name=chosen_model)
         pipeline.run(
             prompt=args.prompt,
             reference_context=args.context,
@@ -627,4 +745,5 @@ if __name__ == "__main__":
     else:
         # Default: run full suite
         run_pipeline_suite()
+
 
