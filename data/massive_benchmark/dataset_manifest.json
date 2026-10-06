@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-10-06T13:34:59Z",
+  "stage1": {
+    "train_count": 7390,
+    "val_count": 1478,
+    "test_indist_count": 986,
+    "xstest_fpr_count": 450,
+    "long_context_count": 500,
+    "total_samples": 10304
+  },
+  "stage2": {
+    "train_count": 3400,
+    "val_count": 600,
+    "test_fever_count": 500,
+    "test_halueval_count": 500,
+    "total_pairs": 5000
+  }
+}
