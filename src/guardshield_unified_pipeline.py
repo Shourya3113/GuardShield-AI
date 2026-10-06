@@ -131,14 +131,60 @@ AVAILABLE_MODELS = {
 }
 
 def resolve_model_name(name_or_alias: Optional[str]) -> str:
-    """Resolves friendly alias (e.g. 'gpt2', 'qwen', '1') to full HuggingFace model ID."""
+    """
+    Resolves friendly alias, preset number, or display name to full HuggingFace model repo ID.
+    Examples:
+      '4', 'tinyllama', 'TinyLlama-1.1B-Chat' -> 'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
+      '3', 'phi', 'phi3', 'Phi-3.5-mini-instruct' -> 'microsoft/Phi-3.5-mini-instruct'
+      '2', 'gpt2' -> 'gpt2'
+      '1', 'qwen', 'qwen2.5' -> 'Qwen/Qwen2.5-0.5B-Instruct'
+    """
     if not name_or_alias or not str(name_or_alias).strip():
         return "Qwen/Qwen2.5-0.5B-Instruct"
-    query = str(name_or_alias).strip()
+    raw_query = str(name_or_alias).strip()
+    query = raw_query.lower()
+
+    # 1. Direct preset key match ('1', '2', '3', '4')
+    if query in AVAILABLE_MODELS:
+        return AVAILABLE_MODELS[query]["id"]
+
+    # 2. Exact match on ID, name, repo leaf, or explicit aliases
     for key, info in AVAILABLE_MODELS.items():
-        if query.lower() in info["aliases"] or query.lower() == info["id"].lower():
+        candidates = set([
+            info["name"].lower(),
+            info["id"].lower(),
+            info["id"].split("/")[-1].lower()
+        ] + [a.lower() for a in info.get("aliases", [])])
+        if query in candidates:
             return info["id"]
-    return query
+
+    # 3. Clean exact match (ignoring hyphens, underscores, dots, spaces)
+    clean_q = query.replace("-", "").replace("_", "").replace(".", "").replace(" ", "")
+    for key, info in AVAILABLE_MODELS.items():
+        candidates = set([
+            info["name"].lower(),
+            info["id"].lower(),
+            info["id"].split("/")[-1].lower()
+        ] + [a.lower() for a in info.get("aliases", [])])
+        for c in candidates:
+            clean_c = c.replace("-", "").replace("_", "").replace(".", "").replace(" ", "")
+            if clean_q == clean_c:
+                return info["id"]
+
+    # 4. Clean substring match for queries with length >= 3
+    if len(clean_q) >= 3:
+        for key, info in AVAILABLE_MODELS.items():
+            candidates = set([
+                info["name"].lower(),
+                info["id"].lower(),
+                info["id"].split("/")[-1].lower()
+            ] + [a.lower() for a in info.get("aliases", [])])
+            for c in candidates:
+                clean_c = c.replace("-", "").replace("_", "").replace(".", "").replace(" ", "")
+                if clean_q in clean_c or clean_c.startswith(clean_q):
+                    return info["id"]
+
+    return raw_query
 
 
 class GuardShieldPipeline:
@@ -273,14 +319,25 @@ class GuardShieldPipeline:
             print(f"  [i] Model is already set to {resolved}.")
             return
         print(f"\n[🔄 MODEL SWITCH] Changing generative backbone to: {resolved}")
-        if hasattr(self, 'gen_model'):
-            del self.gen_model
-        if hasattr(self, 'gen_tokenizer'):
-            del self.gen_tokenizer
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        self._load_generative_model(resolved)
-        print(f"✅ Active model updated to: {resolved}\n")
+        old_name = getattr(self, 'gen_model_name', None)
+        try:
+            if hasattr(self, 'gen_model'):
+                del self.gen_model
+            if hasattr(self, 'gen_tokenizer'):
+                del self.gen_tokenizer
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            self._load_generative_model(resolved)
+            print(f"✅ Active model updated to: {resolved}\n")
+        except Exception as e:
+            print(f"\n❌ [ERROR SWITCHING MODEL]: Could not load '{resolved}': {e}")
+            if old_name and old_name != resolved:
+                print(f"  Restoring previous active model: {old_name}...")
+                try:
+                    self._load_generative_model(old_name)
+                    print(f"  Restored active model to: {old_name}\n")
+                except Exception as ex_restore:
+                    print(f"  Failed to restore previous model: {ex_restore}\n")
 
 
     def _retrieve_wikipedia_grounding(self, prompt: str, generated_text: Optional[str] = None) -> Optional[Tuple[str, str]]:
@@ -795,7 +852,10 @@ def run_interactive_mode(
             if user_input.startswith("/model ") or user_input.startswith("/switch "):
                 parts = user_input.split(" ", 1)
                 new_m = parts[1].strip()
-                pipeline.switch_generative_model(new_m)
+                try:
+                    pipeline.switch_generative_model(new_m)
+                except Exception as ex:
+                    print(f"❌ Failed to switch model: {ex}")
                 continue
 
             # Command: List models
