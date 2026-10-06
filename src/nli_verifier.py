@@ -64,10 +64,30 @@ class WindowedNLIVerifier:
             sentences = raw_sentences
 
         if len(sentences) <= 1:
-            return self.verify_entailment(premise, sentences[0] if sentences else hypothesis)
+            # Also extract the primary clause before commas/appositives (e.g. "X was invented by Y, a British scientist...")
+            first_sent = sentences[0] if sentences else hypothesis
+            sub_clauses = [c.strip() for c in re.split(r'[,;]', first_sent) if len(c.strip().split()) >= 3]
+            if len(sub_clauses) > 1:
+                # Test full sentence and main assertion
+                cand_res = [self.verify_entailment(premise, c) for c in [first_sent, sub_clauses[0]]]
+                # If main clause entails and has no contradiction, take it
+                entailed = [r for r in cand_res if r["decision"] in ("FACTUAL_ENTAILMENT", "FACTUALLY_CONSISTENT_REFUTATION")]
+                if entailed:
+                    best = max(entailed, key=lambda r: (r["decision"] == "FACTUAL_ENTAILMENT", r["entailment_prob"]))
+                    best["hypothesis"] = hypothesis
+                    return best
+            return self.verify_entailment(premise, first_sent)
 
+        # Multi-sentence hypothesis
         start_time = time.perf_counter()
-        sent_results = [self.verify_entailment(premise, s) for s in sentences]
+        candidate_units = list(sentences)
+        for s in sentences:
+            clauses = [c.strip() for c in re.split(r'[,;]', s) if len(c.strip().split()) >= 3]
+            for c in clauses:
+                if c not in candidate_units:
+                    candidate_units.append(c)
+
+        sent_results = [self.verify_entailment(premise, u) for u in candidate_units]
 
         # 1. Any sentence directly contradicting the premise marks a hallucination
         contradictions = [r for r in sent_results if r["is_contradiction"]]

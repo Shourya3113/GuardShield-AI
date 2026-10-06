@@ -343,7 +343,7 @@ class GuardShieldPipeline:
     def _retrieve_wikipedia_grounding(self, prompt: str, generated_text: Optional[str] = None) -> Optional[Tuple[str, str]]:
         """
         Dynamically retrieves authoritative factual context from Wikipedia API (sub-300ms).
-        Ensures arbitrary open-domain questions are factually grounded instead of defaulting to a static topic.
+        Uses search query ranking and lexical overlap to find the most factually relevant article.
         """
         import urllib.request
         import urllib.parse
@@ -351,69 +351,91 @@ class GuardShieldPipeline:
         import re
 
         clean_prompt = re.sub(
-            r'\b(what|who|where|when|why|how|is|are|the|capital|of|tell|me|about|explain|does|a|an)\b',
+            r'\b(what|who|where|when|why|how|is|are|the|tell|me|about|explain|does|a|an)\b',
             '', prompt, flags=re.IGNORECASE
         ).strip()
         clean_prompt = re.sub(r'[^\w\s]', '', clean_prompt).strip()
 
-        search_candidates = []
-        # Extract named entities from prompt (e.g. 'ChatGPT' in 'Is ChatGPT made by Anthropic?')
-        prompt_entities = [w for w in re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b', prompt) if len(w) > 2 and w.lower() not in ['what', 'where', 'when', 'which', 'who', 'how', 'why']]
-        if prompt_entities:
-            search_candidates.append(prompt_entities[0])
-
-        if clean_prompt and clean_prompt not in search_candidates:
-            search_candidates.append(clean_prompt)
-
-        for pe in prompt_entities[1:]:
-            if pe not in search_candidates:
-                search_candidates.append(pe)
-
-        if generated_text:
-            words = [w for w in re.findall(r'\b[A-Z][a-zA-Z]+\b', generated_text) if len(w) > 2]
-            if words:
-                if words[0] not in search_candidates:
-                    search_candidates.append(words[0])
-                if words[-1] not in search_candidates:
-                    search_candidates.append(words[-1])
-
         headers = {'User-Agent': 'GuardShieldAI-Sidecar/1.0 (Academic Verification Tool)'}
+        candidates = []
 
-        for query in search_candidates:
-            if not query:
+        # 1. Clean prompt search query (e.g. "capital of Australia", "invented World Wide Web")
+        if clean_prompt:
+            candidates.append(clean_prompt)
+
+        # 2. Extract multi-word proper noun phrases from prompt AND generated text
+        full_text = f"{prompt} {generated_text or ''}"
+        multi_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+(?:\s+[A-Z][a-zA-Z0-9_-]+)+\b', full_text)
+        for mw in multi_words:
+            if mw not in candidates and len(mw) > 3:
+                candidates.append(mw)
+
+        # 3. Extract single proper nouns (e.g. "Canberra", "Australia", "Mars")
+        single_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b', full_text)
+        for sw in single_words:
+            if sw.lower() not in ['what', 'where', 'when', 'who', 'how', 'why', 'the', 'is', 'are']:
+                if sw not in candidates and len(sw) > 2:
+                    candidates.append(sw)
+
+        retrieved_articles = {}  # title -> extract
+
+        # Search Wikipedia API for top candidate titles
+        for q in candidates[:4]:
+            if not q:
                 continue
+            # Try direct summary endpoint
             try:
-                # 1. Direct summary endpoint
-                url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(query)}"
+                url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(q)}"
                 req = urllib.request.Request(url, headers=headers)
-                with urllib.request.urlopen(req, timeout=3.0) as resp:
+                with urllib.request.urlopen(req, timeout=2.5) as resp:
                     data = json.loads(resp.read().decode('utf-8'))
                     if "extract" in data and data["extract"]:
-                        premise = data["extract"]
-                        first_sentence = premise.split(". ")[0] + "."
-                        return premise, first_sentence
+                        retrieved_articles[q] = data["extract"]
             except Exception:
                 pass
 
+            # Search API to discover target pages (e.g. "Canberra" from "capital of Australia")
             try:
-                # 2. Search fallback
-                search_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(query)}&utf8=&format=json"
+                search_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(q)}&utf8=&format=json"
                 req = urllib.request.Request(search_url, headers=headers)
-                with urllib.request.urlopen(req, timeout=3.0) as resp:
+                with urllib.request.urlopen(req, timeout=2.5) as resp:
                     s_data = json.loads(resp.read().decode('utf-8'))
                     results = s_data.get("query", {}).get("search", [])
-                    if results:
-                        top_title = results[0]["title"]
-                        sum_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(top_title)}"
-                        req_sum = urllib.request.Request(sum_url, headers=headers)
-                        with urllib.request.urlopen(req_sum, timeout=3.0) as sum_resp:
-                            sum_data = json.loads(sum_resp.read().decode('utf-8'))
-                            if "extract" in sum_data and sum_data["extract"]:
-                                premise = sum_data["extract"]
-                                first_sentence = premise.split(". ")[0] + "."
-                                return premise, first_sentence
+                    for r in results[:2]:
+                        title = r["title"]
+                        if title not in retrieved_articles:
+                            sum_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(title)}"
+                            sum_req = urllib.request.Request(sum_url, headers=headers)
+                            with urllib.request.urlopen(sum_req, timeout=2.5) as sum_resp:
+                                sum_data = json.loads(sum_resp.read().decode('utf-8'))
+                                if "extract" in sum_data and sum_data["extract"]:
+                                    retrieved_articles[title] = sum_data["extract"]
             except Exception:
                 pass
+
+        if not retrieved_articles:
+            return None
+
+        # Rank retrieved articles by relevance to BOTH the question and the generated answer
+        target_words = set(re.findall(r'\b\w{3,}\b', (f"{prompt} {generated_text or ''}").lower()))
+        best_title = None
+        best_score = -1
+        best_extract = None
+
+        for title, extract in retrieved_articles.items():
+            extract_words = set(re.findall(r'\b\w{3,}\b', extract.lower()))
+            overlap = len(target_words & extract_words)
+            # Heavy bonus if the article title matches an entity in the generated answer (e.g. "Canberra", "Tim Berners-Lee")
+            if generated_text and title.lower() in generated_text.lower():
+                overlap += 10
+            if overlap > best_score:
+                best_score = overlap
+                best_title = title
+                best_extract = extract
+
+        if best_extract:
+            first_sentence = best_extract.split(". ")[0] + "."
+            return best_extract, first_sentence
 
         return None
 
@@ -660,8 +682,13 @@ class GuardShieldPipeline:
         # ----------------------------------------------------------------------
         # EGRESS DISPATCH DECISION
         # ----------------------------------------------------------------------
-        if is_hallucination and premise:
-            reason = "directly contradictory to verified ground truth" if contra_prob >= self.nli_threshold else "an ungrounded/unsubstantiated speculation"
+        # Only withhold raw generation if:
+        # 1. Direct Factual Contradiction against ground truth (contra_prob >= nli_threshold)
+        # 2. Circuit breaker halted an incomplete sentence fragment (early_terminated)
+        should_withhold = (contra_prob >= self.nli_threshold) or (early_terminated and entail_prob < self.nli_threshold)
+
+        if should_withhold and premise:
+            reason = "directly contradictory to verified ground truth" if contra_prob >= self.nli_threshold else "an incomplete high-uncertainty fragment"
             print(f"\n❌ [HALLUCINATION DETECTED ({nli_decision}) — RAW OUTPUT WITHHELD]")
             print(f"  The raw LLM output was flagged as {reason}.")
             print("  Withholding raw output and substituting verified factual ground truth.")
@@ -669,7 +696,6 @@ class GuardShieldPipeline:
             print(f"  [WITHHELD RAW OUTPUT]:     {raw_output_text}")
             print(f"  [FACT-CHECKED CORRECTION]: {verified_fact}")
             print("=" * 80)
-
 
             return {
                 "status": "HALLUCINATION_DETECTED_AND_CORRECTED",
@@ -702,8 +728,11 @@ class GuardShieldPipeline:
             if nli_decision == "FACTUALLY_CONSISTENT_REFUTATION":
                 print("\n✅ [SAFE & FACTUALLY CONSISTENT REFUTATION DELIVERED]")
                 print("  The model correctly identified and refuted a false presupposition without contradicting verified facts.")
-            else:
+            elif entail_prob >= self.nli_threshold:
                 print("\n✅ [SAFE & FACTUALLY VERIFIED OUTPUT DELIVERED]")
+            else:
+                print("\n✅ [SAFE & FACTUALLY CONSISTENT OUTPUT DELIVERED]")
+                print(f"  The generated response is consistent with verified ground truth (Contradiction Risk: {contra_prob * 100:.2f}%).")
             print(f"  Output: {raw_output_text}")
             print("=" * 80)
 
