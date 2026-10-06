@@ -65,26 +65,40 @@ class WindowedNLIVerifier:
             logits = outputs.logits
             probs = torch.softmax(logits, dim=-1)[0]
             
-        # Label mapping: 0 = Contradiction (Hallucination), 1 = Entailment (Factual), 2 = Neutral
+        # Label mapping: 0 = Contradiction, 1 = Entailment, 2 = Neutral
         p_contradiction = float(probs[0].item())
         p_entailment = float(probs[1].item()) if len(probs) > 1 else 0.5
         p_neutral = float(probs[2].item()) if len(probs) > 2 else 0.0
-        
-        is_hallucination = p_contradiction >= self.threshold
-        decision = "HALLUCINATION_CONTRADICTION" if is_hallucination else "FACTUAL_ENTAILMENT"
-        
+
+        # Rigorous Factual Verification:
+        # A claim is only Factual if p_entailment meets threshold.
+        # If contradiction >= threshold -> Direct Contradiction
+        # If neutral is dominant & entailment < 0.40 -> Ungrounded Speculation / Hallucination
+        if p_contradiction >= self.threshold:
+            decision = "HALLUCINATION_CONTRADICTION"
+            is_hallucination = True
+        elif p_entailment >= self.threshold:
+            decision = "FACTUAL_ENTAILMENT"
+            is_hallucination = False
+        else:
+            # Ungrounded / Neutral claim not substantiated by premise (e.g., "Capital of Mars is Alhussein")
+            decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
+            is_hallucination = True
+
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0
-        
+
         return {
             "premise": premise,
             "hypothesis": hypothesis,
             "decision": decision,
             "is_hallucination": is_hallucination,
-            "is_contradiction": is_hallucination,
+            "is_contradiction": p_contradiction >= self.threshold,
             "entailment_prob": round(p_entailment, 4),
             "contradiction_prob": round(p_contradiction, 4),
+            "neutral_prob": round(p_neutral, 4),
             "latency_ms": round(elapsed_ms, 2)
         }
+
 
 if __name__ == "__main__":
     verifier = WindowedNLIVerifier()

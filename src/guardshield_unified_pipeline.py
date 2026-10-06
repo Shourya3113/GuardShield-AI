@@ -412,7 +412,13 @@ class GuardShieldPipeline:
             is_hallucination = nli_res["is_hallucination"]
             entail_prob = nli_res["entailment_prob"]
             contra_prob = nli_res["contradiction_prob"]
+            neutral_prob = nli_res.get("neutral_prob", 0.0)
             nli_decision = nli_res["decision"]
+
+            # If circuit breaker halted an incomplete sentence with low entailment, treat as hallucination
+            if early_terminated and entail_prob < self.nli_threshold:
+                is_hallucination = True
+                nli_decision = "CIRCUIT_BREAKER_INCOMPLETE_GENERATION"
         else:
             print("  • Grounding Premise:    [No external reference indexed — Evaluating via Token Entropy Profile]")
             # If no external premise is indexed, check token entropy stability
@@ -420,6 +426,7 @@ class GuardShieldPipeline:
             is_hallucination = early_terminated or (mean_h >= self.entropy_threshold)
             entail_prob = round(max(1.0 - (mean_h / self.entropy_threshold), 0.1), 4)
             contra_prob = round(1.0 - entail_prob, 4)
+            neutral_prob = 0.0
             nli_decision = "UNCERTAIN_OPEN_DOMAIN" if is_hallucination else "FACTUAL_HIGH_CONFIDENCE_GENERATION"
             verified_fact = raw_output_text
 
@@ -428,6 +435,8 @@ class GuardShieldPipeline:
         print(f"  • NLI Decision:         {nli_decision}")
         print(f"  • Entailment Score:     {entail_prob * 100:.2f}% (Factual Alignment)")
         print(f"  • Contradiction Score:  {contra_prob * 100:.2f}% (Hallucination Risk)")
+        if premise:
+            print(f"  • Neutral / Ungrounded: {neutral_prob * 100:.2f}% (Unsupported by Premise)")
         print(f"  • Stage 2 Latency:      {s2_latency:.2f} ms")
 
         total_elapsed = (time.perf_counter() - pipeline_start_time) * 1000.0
@@ -436,13 +445,15 @@ class GuardShieldPipeline:
         # EGRESS DISPATCH DECISION
         # ----------------------------------------------------------------------
         if is_hallucination and premise:
-            print("\n❌ [HALLUCINATION DETECTED — RAW OUTPUT WITHHELD]")
-            print("  The raw LLM output was flagged as factually inconsistent or contradictory.")
+            reason = "directly contradictory to verified ground truth" if contra_prob >= self.nli_threshold else "an ungrounded/unsubstantiated speculation"
+            print(f"\n❌ [HALLUCINATION DETECTED ({nli_decision}) — RAW OUTPUT WITHHELD]")
+            print(f"  The raw LLM output was flagged as {reason}.")
             print("  Withholding raw output and substituting verified factual ground truth.")
             print("-" * 80)
             print(f"  [WITHHELD RAW OUTPUT]:     {raw_output_text}")
             print(f"  [FACT-CHECKED CORRECTION]: {verified_fact}")
             print("=" * 80)
+
 
             return {
                 "status": "HALLUCINATION_DETECTED_AND_CORRECTED",
