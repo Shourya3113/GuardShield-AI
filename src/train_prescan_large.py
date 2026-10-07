@@ -172,13 +172,14 @@ def run_holdout_evaluation(model, tokenizer, test_file: Path, device: str, max_l
 
 def main():
     parser = argparse.ArgumentParser(description="GuardShield AI High-VRAM Pre-Scan Training")
-    parser.add_argument("--model-name", type=str, default="microsoft/deberta-v3-large", help="HuggingFace model backbone ID")
+    parser.add_argument("--model-name", type=str, default="microsoft/deberta-v3-base", help="HuggingFace model backbone ID (microsoft/deberta-v3-base recommended, or microsoft/deberta-v3-large)")
     parser.add_argument("--max-length", type=int, default=512, help="Context sequence length (512 or 1024)")
     parser.add_argument("--batch-size", type=int, default=16, help="Per-device train batch size")
-    parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (Effective batch size = batch-size * grad-accum)")
+    parser.add_argument("--grad-accum", type=int, default=2, help="Gradient accumulation steps (Effective batch size = batch-size * grad-accum)")
     parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
-    parser.add_argument("--lr", type=float, default=8.0e-6, help="Learning rate (8e-6 recommended for DeBERTa-v3-Large, 1.5e-5 for Base)")
+    parser.add_argument("--lr", type=float, default=1.5e-5, help="Learning rate (1.5e-5 for DeBERTa-v3-base, 8e-6 for Large)")
     parser.add_argument("--warmup-steps", type=int, default=50, help="Number of warmup steps for learning rate schedule")
+    parser.add_argument("--enable-grad-checkpoint", action="store_true", help="Enable gradient checkpointing (not recommended on >=20GB VRAM to avoid gradient distortion)")
     parser.add_argument("--output-dir", type=str, default=str(DEFAULT_OUTPUT_DIR), help="Output directory for fine-tuned weights")
     parser.add_argument("--dry-run", action="store_true", help="Run rapid sanity check with 200 samples")
     args = parser.parse_args()
@@ -210,6 +211,7 @@ def main():
     print(f"  • Effective Batch Size:      {args.batch_size * args.grad_accum} ({args.batch_size} x {args.grad_accum})")
     print(f"  • Learning Rate:             {args.lr} (Warmup: {args.warmup_steps} steps)")
     print(f"  • Precision Format:          {'BF16 Mixed' if use_bf16 else 'FP16 Mixed' if device == 'cuda' else 'FP32'}")
+    print(f"  • Grad Checkpointing:        {args.enable_grad_checkpoint}")
     print("=" * 80)
 
     # 2. Check Data Splits
@@ -224,6 +226,8 @@ def main():
         sys.exit(1)
 
     # 3. Load Tokenizer & Model
+    from transformers import AutoConfig
+
     logger.info(f"Loading Base Tokenizer: {args.model_name}...")
     try:
         tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=False)
@@ -231,7 +235,9 @@ def main():
         tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
     logger.info(f"Loading Model Architecture: {args.model_name} (num_labels=2)...")
-    model = AutoModelForSequenceClassification.from_pretrained(args.model_name, num_labels=2)
+    config = AutoConfig.from_pretrained(args.model_name, num_labels=2)
+    config.problem_type = "single_label_classification"
+    model = AutoModelForSequenceClassification.from_pretrained(args.model_name, config=config)
     model.to(device)
 
     # 4. Prepare Datasets
@@ -280,11 +286,12 @@ def main():
     elif "warmup_ratio" in ta_params:
         args_dict["warmup_ratio"] = 0.1
 
-    # Handle gradient checkpointing
-    if "gradient_checkpointing" in ta_params:
-        args_dict["gradient_checkpointing"] = True
-    if "gradient_checkpointing_kwargs" in ta_params:
-        args_dict["gradient_checkpointing_kwargs"] = {"use_reentrant": False}
+    # Handle gradient checkpointing (opt-in only)
+    if args.enable_grad_checkpoint:
+        if "gradient_checkpointing" in ta_params:
+            args_dict["gradient_checkpointing"] = True
+        if "gradient_checkpointing_kwargs" in ta_params:
+            args_dict["gradient_checkpointing_kwargs"] = {"use_reentrant": False}
 
     if "dataloader_pin_memory" in ta_params:
         args_dict["dataloader_pin_memory"] = (device == "cuda")
