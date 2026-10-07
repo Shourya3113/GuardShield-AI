@@ -263,8 +263,8 @@ def main():
         "load_best_model_at_end": True,
         "metric_for_best_model": "f1",
         "greater_is_better": True,
-        "fp16": (device == "cuda" and not use_bf16),
-        "bf16": (device == "cuda" and use_bf16),
+        "fp16": (device == "cuda"),
+        "bf16": False,
         "use_cpu": (device == "cpu"),
         "report_to": "none"
     }
