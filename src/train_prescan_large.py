@@ -177,7 +177,8 @@ def main():
     parser.add_argument("--batch-size", type=int, default=16, help="Per-device train batch size")
     parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (Effective batch size = batch-size * grad-accum)")
     parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
-    parser.add_argument("--lr", type=float, default=1.5e-5, help="Learning rate")
+    parser.add_argument("--lr", type=float, default=8.0e-6, help="Learning rate (8e-6 recommended for DeBERTa-v3-Large, 1.5e-5 for Base)")
+    parser.add_argument("--warmup-steps", type=int, default=50, help="Number of warmup steps for learning rate schedule")
     parser.add_argument("--output-dir", type=str, default=str(DEFAULT_OUTPUT_DIR), help="Output directory for fine-tuned weights")
     parser.add_argument("--dry-run", action="store_true", help="Run rapid sanity check with 200 samples")
     args = parser.parse_args()
@@ -207,6 +208,7 @@ def main():
     print(f"  • Model Backbone:            {args.model_name}")
     print(f"  • Context Window:            {args.max_length} Tokens")
     print(f"  • Effective Batch Size:      {args.batch_size * args.grad_accum} ({args.batch_size} x {args.grad_accum})")
+    print(f"  • Learning Rate:             {args.lr} (Warmup: {args.warmup_steps} steps)")
     print(f"  • Precision Format:          {'BF16 Mixed' if use_bf16 else 'FP16 Mixed' if device == 'cuda' else 'FP32'}")
     print("=" * 80)
 
@@ -248,6 +250,7 @@ def main():
         "per_device_eval_batch_size": args.batch_size * 2,
         "gradient_accumulation_steps": args.grad_accum,
         "learning_rate": args.lr,
+        "max_grad_norm": 1.0,
         "weight_decay": 0.01,
         "logging_steps": 20,
         "save_total_limit": 1,
@@ -271,11 +274,11 @@ def main():
     if "save_strategy" in ta_params:
         args_dict["save_strategy"] = "epoch"
 
-    # Handle warmup
-    if "warmup_ratio" in ta_params:
+    # Handle warmup (critical for DeBERTa-v3 gradient stability)
+    if "warmup_steps" in ta_params:
+        args_dict["warmup_steps"] = args.warmup_steps
+    elif "warmup_ratio" in ta_params:
         args_dict["warmup_ratio"] = 0.1
-    elif "warmup_steps" in ta_params:
-        args_dict["warmup_steps"] = 50
 
     # Handle gradient checkpointing
     if "gradient_checkpointing" in ta_params:
