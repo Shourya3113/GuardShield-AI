@@ -238,41 +238,74 @@ def main():
     train_dataset = PromptSecurityDataset(train_file, tokenizer, max_length=args.max_length, max_samples=sample_limit)
     val_dataset = PromptSecurityDataset(val_file, tokenizer, max_length=args.max_length, max_samples=sample_limit)
 
-    # 5. Training Arguments
-    training_args = TrainingArguments(
-        output_dir=str(out_dir / "checkpoints"),
-        num_train_epochs=args.epochs,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size * 2,
-        gradient_accumulation_steps=args.grad_accum,
-        gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={"use_reentrant": False},
-        learning_rate=args.lr,
-        warmup_ratio=0.1,
-        weight_decay=0.01,
-        logging_steps=20,
-        eval_strategy="epoch",
-        save_strategy="epoch",
-        save_total_limit=1,
-        load_best_model_at_end=True,
-        metric_for_best_model="f1",
-        greater_is_better=True,
-        fp16=(device == "cuda" and not use_bf16),
-        bf16=(device == "cuda" and use_bf16),
-        use_cpu=(device == "cpu"),
-        dataloader_pin_memory=(device == "cuda"),
-        report_to="none"
-    )
+    import inspect
 
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        processing_class=tokenizer,
-        data_collator=DataCollatorWithPadding(tokenizer=tokenizer),
-        compute_metrics=compute_metrics
-    )
+    # 5. Universal Backward/Forward Compatible Training Arguments
+    args_dict = {
+        "output_dir": str(out_dir / "checkpoints"),
+        "num_train_epochs": args.epochs,
+        "per_device_train_batch_size": args.batch_size,
+        "per_device_eval_batch_size": args.batch_size * 2,
+        "gradient_accumulation_steps": args.grad_accum,
+        "learning_rate": args.lr,
+        "weight_decay": 0.01,
+        "logging_steps": 20,
+        "save_total_limit": 1,
+        "load_best_model_at_end": True,
+        "metric_for_best_model": "f1",
+        "greater_is_better": True,
+        "fp16": (device == "cuda" and not use_bf16),
+        "bf16": (device == "cuda" and use_bf16),
+        "use_cpu": (device == "cpu"),
+        "report_to": "none"
+    }
+
+    ta_params = inspect.signature(TrainingArguments.__init__).parameters
+
+    # Handle evaluation strategy naming change (eval_strategy vs evaluation_strategy)
+    if "eval_strategy" in ta_params:
+        args_dict["eval_strategy"] = "epoch"
+    elif "evaluation_strategy" in ta_params:
+        args_dict["evaluation_strategy"] = "epoch"
+
+    if "save_strategy" in ta_params:
+        args_dict["save_strategy"] = "epoch"
+
+    # Handle warmup
+    if "warmup_ratio" in ta_params:
+        args_dict["warmup_ratio"] = 0.1
+    elif "warmup_steps" in ta_params:
+        args_dict["warmup_steps"] = 50
+
+    # Handle gradient checkpointing
+    if "gradient_checkpointing" in ta_params:
+        args_dict["gradient_checkpointing"] = True
+    if "gradient_checkpointing_kwargs" in ta_params:
+        args_dict["gradient_checkpointing_kwargs"] = {"use_reentrant": False}
+
+    if "dataloader_pin_memory" in ta_params:
+        args_dict["dataloader_pin_memory"] = (device == "cuda")
+
+    # Filter strictly to parameters accepted by the installed version
+    safe_training_kwargs = {k: v for k, v in args_dict.items() if k in ta_params}
+    training_args = TrainingArguments(**safe_training_kwargs)
+
+    # 6. Universal Trainer Setup (handle tokenizer vs processing_class)
+    trainer_params = inspect.signature(Trainer.__init__).parameters
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": train_dataset,
+        "eval_dataset": val_dataset,
+        "data_collator": DataCollatorWithPadding(tokenizer=tokenizer),
+        "compute_metrics": compute_metrics
+    }
+    if "processing_class" in trainer_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    else:
+        trainer_kwargs["tokenizer"] = tokenizer
+
+    trainer = Trainer(**trainer_kwargs)
 
     # 6. Execute Training
     logger.info(f"Starting High-Capacity Training ({len(train_dataset)} samples, {args.epochs} epochs)...")
