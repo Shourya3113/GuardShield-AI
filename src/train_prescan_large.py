@@ -210,7 +210,7 @@ def main():
     print(f"  • Context Window:            {args.max_length} Tokens")
     print(f"  • Effective Batch Size:      {args.batch_size * args.grad_accum} ({args.batch_size} x {args.grad_accum})")
     print(f"  • Learning Rate:             {args.lr} (Warmup: {args.warmup_steps} steps)")
-    print(f"  • Precision Format:          {'BF16 Mixed' if use_bf16 else 'FP16 Mixed' if device == 'cuda' else 'FP32'}")
+    print(f"  • Precision Format:          FP32 Full Precision (Guaranteed Stability)")
     print(f"  • Grad Checkpointing:        {args.enable_grad_checkpoint}")
     print("=" * 80)
 
@@ -263,7 +263,7 @@ def main():
         "load_best_model_at_end": True,
         "metric_for_best_model": "f1",
         "greater_is_better": True,
-        "fp16": (device == "cuda"),
+        "fp16": False,
         "bf16": False,
         "use_cpu": (device == "cpu"),
         "report_to": "none"
