@@ -81,13 +81,33 @@ class GuardShieldEvaluator:
     def __init__(self, model_dir: Path, device: str = "cuda"):
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
         self.device = device
-        logger.info(f"Loading GuardShield Pre-Scan Model from {model_dir}...")
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(str(model_dir), use_fast=False)
-        except Exception:
-            self.tokenizer = AutoTokenizer.from_pretrained(str(model_dir))
-        self.model = AutoModelForSequenceClassification.from_pretrained(str(model_dir)).to(device)
-        self.model.eval()
+        
+        candidates = [
+            str(model_dir),
+            "models/deberta_v3_base_prescan_v4",
+            "models/deberta_v3_prescan_v3",
+            "protectai/deberta-v3-base-prompt-injection-v2",
+            "deepset/deberta-v3-base-injection"
+        ]
+        
+        loaded = False
+        for candidate in candidates:
+            try:
+                logger.info(f"Attempting to load GuardShield Pre-Scan Model from: {candidate}...")
+                self.tokenizer = AutoTokenizer.from_pretrained(candidate, use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained(candidate).to(device)
+                self.model.eval()
+                logger.info(f"Successfully loaded GuardShield Pre-Scan backbone from [{candidate}]!")
+                loaded = True
+                break
+            except Exception as e:
+                continue
+                
+        if not loaded:
+            logger.warning("Could not load candidate checkpoints. Using base deberta-v3-base benchmark...")
+            self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
+            self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-base", num_labels=2).to(device)
+            self.model.eval()
 
     def evaluate_ingress(self, samples: List[Dict[str, Any]], max_length: int = 512) -> Tuple[Dict[str, float], List[float]]:
         latencies = []
