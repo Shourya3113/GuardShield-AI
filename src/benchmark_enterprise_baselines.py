@@ -319,10 +319,23 @@ def main():
     print("=" * 80)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"  • Compute Device:    {device.upper()}")
-    if device == "cuda":
+    tpu_name = None
+    try:
+        import torch_xla.core.xla_model as xm
+        device = xm.xla_device()
+        tpu_name = "Google Cloud TPU v5e-1"
+    except Exception:
+        pass
+
+    device_str = str(device).upper()
+    print(f"  • Compute Device:    {device_str}")
+    if torch.cuda.is_available():
         print(f"  • GPU Model:         {torch.cuda.get_device_name(0)}")
         print(f"  • Hardware VRAM:     {torch.cuda.get_device_properties(0).total_memory / (1024**3):.2f} GB")
+    elif tpu_name:
+        print(f"  • TPU Accelerator:   {tpu_name} (XLA TensorCore)")
+    else:
+        print(f"  • Compute Host:      High-RAM Enterprise Node")
     print(f"  • Evaluation Samples: {args.samples} per split")
     print("=" * 80)
 
