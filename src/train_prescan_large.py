@@ -51,7 +51,7 @@ DEFAULT_OUTPUT_DIR = BASE_DIR / "models" / "deberta_v3_large_prescan_v4"
 
 class PromptSecurityDataset(Dataset):
     """Memory-efficient PyTorch Dataset for prompt security classification."""
-    def __init__(self, json_path: Path, tokenizer, max_length: int = 512, max_samples: int = None):
+    def __init__(self, json_path: Path, tokenizer, max_length: int = 512, max_samples: int = None, pad_to_max: bool = False):
         with open(json_path, "r", encoding="utf-8") as f:
             raw = json.load(f)
         if max_samples and max_samples > 0:
@@ -59,6 +59,7 @@ class PromptSecurityDataset(Dataset):
         self.data = raw
         self.tokenizer = tokenizer
         self.max_length = max_length
+        self.pad_to_max = pad_to_max
 
     def __len__(self):
         return len(self.data)
@@ -72,7 +73,7 @@ class PromptSecurityDataset(Dataset):
             text,
             truncation=True,
             max_length=self.max_length,
-            padding=False,
+            padding="max_length" if self.pad_to_max else False,
             return_tensors=None
         )
         encoding["labels"] = label
@@ -102,7 +103,7 @@ def compute_metrics(eval_pred):
         "false_positive_rate": round(float(fpr), 4)
     }
 
-def run_holdout_evaluation(model, tokenizer, test_file: Path, device: str, max_length: int = 512) -> Dict[str, Any]:
+def run_holdout_evaluation(model, tokenizer, test_file: Path, device: Any, max_length: int = 512, is_tpu: bool = False) -> Dict[str, Any]:
     """Execute high-speed vectorized inference and compute rigorous evaluation stats."""
     if not test_file.exists():
         logger.warning(f"Holdout file {test_file} not found. Skipping.")
@@ -130,9 +131,13 @@ def run_holdout_evaluation(model, tokenizer, test_file: Path, device: str, max_l
             texts,
             truncation=True,
             max_length=max_length,
-            padding=True,
+            padding="max_length" if is_tpu else True,
             return_tensors="pt"
-        ).to(device)
+        )
+        if isinstance(device, str):
+            inputs = inputs.to(device)
+        else:
+            inputs = {k: v.to(device) for k, v in inputs.items()}
 
         with torch.inference_mode():
             outputs = model(**inputs)
@@ -192,20 +197,31 @@ def main():
     print("=" * 80)
 
     # 1. Hardware Inspection
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    gpu_name = "None (CPU)"
+    device = "cpu"
+    gpu_name = "Host CPU"
     vram_gb = 0.0
-    use_bf16 = False
+    is_tpu = False
 
-    if device == "cuda":
+    if torch.cuda.is_available():
+        device = "cuda"
         gpu_name = torch.cuda.get_device_name(0)
         vram_bytes = torch.cuda.get_device_properties(0).total_memory
         vram_gb = round(vram_bytes / (1024 ** 3), 2)
-        use_bf16 = torch.cuda.is_bf16_supported()
+    else:
+        try:
+            import torch_xla.core.xla_model as xm
+            device = xm.xla_device()
+            gpu_name = f"Google Cloud TPU ({device})"
+            is_tpu = True
+            vram_gb = 16.0  # TPU v5e HBM
+        except Exception:
+            device = "cpu"
+            gpu_name = "Host CPU"
 
-    print(f"  • Target Compute Device:     {device.upper()}")
-    print(f"  • GPU Model:                 {gpu_name}")
-    print(f"  • Dedicated VRAM:            {vram_gb} GB")
+    device_str = str(device).upper()
+    print(f"  • Target Compute Device:     {device_str}")
+    print(f"  • Accelerator Model:         {gpu_name}")
+    print(f"  • Dedicated VRAM / HBM:      {vram_gb} GB")
     print(f"  • Model Backbone:            {args.model_name}")
     print(f"  • Context Window:            {args.max_length} Tokens")
     print(f"  • Effective Batch Size:      {args.batch_size * args.grad_accum} ({args.batch_size} x {args.grad_accum})")
@@ -238,13 +254,15 @@ def main():
     config = AutoConfig.from_pretrained(args.model_name, num_labels=2)
     config.problem_type = "single_label_classification"
     model = AutoModelForSequenceClassification.from_pretrained(args.model_name, config=config)
-    model.to(device)
+    if not is_tpu:
+        model.to(device)
 
-    # 4. Prepare Datasets
+    # 4. Prepare Datasets (Static padding on TPU prevents repeated XLA graph recompilations)
     sample_limit = 200 if args.dry_run else None
-    logger.info(f"Loading Train Dataset from {train_file.name} (limit={sample_limit})...")
-    train_dataset = PromptSecurityDataset(train_file, tokenizer, max_length=args.max_length, max_samples=sample_limit)
-    val_dataset = PromptSecurityDataset(val_file, tokenizer, max_length=args.max_length, max_samples=sample_limit)
+    pad_to_max = is_tpu
+    logger.info(f"Loading Train Dataset from {train_file.name} (limit={sample_limit}, pad_to_max={pad_to_max})...")
+    train_dataset = PromptSecurityDataset(train_file, tokenizer, max_length=args.max_length, max_samples=sample_limit, pad_to_max=pad_to_max)
+    val_dataset = PromptSecurityDataset(val_file, tokenizer, max_length=args.max_length, max_samples=sample_limit, pad_to_max=pad_to_max)
 
     import inspect
 
@@ -268,6 +286,10 @@ def main():
         "use_cpu": (device == "cpu"),
         "report_to": "none"
     }
+
+    if is_tpu:
+        args_dict["use_cpu"] = False
+        args_dict["dataloader_drop_last"] = True
 
     ta_params = inspect.signature(TrainingArguments.__init__).parameters
 
@@ -336,7 +358,7 @@ def main():
     print("=" * 80)
 
     logger.info("1/3 Evaluating In-Distribution Test Split...")
-    eval_indist = run_holdout_evaluation(model, tokenizer, test_indist_file, device, max_length=args.max_length)
+    eval_indist = run_holdout_evaluation(model, tokenizer, test_indist_file, device, max_length=args.max_length, is_tpu=is_tpu)
     print(f"  • In-Distribution Test Set ({eval_indist.get('sample_count', 0)} samples):")
     print(f"    - Accuracy:  {eval_indist.get('accuracy')}%")
     print(f"    - Precision: {eval_indist.get('precision')}%")
@@ -345,13 +367,13 @@ def main():
     print(f"    - Latency:   {eval_indist.get('mean_latency_ms')} ms (p95: {eval_indist.get('p95_latency_ms')} ms)")
 
     logger.info("2/3 Evaluating XSTest v2 Exaggerated-Safety Benchmark (FPR Minimization)...")
-    eval_xstest = run_holdout_evaluation(model, tokenizer, test_xstest_file, device, max_length=args.max_length)
+    eval_xstest = run_holdout_evaluation(model, tokenizer, test_xstest_file, device, max_length=args.max_length, is_tpu=is_tpu)
     print(f"  • XSTest v2 Exaggerated Safety ({eval_xstest.get('sample_count', 0)} benign trigger prompts):")
     print(f"    - Benign Safe Pass Rate:        {eval_xstest.get('accuracy')}%")
     print(f"    - False Positive Rate (FPR):    {eval_xstest.get('false_positive_rate_pct')}% (Target: < 1.0%)")
 
     logger.info("3/3 Evaluating Long-Context Ablation Split (>256 tokens)...")
-    eval_long = run_holdout_evaluation(model, tokenizer, test_long_file, device, max_length=args.max_length)
+    eval_long = run_holdout_evaluation(model, tokenizer, test_long_file, device, max_length=args.max_length, is_tpu=is_tpu)
     print(f"  • Long-Context Split ({eval_long.get('sample_count', 0)} samples):")
     print(f"    - Long-Context F1-Score:        {eval_long.get('f1_score')}")
     print(f"    - Mean Latency:                 {eval_long.get('mean_latency_ms')} ms")

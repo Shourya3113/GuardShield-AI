@@ -51,53 +51,7 @@ if str(SRC_DIR) not in sys.path:
 from prescan_filter import PreScanSecurityFilter
 from nli_verifier import WindowedNLIVerifier
 
-# ------------------------------------------------------------------------------
-# Built-In Authoritative Fact Grounding Knowledge Base
-# ------------------------------------------------------------------------------
-DEFAULT_KNOWLEDGE_BASE = {
-    "capital_india": {
-        "entities": ["india", "delhi", "new delhi"],
-        "keywords": ["capital"],
-        "premise": "The capital of India is New Delhi. It is the seat of the Government of India, housing the Rashtrapati Bhavan, Parliament House, and Supreme Court.",
-        "verified_fact": "The capital of India is New Delhi."
-    },
-    "capital_france": {
-        "entities": ["france", "paris"],
-        "keywords": ["capital"],
-        "premise": "Paris is the official capital and most populous city of France, situated along the Seine River.",
-        "verified_fact": "The capital of France is Paris."
-    },
-    "capital_japan": {
-        "entities": ["japan", "tokyo"],
-        "keywords": ["capital"],
-        "premise": "Tokyo is the official capital of Japan and the most populous metropolitan area in the world.",
-        "verified_fact": "The capital of Japan is Tokyo."
-    },
-    "capital_south_korea": {
-        "entities": ["south korea", "seoul", "korea"],
-        "keywords": ["capital"],
-        "premise": "Seoul, officially Seoul Special Metropolitan City, is the capital and largest city of South Korea, with a history spanning over two millennia.",
-        "verified_fact": "The capital of South Korea is Seoul."
-    },
-    "guardshield_architecture": {
-        "entities": ["guardshield", "sidecar proxy", "guardshield ai"],
-        "keywords": ["architecture", "proxy"],
-        "premise": "GuardShield AI is an asymmetric sidecar proxy designed for real-time prompt injection defense and streaming hallucination detection using fine-tuned DeBERTa-v3 and dynamic Shannon entropy.",
-        "verified_fact": "GuardShield AI operates as an asymmetric dual-stage sidecar proxy combining DeBERTa-v3 pre-scanning with streaming entropy and NLI fact verification."
-    },
-    "light_speed": {
-        "entities": ["speed of light", "light speed", "vacuum"],
-        "keywords": ["speed", "light"],
-        "premise": "The speed of light in vacuum is exactly 299,792,458 meters per second (approximately 300,000 km/s).",
-        "verified_fact": "The speed of light in vacuum is approximately 299,792,458 meters per second."
-    },
-    "quantum_computing": {
-        "entities": ["quantum computing", "qubit", "superposition"],
-        "keywords": ["quantum", "qubit"],
-        "premise": "Quantum computers utilize qubits capable of existing in superposition states, unlike classical binary bits.",
-        "verified_fact": "Quantum computing leverages quantum mechanical superposition and entanglement across qubits."
-    }
-}
+
 
 
 # ------------------------------------------------------------------------------
@@ -448,29 +402,13 @@ class GuardShieldPipeline:
         if user_context and user_context.strip():
             return user_context.strip(), user_context.strip(), "USER_CONTEXT"
 
-        prompt_lower = prompt.lower()
-        gen_lower = (generated_text or "").lower()
-
-        # 2. Strict entity matching in local DEFAULT_KNOWLEDGE_BASE
-        best_match = None
-        max_entity_score = 0
-
-        for key, entry in DEFAULT_KNOWLEDGE_BASE.items():
-            entity_matches = sum(1 for ent in entry.get("entities", []) if ent in prompt_lower or ent in gen_lower)
-            if entity_matches > max_entity_score:
-                max_entity_score = entity_matches
-                best_match = entry
-
-        if best_match and max_entity_score > 0:
-            return best_match["premise"], best_match["verified_fact"], "LOCAL_KNOWLEDGE_BASE"
-
-        # 3. Dynamic Wikipedia Knowledge Retrieval (for arbitrary open-domain facts)
+        # 2. Dynamic Wikipedia Knowledge Retrieval (for arbitrary open-domain facts)
         wiki_res = self._retrieve_wikipedia_grounding(prompt, generated_text)
         if wiki_res:
             premise, verified_fact = wiki_res
             return premise, verified_fact, "DYNAMIC_WIKIPEDIA_RETRIEVAL"
 
-        # 4. Open-domain query without external reference
+        # 3. Open-domain query without external reference
         return None, None, "OPEN_DOMAIN_UNGROUNDED"
 
 
@@ -659,22 +597,23 @@ class GuardShieldPipeline:
                 nli_decision = "CIRCUIT_BREAKER_INCOMPLETE_GENERATION"
         else:
             print("  • Grounding Premise:    [No external reference indexed — Evaluating via Token Entropy Profile]")
-            # If no external premise is indexed, check token entropy stability
             mean_h = sum(entropy_trace) / max(len(entropy_trace), 1)
             is_hallucination = early_terminated or (mean_h >= self.entropy_threshold)
-            entail_prob = round(max(1.0 - (mean_h / self.entropy_threshold), 0.1), 4)
-            contra_prob = round(1.0 - entail_prob, 4)
-            neutral_prob = 0.0
-            nli_decision = "UNCERTAIN_OPEN_DOMAIN" if is_hallucination else "FACTUAL_HIGH_CONFIDENCE_GENERATION"
+            entail_prob = 0.5
+            contra_prob = 0.5 if is_hallucination else 0.1
+            neutral_prob = 1.0
+            nli_decision = "UNCERTAIN_OPEN_DOMAIN (Entropy Spike)" if is_hallucination else "OPEN_DOMAIN_CONFIDENT"
             verified_fact = raw_output_text
 
         s2_latency = (time.perf_counter() - s2_start) * 1000.0
 
         print(f"  • NLI Decision:         {nli_decision}")
-        print(f"  • Entailment Score:     {entail_prob * 100:.2f}% (Factual Alignment)")
-        print(f"  • Contradiction Score:  {contra_prob * 100:.2f}% (Hallucination Risk)")
         if premise:
+            print(f"  • Entailment Score:     {entail_prob * 100:.2f}% (Factual Alignment)")
+            print(f"  • Contradiction Score:  {contra_prob * 100:.2f}% (Hallucination Risk)")
             print(f"  • Neutral / Ungrounded: {neutral_prob * 100:.2f}% (Unsupported by Premise)")
+        else:
+            print(f"  • Reference Status:     Unindexed Open-Domain Query (Assessed via Mean Token Entropy: {mean_h:.4f} bits)")
         print(f"  • Stage 2 Latency:      {s2_latency:.2f} ms")
 
         total_elapsed = (time.perf_counter() - pipeline_start_time) * 1000.0
