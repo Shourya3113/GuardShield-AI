@@ -259,8 +259,7 @@ def main():
         torch_dtype=torch.float32
     )
     model = model.float()
-    if not is_tpu:
-        model.to(device)
+    model.to(device)
 
     # 4. Prepare Datasets (Static padding on TPU prevents repeated XLA graph recompilations)
     sample_limit = 200 if args.dry_run else None
