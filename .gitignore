@@ -42,6 +42,8 @@ scratch/
 tmp/
 *.tmp
 *.log
+*.zip
+*.tar.gz
 
 # Heavy Machine Learning Model Weights & Checkpoints (>100MB)
 # Note: Keep training configurations, tokenizers, and metadata JSONs
