@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import math
 import json
 import logging
 from pathlib import Path
@@ -40,6 +41,8 @@ class ChatCompletionRequest(BaseModel):
     messages: List[ChatMessage]
     stream: Optional[bool] = False
     temperature: Optional[float] = 0.7
+    logprobs: Optional[bool] = True
+    top_logprobs: Optional[int] = 3
 
 # Global PreScan Security Filter (weights loaded once on startup)
 prescan_filter: Optional[PreScanSecurityFilter] = None
@@ -136,24 +139,43 @@ async def chat_completions(req: ChatCompletionRequest):
 
                                         # Inspect token uncertainty if logprobs or token content is provided
                                         if content_chunk:
-                                            # If upstream provides logprobs, use them; otherwise record token
-                                            res = session_entropy_engine.process_token(content_chunk, [0.85, 0.10, 0.05])
-                                            chunk_json["choices"][0]["entropy"] = res["entropy"]
-                                            chunk_json["choices"][0]["status"] = res["status"]
+                                            choice_obj = chunk_json.get("choices", [{}])[0]
+                                            extracted_probs = []
 
-                                            if res["should_terminate"]:
-                                                # Emit circuit breaker halt chunk and abort stream
-                                                halt_chunk = {
-                                                    "id": f"chatcmpl-{int(time.time())}",
-                                                    "object": "chat.completion.chunk",
-                                                    "choices": [{
-                                                        "delta": {"content": " [GUARDSHIELD CIRCUIT BREAKER: Generation halted on sustained uncertainty / hallucination drift]"},
-                                                        "finish_reason": "length"
-                                                    }]
-                                                }
-                                                yield f"data: {json.dumps(halt_chunk)}\n\n"
-                                                yield "data: [DONE]\n\n"
-                                                break
+                                            # Dynamically extract upstream token probabilities if returned
+                                            logprobs_info = choice_obj.get("logprobs") or {}
+                                            content_lps = logprobs_info.get("content") or []
+                                            if content_lps and isinstance(content_lps, list):
+                                                top_lps = content_lps[0].get("top_logprobs") or []
+                                                for item in top_lps:
+                                                    if isinstance(item, dict) and "logprob" in item:
+                                                        extracted_probs.append(math.exp(float(item["logprob"])))
+                                            elif "top_logprobs" in logprobs_info and isinstance(logprobs_info["top_logprobs"], list):
+                                                for item in logprobs_info["top_logprobs"]:
+                                                    if isinstance(item, dict) and "logprob" in item:
+                                                        extracted_probs.append(math.exp(float(item["logprob"])))
+
+                                            if len(extracted_probs) >= 2:
+                                                res = session_entropy_engine.process_token(content_chunk, extracted_probs)
+                                                choice_obj["entropy"] = res["entropy"]
+                                                choice_obj["status"] = res["status"]
+
+                                                if res["should_terminate"]:
+                                                    # Emit circuit breaker halt chunk and abort stream
+                                                    halt_chunk = {
+                                                        "id": f"chatcmpl-{int(time.time())}",
+                                                        "object": "chat.completion.chunk",
+                                                        "choices": [{
+                                                            "delta": {"content": " [GUARDSHIELD CIRCUIT BREAKER: Generation halted on sustained uncertainty / hallucination drift]"},
+                                                            "finish_reason": "length"
+                                                        }]
+                                                    }
+                                                    yield f"data: {json.dumps(halt_chunk)}\n\n"
+                                                    yield "data: [DONE]\n\n"
+                                                    break
+                                            else:
+                                                choice_obj["entropy"] = None
+                                                choice_obj["status"] = "PASSTHROUGH (Logprobs unavailable from upstream)"
 
                                         yield f"data: {json.dumps(chunk_json)}\n\n"
                                     except Exception:

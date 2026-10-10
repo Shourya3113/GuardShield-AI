@@ -30,13 +30,19 @@ class PreScanSecurityFilter:
         self.threshold = threshold
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
-        # Resolve model directory with graceful fallbacks
+        # Resolve model directory with graceful fallbacks (v4 large -> v4 base -> v3 -> v1)
+        v4_large = config.BASE_DIR / "models" / "deberta_v3_large_prescan_v4"
+        v4_base = config.BASE_DIR / "models" / "deberta_v3_base_prescan_v4"
         v3_path = config.BASE_DIR / "models" / "deberta_v3_prescan_v3"
         v1_path = config.BASE_DIR / "models" / "deberta_v3_prescan"
         
         resolved_path = None
         if model_dir and Path(model_dir).exists():
             resolved_path = Path(model_dir)
+        elif v4_large.exists() and (any(v4_large.glob("*.safetensors")) or any(v4_large.glob("*.bin"))):
+            resolved_path = v4_large
+        elif v4_base.exists() and (any(v4_base.glob("*.safetensors")) or any(v4_base.glob("*.bin"))):
+            resolved_path = v4_base
         elif v3_path.exists() and (any(v3_path.glob("*.safetensors")) or any(v3_path.glob("*.bin"))):
             resolved_path = v3_path
         elif v1_path.exists() and (any(v1_path.glob("*.safetensors")) or any(v1_path.glob("*.bin"))):
