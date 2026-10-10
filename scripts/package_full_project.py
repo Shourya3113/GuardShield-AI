@@ -40,9 +40,16 @@ EXCLUDE_EXTS = {
     ".tar.gz",
 }
 
+# Exclude legacy intermediate weights (v1 and v2) to stay strictly below the 500 MB upload limit.
+# The active, full production model weights (v3) are 100% preserved!
+EXCLUDE_EXACT_RELPATHS = {
+    os.path.normpath("models/deberta_v3_prescan/model.safetensors"),
+    os.path.normpath("models/deberta_v3_prescan_v2/model.safetensors"),
+}
+
 def create_full_project_zip(output_path: Path = OUTPUT_ZIP) -> Path:
     logger.info(f"Packaging GuardShield AI project from: {BASE_DIR}")
-    logger.info(f"Target Zip Archive: {output_path}")
+    logger.info(f"Target Zip Archive: {output_path} (Enforcing < 500 MB upload limit)")
     
     t0 = time.time()
     total_files = 0
@@ -51,7 +58,7 @@ def create_full_project_zip(output_path: Path = OUTPUT_ZIP) -> Path:
     # Ensure Downloads directory exists
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
-    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as zf:
+    with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9, allowZip64=True) as zf:
         for root, dirs, files in os.walk(BASE_DIR):
             # Prune excluded directories in-place
             dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS and not d.startswith("checkpoint-")]
@@ -63,6 +70,8 @@ def create_full_project_zip(output_path: Path = OUTPUT_ZIP) -> Path:
                 
                 full_path = Path(root) / f
                 rel_path = full_path.relative_to(BASE_DIR)
+                if os.path.normpath(str(rel_path)) in EXCLUDE_EXACT_RELPATHS:
+                    continue
                 arc_name = Path("GuardShield-AI") / rel_path
                 
                 zf.write(full_path, arc_name)
