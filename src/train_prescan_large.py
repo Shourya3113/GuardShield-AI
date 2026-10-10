@@ -253,7 +253,12 @@ def main():
     logger.info(f"Loading Model Architecture: {args.model_name} (num_labels=2)...")
     config = AutoConfig.from_pretrained(args.model_name, num_labels=2)
     config.problem_type = "single_label_classification"
-    model = AutoModelForSequenceClassification.from_pretrained(args.model_name, config=config)
+    model = AutoModelForSequenceClassification.from_pretrained(
+        args.model_name, 
+        config=config, 
+        torch_dtype=torch.float32
+    )
+    model = model.float()
     if not is_tpu:
         model.to(device)
 
@@ -336,6 +341,18 @@ def main():
         trainer_kwargs["processing_class"] = tokenizer
     else:
         trainer_kwargs["tokenizer"] = tokenizer
+
+    # On TPU or CPU, explicitly supply AdamW with fused=False to bypass kernel device restriction
+    if is_tpu or device != "cuda":
+        from torch.optim import AdamW
+        decay_params = [p for n, p in model.named_parameters() if p.requires_grad and not any(nd in n for nd in ["bias", "LayerNorm.weight"])]
+        no_decay_params = [p for n, p in model.named_parameters() if p.requires_grad and any(nd in n for nd in ["bias", "LayerNorm.weight"])]
+        optimizer_grouped_parameters = [
+            {"params": decay_params, "weight_decay": 0.01},
+            {"params": no_decay_params, "weight_decay": 0.0}
+        ]
+        optimizer = AdamW(optimizer_grouped_parameters, lr=args.lr, fused=False)
+        trainer_kwargs["optimizers"] = (optimizer, None)
 
     trainer = Trainer(**trainer_kwargs)
 
