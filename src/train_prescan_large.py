@@ -341,17 +341,16 @@ def main():
     else:
         trainer_kwargs["tokenizer"] = tokenizer
 
-    # On TPU or CPU, explicitly supply AdamW with fused=False to bypass kernel device restriction
-    if is_tpu or device != "cuda":
-        from torch.optim import AdamW
-        decay_params = [p for n, p in model.named_parameters() if p.requires_grad and not any(nd in n for nd in ["bias", "LayerNorm.weight"])]
-        no_decay_params = [p for n, p in model.named_parameters() if p.requires_grad and any(nd in n for nd in ["bias", "LayerNorm.weight"])]
-        optimizer_grouped_parameters = [
-            {"params": decay_params, "weight_decay": 0.01},
-            {"params": no_decay_params, "weight_decay": 0.0}
-        ]
-        optimizer = AdamW(optimizer_grouped_parameters, lr=args.lr, fused=False)
-        trainer_kwargs["optimizers"] = (optimizer, None)
+    # Explicitly supply AdamW with fused=False to guarantee numerical stability across TPU, CUDA, and CPU
+    from torch.optim import AdamW
+    decay_params = [p for n, p in model.named_parameters() if p.requires_grad and not any(nd in n for nd in ["bias", "LayerNorm.weight"])]
+    no_decay_params = [p for n, p in model.named_parameters() if p.requires_grad and any(nd in n for nd in ["bias", "LayerNorm.weight"])]
+    optimizer_grouped_parameters = [
+        {"params": decay_params, "weight_decay": 0.01},
+        {"params": no_decay_params, "weight_decay": 0.0}
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=args.lr, eps=1e-7, fused=False)
+    trainer_kwargs["optimizers"] = (optimizer, None)
 
     trainer = Trainer(**trainer_kwargs)
 
