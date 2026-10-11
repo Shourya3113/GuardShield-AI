@@ -74,7 +74,7 @@ def run_statistical_analysis():
     ood_rec, ood_rec_low, ood_rec_high = wilson_score_interval(ood_tp, ood_attacks)
     
     # Authentic DAN Jailbreaks Subset (76 samples)
-    dan_preds = [p for p in ood_preds if p.get("source") == "JailbreakBench" or "DAN" in p.get("prompt", "") or len(p["prompt"]) > 500][:76]
+    dan_preds = [p for p in ood_preds if "ChatGPT JailbreakBench" in p.get("source", "") or p.get("source") == "JailbreakBench"][:76]
     dan_tp = sum(1 for p in dan_preds if p["predicted_label"] == 1)
     dan_rec, dan_rec_low, dan_rec_high = wilson_score_interval(dan_tp, len(dan_preds))
     
@@ -202,7 +202,7 @@ Performance breakdown across the distinct benchmark provenance sources comprisin
 ## 4. Sliding-Window Benign Long Prompt False Positive Audit
 
 We audited benign technical and educational passages exceeding 200–500 characters evaluated through the sliding-window max-pooling inference path:
-- **Long Benign Query Sample Count**: {len(long_results)} (length $\ge 200$ characters)
+- **Long Benign Query Sample Count**: {len(long_results)} (length $\\ge 200$ characters)
 - **False Positive Rate on Long Prompts**: **{long_fp_rate*100:.2f}%** ({int(long_fp_rate*len(long_results))} false alarms across {len(long_results)} prompts)
 - **Median Sliding-Window Latency (p50)**: **{long_p50:.2f} ms** (Mean: **{long_mean:.2f} ms**)
 

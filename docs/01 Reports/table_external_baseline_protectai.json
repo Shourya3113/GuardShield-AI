@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "model_name": "protectai/deberta-v3-base-prompt-injection-v2",
+    "architecture": "DeBERTa-v3-base (125M parameters)",
+    "git_commit": "cf77b6fa17717d433d12ff8e3645be4082d20c99",
+    "timestamp": "2026-10-11 18:32:47",
+    "device": "CUDA"
+  },
+  "in_distribution": {
+    "split_name": "In-Distribution Test (698)",
+    "sample_count": 698,
+    "accuracy": 0.9384,
+    "recall": 0.8873,
+    "precision": 0.9906,
+    "f1_score": 0.9361,
+    "fpr": 0.0087,
+    "confusion_matrix": {
+      "tn": 340,
+      "fp": 3,
+      "fn": 40,
+      "tp": 315
+    },
+    "latency_p50_ms": 41.28,
+    "latency_mean_ms": 45.38
+  },
+  "out_of_distribution": {
+    "split_name": "Zero-Shot OOD Test (500)",
+    "sample_count": 500,
+    "accuracy": 0.882,
+    "recall": 0.788,
+    "precision": 0.9704,
+    "f1_score": 0.8698,
+    "fpr": 0.024,
+    "confusion_matrix": {
+      "tn": 244,
+      "fp": 6,
+      "fn": 53,
+      "tp": 197
+    },
+    "latency_p50_ms": 70.72,
+    "latency_mean_ms": 477.87
+  }
+}

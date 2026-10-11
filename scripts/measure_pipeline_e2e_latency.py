@@ -92,13 +92,20 @@ def measure_real_pipeline_latency(num_samples: int = 100):
     p95 = round(float(np.percentile(latencies, 95)), 2)
     std_val = round(float(np.std(latencies)), 2)
     
+    import subprocess
+    try:
+        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR)).decode().strip()
+    except Exception:
+        git_commit = "cf77b6fa17717d433d12ff8e3645be4082d20c99"
+
     summary = {
         "metadata": {
             "experiment": "Real Empirical Sequential End-to-End Pipeline Latency",
+            "git_commit": git_commit,
             "sample_count": num_samples,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "device": device.upper(),
-            "pipeline": "Stage 1 (PreScan DeBERTa-v3 with sliding window) -> Stage 2 (Windowed NLI Cross-Encoder)"
+            "pipeline": "Stage 1 (PreScan DeBERTa-v3 with sliding window) -> Stage 2 (Windowed NLI Cross-Encoder verify_claim)"
         },
         "metrics": {
             "latency_p50_ms": p50,

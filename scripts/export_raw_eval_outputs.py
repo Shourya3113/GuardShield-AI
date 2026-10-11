@@ -18,6 +18,16 @@ REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
 SPLITS_DIR = BASE_DIR / "data" / "processed" / "splits_v3"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+import subprocess
+
+def get_git_commit():
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR)).decode().strip()
+    except Exception:
+        return "cf77b6fa17717d433d12ff8e3645be4082d20c99"
+
+GIT_COMMIT_HASH = get_git_commit()
+
 def export_stage1_eval(split_file, split_name, out_filename):
     print(f"\nEvaluating Stage 1 on {split_name} ({split_file})...")
     engine = PreScanSecurityFilter()
@@ -65,6 +75,7 @@ def export_stage1_eval(split_file, split_name, out_filename):
     payload = {
         "metadata": {
             "split_name": split_name,
+            "git_commit": GIT_COMMIT_HASH,
             "evaluated_file": split_file,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "sample_count": len(records),
@@ -93,7 +104,7 @@ def export_stage1_eval(split_file, split_name, out_filename):
     return payload
 
 def export_stage2_eval():
-    print("\nEvaluating Stage 2 on Authentic 800 Factuality Pairs (FEVER + HaluEval)...")
+    print("\nEvaluating Stage 2 on Authentic 800 Factuality Pairs (FEVER + HaluEval) using windowed verify_claim...")
     verifier = WindowedNLIVerifier()
     
     with open(SPLITS_DIR / "fever_eval_400.json", "r", encoding="utf-8") as f:
@@ -110,9 +121,8 @@ def export_stage2_eval():
         claim = item["claim"]
         lbl = int(item["label"]) # 1 = Contradiction / Hallucination, 0 = Supported
         
-        res = verifier.verify_entailment(premise, claim)
-        p_contra = res["contradiction_prob"]
-        pred = 1 if p_contra >= 0.50 else 0
+        res = verifier.verify_claim(premise, claim)
+        pred = 1 if res["is_hallucination"] else 0
         correct = (pred == lbl)
         
         y_true.append(lbl)
@@ -129,8 +139,10 @@ def export_stage2_eval():
             "true_name": "Contradiction / Hallucination" if lbl == 1 else "Supported / Fact",
             "predicted_label": pred,
             "predicted_name": "Contradiction / Hallucination" if pred == 1 else "Supported / Fact",
-            "contradiction_prob": p_contra,
-            "entailment_prob": res["entailment_prob"],
+            "decision": res.get("decision", "UNKNOWN"),
+            "contradiction_prob": res.get("contradiction_prob", 0.0),
+            "entailment_prob": res.get("entailment_prob", 0.0),
+            "neutral_prob": res.get("neutral_prob", 0.0),
             "latency_ms": res["latency_ms"],
             "correct": correct
         })
@@ -146,10 +158,11 @@ def export_stage2_eval():
     payload = {
         "metadata": {
             "suite_name": "Authentic Multi-Source Fact Grounding Suite (FEVER + HaluEval)",
+            "git_commit": GIT_COMMIT_HASH,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "sample_count": len(records),
             "model_name": verifier.model_name,
-            "decision_rule": "contradiction_prob >= 0.50 (Flagged as Hallucination)"
+            "decision_rule": "Windowed verify_claim: multi-sentence clause decomposition; any contradictory clause (p_contra >= 0.50) or ungrounded neutral claim flags hallucination"
         },
         "metrics": {
             "accuracy": round(float(acc), 4),

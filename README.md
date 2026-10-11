@@ -50,29 +50,30 @@ GuardShield AI has been empirically evaluated across **7 published academic and 
 
 | Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Median Latency (ms) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.42%** | **99.14%** | **97.75%** | **0.9844** | **0.87%** | **32.95 ms** |
-| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **98.79%** | **97.60%** | **0.9819** | **1.20%** | **18.48 ms** |
-| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **73.25%** | **76.88%** | **66.50%** | **0.7131** | **20.00%** | **18.91 ms** |
-| **Dual-Stage Pipeline** | **Empirical Measured Sequential Overhead** | — | — | — | — | — | — | **65.86 ms** |
+| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.42%** | **99.14%** | **97.75%** | **0.9844** | **0.87%** | **16.17 ms** |
+| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **98.79%** | **97.60%** | **0.9819** | **1.20%** | **28.69 ms** |
+| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **63.00%** | **58.84%** | **86.50%** | **0.7004** | **60.50%** | **29.73 ms** |
+| **Dual-Stage Pipeline** | **Empirical Measured Sequential Overhead** | — | — | — | — | — | — | **27.90 ms** |
 
-*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates cross-encoder contradiction classification ($p_{\text{contradiction}} \ge 0.50$) across 800 authentic, non-duplicated academic benchmark pairs with declarative statement formulation: FEVER (86.50% Accuracy, 88.50% Recall, 15.50% FPR) and HaluEval QA (60.00% Accuracy, 44.50% Recall, 24.50% FPR). Complete prediction-level logs with per-sample scores and latencies are committed in `docs/01 Reports/raw_eval_*.json` for independent verification without GPU hardware.*
+*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates windowed premise-hypothesis fact verification using verify_claim with multi-sentence clause decomposition across 800 authentic, non-duplicated academic benchmark pairs: FEVER (73.75% Accuracy, 88.50% Recall) and HaluEval QA (52.25% Accuracy, 84.50% Recall). Because verify_claim strictly flags ungrounded neutral assertions and multi-clause contradictions as hallucinations, contradiction recall reaches 86.50% (intercepting 346 of 400 hallucinations) at the expense of a 60.50% false positive rate on open-domain conversational claims. Complete prediction-level logs with per-sample scores, latencies, and git commit hashes are committed in `docs/01 Reports/raw_eval_*.json`.*
 
 ---
 
-### Comparative Baseline: Transformer vs. Bag-of-Words (TF-IDF + Logistic Regression)
+### Comparative Baselines: GuardShield vs. TF-IDF & ProtectAI DeBERTa-v3
 
-To assess whether the transformer representation provides genuine advantages over surface lexical features, we benchmarked a standard TF-IDF + Logistic Regression model against GuardShield on identical splits:
+To rigorously evaluate defense efficacy against both classical surface-lexical baselines and modern industry SLMs, we benchmarked GuardShield against TF-IDF + Logistic Regression and ProtectAI's `deberta-v3-base-prompt-injection-v2` (125M parameters) on identical splits:
 
-| Model Architecture | In-Distribution Accuracy | In-Distribution Recall | OOD Zero-Shot Accuracy | OOD Zero-Shot Recall | Generalization Delta |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **TF-IDF + Logistic Regression (Baseline)** | 94.56% | 91.55% | 80.00% | 62.40% | **-29.15% Recall Collapse** |
-| **GuardShield DeBERTa-v3 (Ours)** | **98.42%** | **97.75%** | **98.20%** | **97.60%** | **-0.15% Robust Generalization** |
+| Model Architecture | In-Distribution Accuracy | In-Distribution Recall | OOD Zero-Shot Accuracy | OOD Zero-Shot Recall | Parameters | Latency (p50) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **TF-IDF + Logistic Regression (Baseline)** | 94.41% | 91.55% | 71.60% | 45.60% | Linear (10k n-grams) | < 1 ms |
+| **ProtectAI DeBERTa-v3-base (External SLM)** | 93.84% | 88.73% | 88.20% | 78.80% | 125M (Base) | 41.28 ms |
+| **GuardShield DeBERTa-v3 (Ours)** | **98.42%** | **97.75%** | **98.20%** | **97.60%** | **44.3M Backbone (Small)** | **16.17 ms** |
 
 **Granular Zero-Shot OOD Generalization Breakdown**:
-- **Authentic Human DAN Jailbreaks (76 prompts)**: On real, human-authored ChatGPT jailbreaks, GuardShield achieves **85.53% to 92.11% recall** (65 to 70 of 76 detected) against TF-IDF's **90.79%**. Because colloquial jailbreak prompts share explicit keyword markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`), bag-of-words baselines detect them effectively.
-- **Controlled Structural Template Shifts (174 prompts)**: Evaluated on 174 injection variations derived from 5 fixed structural templates with slot variations, TF-IDF drops to **50.00% recall**, while GuardShield's contextual transformer representation maintains **100.00% recall** (174 of 174 detected).
+- **Authentic Human DAN Jailbreaks (76 prompts)**: On real, human-authored ChatGPT jailbreaks, GuardShield achieves **92.11% recall** (70 of 76 detected) against ProtectAI's **93.42%** (71/76) and TF-IDF's **92.11%** (70/76). Because colloquial jailbreak prompts share explicit keyword markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`), lexical features detect them effectively.
+- **Controlled Structural Template Shifts (174 prompts)**: Evaluated on 174 injection variations derived from 5 fixed structural templates with slot variations, TF-IDF collapses to **25.29% recall** (44/174), while GuardShield's contextual transformer representation maintains **100.00% recall** (174/174).
 - **Overall OOD Attack Recall**: Across all 250 zero-shot attacks, GuardShield achieves **97.60% recall** (244 of 250) with a low false positive rate of **1.20%**.
-- **In-Distribution Domain Breakdown**: Held-out in-distribution recall varies across provenance sources: Stanford SPML (**99.19%**, 301/303), Jayavibhav (**98.46%**, 128/130), and Deepset (**88.37%**, 38/43), reflecting natural cross-domain variability.
+- **In-Distribution Domain Breakdown**: Held-out in-distribution recall varies across provenance sources: Stanford SPML (**99.19%**, 301/303), Jayavibhav (**98.46%**, 128/130), and Deepset (**88.37%**, 38/43).
 - **Statistical Rigor & Controls**: 95% Wilson score confidence intervals ($98.42\% \pm 0.96\%$), length-matched control experiments (length heuristic 60.61% vs. GuardShield 98.48%), and long-prompt sliding-window audits (66 prompts $\ge 200$ chars, 4.55% FPR) are detailed in [`statistical_rigor_and_controls.md`](docs/03%20Research%20and%20Catalogs/statistical_rigor_and_controls.md).
 
 ---
@@ -81,15 +82,22 @@ To assess whether the transformer representation provides genuine advantages ove
 
 To evaluate robustness against advanced bypass vectors, GuardShield was benchmarked against 11 perturbation vectors on balanced cohorts ($N=100$ attacks, $N=100$ benign) with exact 95% Wilson confidence intervals (detailed in [`table_adaptive_robustness.md`](docs/01%20Reports/table_adaptive_robustness.md)):
 
-1. **Adversarial Length-Padding Evasion Defense**:
-   - **Benign Prefix Padding (>256 tokens prepended)**: Fixed 128-token truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield's sliding-window chunking maintains **98.0% recall** [93.0%, 99.45%] with **2.0% FPR** [0.55%, 7.0%].
-   - **Sandwich Padding (benign prefix + suffix)**: Fixed truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield achieves **95.0% recall** [88.82%, 97.85%] with **2.0% FPR** [0.55%, 7.0%].
-   - **Suffix Padding**: GuardShield achieves **94.0% recall** [87.52%, 97.22%] with **0.0% FPR** [0.0%, 3.7%].
-2. **Disaggregated XSTest Evaluation ($N=450$)**:
-   - **Safe Homonym Prompts ($N=250$)**: GuardShield achieves **0.0% False Refusal Rate (FRR)** [0.0%, 1.51%].
-   - **Contrast Unsafe Prompts ($N=200$)**: Evaluated on direct toxic/harmful requests (non-injection), GuardShield achieves **0.0% block rate** [0.0%, 1.88%]. This confirms Stage 1's precise architectural specialization as a prompt-injection/jailbreak ingress filter, passing plain non-adversarial queries to upstream policy moderators.
-3. **Probability Calibration**:
-   - `PreScanSecurityFilter` incorporates temperature scaling ($T = 2.0$) to smooth cross-entropy logits, avoiding overconfident probability saturation on edge-case inputs.
+**1. Critical Empirical Finding: High False Positive Rates on Character Obfuscation (90%–100% FPR)**:
+Across 7 of the 11 evaluated perturbation vectors (Zero-Width Spaces, Soft-Hyphens, Leetspeak, Cyrillic Homoglyphs, Base64, ROT13, and Hinglish Code-Mixing), evaluating benign prompts transformed with the exact same perturbations results in a False Positive Rate of **90.0% to 100.0%**.
+This demonstrates that the ingress classifier does not decode obfuscated syntax; rather, out-of-distribution token fragmentation, unknown subword splits, and cipher wrappers push the model into high-uncertainty anomaly rejection regardless of underlying intent. Therefore, 100% recall on these perturbation rows reflects blanket rejection of non-standard text rather than semantic comprehension.
+
+**2. Adversarial Length-Padding Evasion Defense (Clean Semantics)**:
+Conversely, on adversarial length-padding where the underlying semantics remain clean and uncorrupted:
+- **Benign Prefix Padding (>256 tokens prepended)**: Fixed 128-token truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield's sliding-window chunking maintains **98.0% recall** [93.0%, 99.45%] with **2.0% FPR** [0.55%, 7.0%].
+- **Sandwich Padding (benign prefix + suffix)**: Fixed truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield achieves **95.0% recall** [88.82%, 97.85%] with **2.0% FPR** [0.55%, 7.0%].
+- **Suffix Padding**: GuardShield achieves **94.0% recall** [87.52%, 97.22%] with **0.0% FPR** [0.0%, 3.7%].
+
+**3. Disaggregated XSTest Evaluation ($N=450$)**:
+- **Safe Homonym Prompts ($N=250$)**: GuardShield achieves **0.0% False Refusal Rate (FRR)** [0.0%, 1.51%].
+- **Contrast Unsafe Prompts ($N=200$)**: Evaluated on direct toxic/harmful requests (non-injection), GuardShield achieves **0.0% block rate** [0.0%, 1.88%]. This confirms Stage 1's precise architectural specialization as a prompt-injection/jailbreak ingress filter, passing plain non-adversarial queries to upstream policy moderators.
+
+**4. Calibration & Operational Boundaries**:
+- `PreScanSecurityFilter` defaults to raw model logits ($T = 1.0$). At the 0.50 decision threshold, post-hoc scalar temperature scaling does not change classification boundaries; addressing out-of-distribution uncertainty under real distribution shifts requires domain-specific hard-negative training and language routing rather than simple scalar scaling.
 
 ---
 

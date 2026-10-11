@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "model": "TfidfVectorizer(ngram=(1,2), max_features=10000) + LogisticRegression(C=1.0)",
+    "git_commit": "cf77b6fa17717d433d12ff8e3645be4082d20c99",
+    "timestamp": "2026-10-11 18:27:51"
+  },
+  "in_distribution": {
+    "sample_count": 698,
+    "accuracy": 0.9441,
+    "recall": 0.9155,
+    "precision": 0.9731,
+    "f1_score": 0.9434
+  },
+  "out_of_distribution": {
+    "sample_count": 500,
+    "accuracy": 0.716,
+    "recall": 0.456,
+    "precision": 0.95,
+    "f1_score": 0.6162,
+    "dan_jailbreaks_recall": 0.9211,
+    "dan_sample_count": 76,
+    "synthetic_template_recall": 0.2529,
+    "synthetic_sample_count": 174
+  }
+}
