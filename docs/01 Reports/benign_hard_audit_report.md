@@ -24,18 +24,20 @@ Evaluated on $N = 85$ curated hard probes spanning routine conversational, multi
 
 ---
 
-## 2. Auditor Finding Analysis & Architectural Insights
+## 2. Empirical Analysis & Operational Scope (Non-Speculative)
 
-### A. Surface Framing & Imperative Correlation (Finding F1)
-Prior Stage 1 training corpora (Stanford SPML and Jayavibhav) under-represented:
-1. **Benign Role Prompts**: High-frequency training jailbreaks shared prefixes like *"You are an unrestricted AI..."*, inducing the SLM to correlate *"You are..."* with malicious intent.
-2. **Short Multi-Turn Prompts**: Single-word commands in SPML were almost exclusively adversarial overrides (*"ignore"*, *"override"*), leading the model to treat brief conversational turns (*"continue"*, *"ok thanks"*) with heightened risk.
-3. **Indic Text**: Byte-level subword tokenizers represent Devanagari and romanized Indic with higher perplexity when unrepresented in benign training splits.
+### A. Empirical Failure Modes & Measured Boundaries
+Empirical measurement on the shipped `deberta_v3_prescan_v3` checkpoint reveals clear operational boundaries:
+1. **Multilingual Ingress**: The classifier exhibits elevated false positive rates on non-English benign prompts (Hinglish FPR: **90.0%** [59.59%, 98.21%]; Hindi Devanagari FPR: **50.0%** [23.66%, 76.34%]). The shipped weights were fine-tuned predominantly on English injection corpora; non-English tokens trigger high uncertainty.
+2. **System Framing & Role-Play Sensitivity**: Benign prompts starting with imperative system assignments (*"You are a helpful assistant..."*, *"Act as a software architect..."*) yield **50.0% FPR** [23.66%, 76.34%], as the classifier associates imperative role-assignment framing with jailbreak attempts.
+3. **Short Conversational Turns**: Brief isolated phrases without conversational history (*"continue"*, *"ok thanks"*, *"what else?"*) suffer **40.0% FPR** [19.82%, 64.25%]. In isolation, short imperative utterances trigger elevated risk scores compared to complete declarative questions.
+4. **Structured Syntax / Code**: Prompts containing raw JSON, SQL fragments, or curly braces yield **40.0% FPR** [16.82%, 68.73%].
 
-### B. Probability Calibration & Remediation Roadmap (Finding F2)
-- **Softmax Saturation**: Saturated outputs ($p > 0.999$ or $p < 0.001$) arise from unscaled cross-entropy logits.
-- **Remediation**: Temperature scaling parameter $T$ calibrated on the validation split smoothly maps logits to true empirical risk probabilities, preventing boundary inflation.
-- **Hard Negative Augmentation**: The curated `benign_hard_eval.json` dataset is now committed as an open-source evaluation benchmark and training augmentation set.
+### B. Deployment Recommendations & Architectural Scope
+- **Language-Aware Routing**: In enterprise production, ingress traffic should pass through an upfront language identifier (e.g. fastText or CLD3). Multilingual requests should route to multilingual safety classifiers or be translated prior to SLM evaluation.
+- **Context-Aware Ingress**: Short multi-turn follow-ups must be evaluated with their conversational parent context rather than as isolated zero-context fragments.
+- **Probability Calibration (Temperature Scaling)**: Applying temperature scaling ($T = 2.0$) in `PreScanSecurityFilter` prevents probability saturation ($p \in \{0.0001, 0.9999\}$), providing continuous confidence metrics for downstream risk-scoring engines.
+- **Scope Clarification**: GuardShield Stage 1 is specialized as a prompt-injection and jailbreak ingress filter; it is not a general conversational or multilingual content moderation system.
 
 ---
-*Report generated automatically by `scripts/build_and_eval_benign_hard.py`.*
+*Report generated from empirical test evaluation of `data/benign_hard_eval.json` on shipped weights.*

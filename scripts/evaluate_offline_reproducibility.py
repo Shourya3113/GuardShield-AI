@@ -223,7 +223,7 @@ def evaluate_stage2_nli_offline() -> Dict[str, Any]:
         lbl = int(item.get("label", 0))  # 0 = Supported, 1 = Refuted/Hallucination
         y_true.append(lbl)
 
-        res = verifier.verify_entailment(premise, claim)
+        res = verifier.verify_claim(premise, claim)
         latencies.append(res["latency_ms"])
         y_pred.append(1 if res["is_hallucination"] else 0)
 

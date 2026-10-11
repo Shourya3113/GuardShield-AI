@@ -26,8 +26,9 @@ class PreScanSecurityFilter:
     Evaluates incoming prompts for prompt injections, jailbreaks, and policy violations.
     Target latency overhead: < 25ms.
     """
-    def __init__(self, model_dir: Path = None, threshold: float = 0.5, allow_untrained_fallback: bool = False):
+    def __init__(self, model_dir: Path = None, threshold: float = 0.5, allow_untrained_fallback: bool = False, temperature: float = 1.0):
         self.threshold = threshold
+        self.temperature = max(0.01, float(temperature))
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
         # Resolve model directory with graceful fallbacks (v4 large -> v4 base -> v3 -> v1)
@@ -98,7 +99,8 @@ class PreScanSecurityFilter:
             inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=max_chunk_tokens + 2).to(self.device)
             with torch.no_grad():
                 outputs = self.model(**inputs)
-                probs = torch.softmax(outputs.logits, dim=-1)[0]
+                scaled_logits = outputs.logits / self.temperature
+                probs = torch.softmax(scaled_logits, dim=-1)[0]
                 risk_score = float(probs[1].item())
         else:
             # Long prompt defense: Evaluate sliding windows and take maximum injection probability
@@ -122,7 +124,8 @@ class PreScanSecurityFilter:
             }
             with torch.no_grad():
                 outputs = self.model(**batch)
-                probs = torch.softmax(outputs.logits, dim=-1)
+                scaled_logits = outputs.logits / self.temperature
+                probs = torch.softmax(scaled_logits, dim=-1)
                 risk_score = float(torch.max(probs[:, 1]).item())
             
         # Class 1 = Injection / Malicious, Class 0 = Safe

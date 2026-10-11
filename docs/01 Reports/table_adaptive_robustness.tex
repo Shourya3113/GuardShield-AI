@@ -1,25 +1,28 @@
 % GuardShield AI - Camera-Ready Adaptive Adversarial Robustness Table
 \begin{table*}[t]
 \centering\small
-\caption{Adversarial Robustness and Evasion Defense Comparison across Perturbation Vectors and Length-Padding Evasions}
+\caption{Adversarial Robustness and Evasion Defense: Attack Recall vs. Benign False Positive Rate (FPR) with 95\% Wilson Confidence Intervals ($N=100$ per cohort)}
 \label{tab:adaptive_robustness}
-\begin{tabular}{lcccc}
+\begin{tabular}{lcccccccc}
 \toprule
-\textbf{Adversarial Perturbation Vector} & \textbf{GuardShield (Ours)} & \textbf{Naive Cutoff} & \textbf{Keyword Regex} & \textbf{Latency (p50)} \\
+& \multicolumn{2}{c}{\textbf{GuardShield (Ours)}} & \multicolumn{2}{c}{\textbf{Naive Cutoff (128t)}} & \multicolumn{2}{c}{\textbf{Regex Blocklist}} & \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+\textbf{Perturbation Vector} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{p50 Lat.} \\
 \midrule
-1. Raw Ingress Injections (Baseline) & \textbf{100.0\%} & 100.0\% & 75.0\% & 31.8 ms \\
-2. Zero-Width Spaces (Invisible Chars) & \textbf{100.0\%} & 100.0\% & 37.5\% & 27.79 ms \\
-3. Soft-Hyphens (Subword Splitting) & \textbf{100.0\%} & 100.0\% & 37.5\% & 42.11 ms \\
-4. Leetspeak Obfuscation & \textbf{100.0\%} & 100.0\% & 0.0\% & 42.97 ms \\
-5. Cyrillic Homoglyphs (Visual Spoof) & \textbf{100.0\%} & 100.0\% & 0.0\% & 24.19 ms \\
-6. Base64 Cipher Wrapping & \textbf{100.0\%} & 100.0\% & 0.0\% & 27.28 ms \\
-7. ROT13 Caesar Cipher Wrapping & \textbf{100.0\%} & 100.0\% & 0.0\% & 23.41 ms \\
-8. Hinglish Code-Mixed Wrapping & \textbf{100.0\%} & 100.0\% & 75.0\% & 27.06 ms \\
-9. Benign Prefix Padding (>256 Tok) & \textbf{100.0\%} & 0.0\% & 75.0\% & 39.48 ms \\
-10. Benign Suffix Padding (>256 Tok) & \textbf{87.5\%} & 87.5\% & 75.0\% & 39.32 ms \\
-11. Sandwich Padding (Evasion Core) & \textbf{100.0\%} & 0.0\% & 75.0\% & 77.21 ms \\
+1. Raw Ingress (Baseline) & \textbf{98.0\%} & 1.0\% & 98.0\% & 1.0\% & 21.0\% & 0.0\% & 32.01 ms \\
+2. Zero-Width Spaces (Invisible Chars) & \textbf{100.0\%} & 99.0\% & 100.0\% & 99.0\% & 0.0\% & 0.0\% & 38.22 ms \\
+3. Soft-Hyphens (Subword Splitting) & \textbf{100.0\%} & 98.0\% & 100.0\% & 98.0\% & 0.0\% & 0.0\% & 103.38 ms \\
+4. Leetspeak Obfuscation & \textbf{100.0\%} & 99.0\% & 100.0\% & 99.0\% & 0.0\% & 0.0\% & 36.82 ms \\
+5. Cyrillic Homoglyphs (Visual Spoof) & \textbf{100.0\%} & 90.0\% & 100.0\% & 90.0\% & 1.0\% & 0.0\% & 36.46 ms \\
+6. Base64 Cipher Wrapping & \textbf{100.0\%} & 100.0\% & 100.0\% & 100.0\% & 0.0\% & 0.0\% & 53.39 ms \\
+7. ROT13 Caesar Cipher Wrapping & \textbf{100.0\%} & 97.0\% & 100.0\% & 97.0\% & 0.0\% & 0.0\% & 34.37 ms \\
+8. Hinglish Code-Mixed Wrapping & \textbf{100.0\%} & 92.0\% & 100.0\% & 92.0\% & 39.0\% & 0.0\% & 31.88 ms \\
+9. Benign Prefix Padding (>256 Tok) & \textbf{98.0\%} & 2.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 46.63 ms \\
+10. Benign Suffix Padding (>256 Tok) & \textbf{94.0\%} & 0.0\% & 94.0\% & 0.0\% & 21.0\% & 0.0\% & 41.69 ms \\
+11. Sandwich Padding (Evasion Core) & \textbf{95.0\%} & 2.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 68.05 ms \\
 \midrule
-XSTest False Refusal Rate (FPR, N=450) & \textbf{0.0\%} & 0.0\% & 0.0\% & -- \\
+XSTest Safe Prompts (FRR, $N=250$) & \multicolumn{2}{c}{\textbf{0.0\%} [0.0\%-1.51\%]} & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{0.0\%} & -- \\
+XSTest Contrast Unsafe ($N=200$) & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{21.0\%} & -- \\
 \bottomrule
 \end{tabular}
 \end{table*}

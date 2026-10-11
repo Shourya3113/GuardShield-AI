@@ -47,7 +47,7 @@ def measure_real_pipeline_latency(num_samples: int = 100):
     for _ in range(5):
         if torch.cuda.is_available(): torch.cuda.synchronize()
         _ = prescan.inspect_prompt("Explain quantum computing in simple terms.")
-        _ = nli.verify_entailment("Quantum computing uses qubits.", "Quantum computers leverage quantum mechanics.")
+        _ = nli.verify_claim("Quantum computing uses qubits.", "Quantum computers leverage quantum mechanics.")
         if torch.cuda.is_available(): torch.cuda.synchronize()
         
     logger.info(f"Running {num_samples} real sequential end-to-end measurements on {device.upper()}...")
@@ -66,7 +66,7 @@ def measure_real_pipeline_latency(num_samples: int = 100):
         s1_res = prescan.inspect_prompt(prompt)
         
         # Stage 2: Post-Generation Fact Grounding (on approved queries)
-        s2_res = nli.verify_entailment(premise, claim) if s1_res["is_safe"] else None
+        s2_res = nli.verify_claim(premise, claim) if s1_res["is_safe"] else None
         
         if torch.cuda.is_available():
             torch.cuda.synchronize()

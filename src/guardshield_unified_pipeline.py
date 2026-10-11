@@ -50,6 +50,7 @@ if str(SRC_DIR) not in sys.path:
 
 from prescan_filter import PreScanSecurityFilter
 from nli_verifier import WindowedNLIVerifier
+from streaming_entropy_engine import StreamingEntropyEngine
 
 
 
@@ -151,8 +152,8 @@ class GuardShieldPipeline:
     def __init__(
         self,
         gen_model_name: str = "Qwen/Qwen2.5-0.5B-Instruct",
-        entropy_threshold: float = 1.40,
-        consecutive_spikes_limit: int = 3,
+        entropy_threshold: float = 1.25,
+        consecutive_spikes_limit: int = 2,
         prescan_threshold: float = 0.50,
         nli_threshold: float = 0.50,
         device: Optional[str] = None
@@ -161,6 +162,10 @@ class GuardShieldPipeline:
         self.consecutive_spikes_limit = consecutive_spikes_limit
         self.prescan_threshold = prescan_threshold
         self.nli_threshold = nli_threshold
+        self.entropy_engine = StreamingEntropyEngine(
+            spike_threshold=entropy_threshold,
+            consecutive_spike_limit=consecutive_spikes_limit
+        )
 
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         print("\n" + "=" * 80)
@@ -393,33 +398,18 @@ class GuardShieldPipeline:
 
         return None
 
-    def _match_knowledge(self, prompt: str, generated_text: Optional[str] = None, user_context: Optional[str] = None) -> Tuple[Optional[str], Optional[str], str]:
+    def _match_knowledge(self, prompt: str, user_context: Optional[str] = None) -> Tuple[Optional[str], Optional[str], str]:
         """
         Finds or dynamically retrieves authoritative reference knowledge for fact-checking.
-        Prioritizes user context (enterprise RAG), local in-memory knowledge index (air-gapped),
-        and dynamic Wikipedia API (if online).
+        Prioritizes user context (enterprise RAG) and dynamic Wikipedia API (if online).
+        Strictly prompt-driven: never uses candidate output text, preventing circular confirmation bias.
         Returns: (premise, verified_fact, source_type)
         """
         # 1. Explicit user reference context (Enterprise RAG priority)
         if user_context and user_context.strip():
             return user_context.strip(), user_context.strip(), "USER_CONTEXT_RAG"
 
-        # 2. Local In-Memory Knowledge Grounding Index (Air-gapped / offline support)
-        local_store = {
-            "france": ("Paris is the capital and most populous city of France.", "Paris"),
-            "australia": ("Canberra is the capital city of Australia.", "Canberra"),
-            "india": ("New Delhi is the official national capital of India.", "New Delhi"),
-            "world wide web": ("The World Wide Web was invented by English scientist Tim Berners-Lee in 1989.", "Tim Berners-Lee"),
-            "guardshield": ("GuardShield AI is an open-source security sidecar proxy for LLMs running local pre-scan and streaming entropy verification.", "GuardShield AI"),
-            "python": ("Python is a high-level, general-purpose programming language created by Guido van Rossum.", "Guido van Rossum"),
-            "transformer": ("The Transformer architecture was introduced in the 2017 paper Attention Is All You Need by Vaswani et al.", "Vaswani et al.")
-        }
-        query_text = f"{prompt} {generated_text or ''}".lower()
-        for key, (prem, fact) in local_store.items():
-            if key in query_text:
-                return prem, fact, "LOCAL_RAG_INDEX (Air-Gapped)"
-
-        # 3. Dynamic Wikipedia Knowledge Retrieval (if network accessible)
+        # 2. Dynamic Wikipedia Knowledge Retrieval (if network accessible)
         try:
             wiki_res = self._retrieve_wikipedia_grounding(prompt)
             if wiki_res:
@@ -428,28 +418,19 @@ class GuardShieldPipeline:
         except Exception:
             pass
 
-        # 4. Open-domain query without external reference
+        # 3. Open-domain query without external reference
         return None, None, "OPEN_DOMAIN_UNGROUNDED"
 
 
     def _compute_entropy(self, probabilities: List[float]) -> float:
-        """Calculates normalized Shannon entropy H(x) in bits."""
-        s = sum(probabilities)
-        if s <= 0:
-            return 0.0
-        norm = [p / s for p in probabilities]
-        h = 0.0
-        for p in norm:
-            if p > 1e-7:
-                h -= p * math.log2(p)
-        return round(h, 4)
+        """Calculates normalized Shannon entropy H(x) in bits using the unified StreamingEntropyEngine."""
+        return self.entropy_engine.compute_entropy(probabilities)
 
     def run(
         self,
         prompt: str,
         reference_context: Optional[str] = None,
-        max_new_tokens: int = 30,
-        inject_synthetic_hallucination: bool = False
+        max_new_tokens: int = 30
     ) -> Dict[str, Any]:
         """
         Executes the complete unified GuardShield AI pipeline on a single prompt.
@@ -526,9 +507,13 @@ class GuardShieldPipeline:
         print(f"  {'Generated Token':<16} | {'Top-3 Dynamic Probabilities':<28} | {'Entropy H(x)':<12} | {'Status'}")
         print("  " + "-" * 76)
 
+        past_key_values = None
+        next_input_ids = input_ids
+
         for step in range(max_new_tokens):
             with torch.no_grad():
-                outputs = self.gen_model(current_ids, use_cache=True)
+                outputs = self.gen_model(next_input_ids, past_key_values=past_key_values, use_cache=True)
+                past_key_values = getattr(outputs, "past_key_values", None)
                 next_logits = outputs.logits[:, -1, :]
                 probs = torch.softmax(next_logits, dim=-1)[0]
                 top3_p, top3_idx = torch.topk(probs, 3)
@@ -555,6 +540,7 @@ class GuardShieldPipeline:
 
                 current_ids = torch.cat([current_ids, next_token_id], dim=-1)
                 generated_tokens.append(token_str)
+                next_input_ids = next_token_id
 
                 # Check circuit breaker
                 if consecutive_spikes >= self.consecutive_spikes_limit:
@@ -581,11 +567,6 @@ class GuardShieldPipeline:
             if len(trailing.split()) < 4:
                 raw_output_text = raw_output_text[:last_punct + 1].strip()
 
-        # Optional synthetic test injection to demonstrate hallucination suppression
-        if inject_synthetic_hallucination:
-            raw_output_text = "The capital of India is Mumbai, which was officially declared the administrative capital."
-            print(f"\n  [TEST INJECTION MODE] Artificially altered generation to: {repr(raw_output_text)}")
-
         print(f"\n  • Raw Generated Output: {repr(raw_output_text)}")
         print(f"  • Tokens Emitted:       {len(generated_tokens)}")
         print(f"  • Mean Entropy H(x):    {sum(entropy_trace)/max(len(entropy_trace), 1):.4f} bits")
@@ -598,7 +579,7 @@ class GuardShieldPipeline:
         print("[STAGE 2-B] Running Declarative NLI Fact Grounding & Verification...")
         s2_start = time.perf_counter()
 
-        premise, verified_fact, source_type = self._match_knowledge(prompt, raw_output_text, reference_context)
+        premise, verified_fact, source_type = self._match_knowledge(prompt, reference_context)
         print(f"  • Knowledge Source:     {source_type}")
 
         if premise:
@@ -750,10 +731,10 @@ def run_pipeline_suite():
             "inject_hallucination": False
         },
         {
-            "name": "Scenario 3: Hallucination Detection & Fact-Check Correction (Withholds Raw Output)",
+            "name": "Scenario 3: Factual Grounding Verification with Reference Context",
             "prompt": "What is the capital of India?",
             "context": "The capital of India is New Delhi. It is the seat of the executive and legislative branches.",
-            "inject_hallucination": True
+            "inject_hallucination": False
         },
         {
             "name": "Scenario 4: Benign Complex AI Safety Question",
@@ -769,8 +750,7 @@ def run_pipeline_suite():
         print(f"\n>>> EXECUTING {sc['name']} <<<")
         res = pipeline.run(
             prompt=sc["prompt"],
-            reference_context=sc["context"],
-            inject_synthetic_hallucination=sc["inject_hallucination"]
+            reference_context=sc["context"]
         )
         results_summary.append({
             "scenario": sc["name"],
@@ -888,7 +868,6 @@ if __name__ == "__main__":
     parser.add_argument("--consecutive-spikes", type=int, default=3, help="Consecutive entropy spikes to trigger early termination (default: 3)")
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive prompt shell")
     parser.add_argument("--suite", action="store_true", help="Run full 4-scenario demonstration suite")
-    parser.add_argument("--inject-hallucination", action="store_true", help="Simulate a hallucination to test correction")
 
     args = parser.parse_args()
 
@@ -912,8 +891,7 @@ if __name__ == "__main__":
         )
         pipeline.run(
             prompt=args.prompt,
-            reference_context=args.context,
-            inject_synthetic_hallucination=args.inject_hallucination
+            reference_context=args.context
         )
     else:
         # Default: run full suite

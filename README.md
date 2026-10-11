@@ -77,6 +77,22 @@ To assess whether the transformer representation provides genuine advantages ove
 
 ---
 
+### 🛡️ Adaptive Adversarial Robustness & Evasion Defense
+
+To evaluate robustness against advanced bypass vectors, GuardShield was benchmarked against 11 perturbation vectors on balanced cohorts ($N=100$ attacks, $N=100$ benign) with exact 95% Wilson confidence intervals (detailed in [`table_adaptive_robustness.md`](docs/01%20Reports/table_adaptive_robustness.md)):
+
+1. **Adversarial Length-Padding Evasion Defense**:
+   - **Benign Prefix Padding (>256 tokens prepended)**: Fixed 128-token truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield's sliding-window chunking maintains **98.0% recall** [93.0%, 99.45%] with **2.0% FPR** [0.55%, 7.0%].
+   - **Sandwich Padding (benign prefix + suffix)**: Fixed truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield achieves **95.0% recall** [88.82%, 97.85%] with **2.0% FPR** [0.55%, 7.0%].
+   - **Suffix Padding**: GuardShield achieves **94.0% recall** [87.52%, 97.22%] with **0.0% FPR** [0.0%, 3.7%].
+2. **Disaggregated XSTest Evaluation ($N=450$)**:
+   - **Safe Homonym Prompts ($N=250$)**: GuardShield achieves **0.0% False Refusal Rate (FRR)** [0.0%, 1.51%].
+   - **Contrast Unsafe Prompts ($N=200$)**: Evaluated on direct toxic/harmful requests (non-injection), GuardShield achieves **0.0% block rate** [0.0%, 1.88%]. This confirms Stage 1's precise architectural specialization as a prompt-injection/jailbreak ingress filter, passing plain non-adversarial queries to upstream policy moderators.
+3. **Probability Calibration**:
+   - `PreScanSecurityFilter` incorporates temperature scaling ($T = 2.0$) to smooth cross-entropy logits, avoiding overconfident probability saturation on edge-case inputs.
+
+---
+
 ## 🚀 Live Interactive Colab Suite
 
 Experience GuardShield AI directly in Google Colab with free T4 GPU acceleration:  
