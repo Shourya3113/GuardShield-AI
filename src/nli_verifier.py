@@ -17,6 +17,9 @@ if sys.platform == "win32":
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("NLIVerifier")
 
+sys.path.append(str(Path(__file__).resolve().parent))
+import config
+
 class WindowedNLIVerifier:
     """
     Windowed Natural Language Inference (NLI) Entailment Verifier.
@@ -29,14 +32,36 @@ class WindowedNLIVerifier:
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
         logger.info(f"Initializing NLIVerifier on {self.device.upper()}...")
+        loaded = False
+
+        # 1. Try local cache first for air-gapped / offline reproducibility
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
-            self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False, local_files_only=True)
+            self.model = AutoModelForSequenceClassification.from_pretrained(model_name, local_files_only=True)
+            loaded = True
+            logger.info(f"Loaded {model_name} from local cache (Air-Gapped Mode).")
         except Exception:
-            # Fallback to local DeBERTa if cross-encoder download is restricted
+            pass
+
+        # 2. Try online HuggingFace download if not cached
+        if not loaded:
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
+                loaded = True
+            except Exception:
+                pass
+
+        # 3. Fallback to local DeBERTa weights directory if cross-encoder download is restricted
+        if not loaded:
             logger.info("Using local DeBERTa architecture for NLI verification.")
-            self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
-            self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=3)
+            local_deberta = config.BASE_DIR / "models" / "deberta_v3_prescan_v3"
+            if local_deberta.exists():
+                self.tokenizer = AutoTokenizer.from_pretrained(str(local_deberta), use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained(str(local_deberta))
+            else:
+                self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
+                self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=3)
             
         self.model.to(self.device)
         self.model.eval()
