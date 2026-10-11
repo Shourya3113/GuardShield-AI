@@ -1,14 +1,19 @@
 {
   "metadata": {
     "model_name": "protectai/deberta-v3-base-prompt-injection-v2",
-    "architecture": "DeBERTa-v3-base (125M parameters)",
-    "git_commit": "cf77b6fa17717d433d12ff8e3645be4082d20c99",
-    "timestamp": "2026-10-11 18:32:47",
+    "architecture": "DeBERTa-v3-base",
+    "backbone_parameters": "86.0M",
+    "embedding_parameters": "98.0M",
+    "total_parameters": "184.0M",
+    "comparison_notes": "ProtectAI DeBERTa-v3-base has 184M total params compared to GuardShield-AI's 142.6M (44.3M backbone + 98.3M embeddings). ProtectAI is zero-shot on these benchmarks; GuardShield was fine-tuned on the in-distribution training split.",
+    "git_commit": "7cd714f901cc7ae495bae58e6102792c278deb3f",
+    "timestamp": "2026-10-12 00:47:19",
     "device": "CUDA"
   },
   "in_distribution": {
     "split_name": "In-Distribution Test (698)",
     "sample_count": 698,
+    "dataset_sha256": "498a3d56e97a67e0a457b98a3651f935d758f7e4ff842e4799c0436071bf263c",
     "accuracy": 0.9384,
     "recall": 0.8873,
     "precision": 0.9906,
@@ -20,12 +25,13 @@
       "fn": 40,
       "tp": 315
     },
-    "latency_p50_ms": 41.28,
-    "latency_mean_ms": 45.38
+    "latency_p50_ms": 45.44,
+    "latency_mean_ms": 50.47
   },
   "out_of_distribution": {
     "split_name": "Zero-Shot OOD Test (500)",
     "sample_count": 500,
+    "dataset_sha256": "b692f109f92e0a0f154478fc800f6aa25ad48ef27993a88186f622f968d29319",
     "accuracy": 0.882,
     "recall": 0.788,
     "precision": 0.9704,
@@ -37,7 +43,30 @@
       "fn": 53,
       "tp": 197
     },
-    "latency_p50_ms": 70.72,
-    "latency_mean_ms": 477.87
+    "latency_p50_ms": 54.6,
+    "latency_mean_ms": 58.02,
+    "granular_breakdown": {
+      "human_dan_jailbreak_recall": 0.8684,
+      "human_dan_sample_count": 76,
+      "human_dan_tp": 66,
+      "template_shift_recall": 0.7529,
+      "template_shift_sample_count": 174,
+      "template_shift_tp": 131
+    }
+  },
+  "benign_hard_control": {
+    "sample_count": 85,
+    "dataset_sha256": "ec95979647976fe244698435681c7eb43c9231433b2e6ee56e2af84e07a1f22c",
+    "false_positive_count": 29,
+    "false_positive_rate": 0.3412,
+    "accuracy": 0.6588
+  },
+  "xstest_control": {
+    "sample_count": 450,
+    "dataset_sha256": "19a55f2715bde59e9efd7259cddfa53259a73748089c216a0d6b37777df15c3d",
+    "safe_prompts_count": 250,
+    "safe_false_refusal_rate": 0.0,
+    "contrast_unsafe_count": 200,
+    "contrast_unsafe_recall": 0.0
   }
 }

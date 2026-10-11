@@ -43,14 +43,26 @@ class WindowedNLIVerifier:
         except Exception:
             pass
 
-        # 2. Try online HuggingFace download if not cached
+        # 2. Check network connectivity with fast 1.5s timeout before attempting online HuggingFace fetch
         if not loaded:
+            import socket
+            is_online = False
             try:
-                self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
-                self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
-                loaded = True
+                s = socket.create_connection(("huggingface.co", 443), timeout=1.5)
+                s.close()
+                is_online = True
             except Exception:
-                pass
+                is_online = False
+
+            if is_online:
+                try:
+                    self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+                    self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
+                    loaded = True
+                except Exception as exc:
+                    logger.warning(f"Failed to fetch {model_name} online: {exc}")
+            else:
+                logger.warning(f"Host offline: Skipping remote HuggingFace download for {model_name}.")
 
         # 3. Strict failure if model cannot be loaded (no silent untrained fallback)
         if not loaded:
@@ -90,7 +102,8 @@ class WindowedNLIVerifier:
         Runs claim-level windowed NLI verification.
         Splits multi-sentence hypotheses into declarative sentences.
         Requires all asserted claims to be factually entailed; any contradictory
-        or ungrounded claim flags hallucination.
+        claim flags hard hallucination. Neutral claims without sufficient evidence
+        are classified as UNVERIFIED_NEUTRAL rather than conflated with hallucinations.
         """
         import re
         raw_sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', hypothesis) if s.strip()]
@@ -124,7 +137,7 @@ class WindowedNLIVerifier:
             min_entail["hypothesis"] = hypothesis
             return min_entail
 
-        # 3. If any sentence is ungrounded / neutral, it cannot be masked by an entailed sentence
+        # 3. If no contradiction but not all entailed, claim is unverified / insufficient context
         avg_contra = sum(r["contradiction_prob"] for r in sent_results) / len(sent_results)
         avg_entail = sum(r["entailment_prob"] for r in sent_results) / len(sent_results)
         avg_neutral = sum(r["neutral_prob"] for r in sent_results) / len(sent_results)
@@ -132,9 +145,10 @@ class WindowedNLIVerifier:
         return {
             "premise": premise,
             "hypothesis": hypothesis,
-            "decision": "UNGROUNDED_NEUTRAL_HALLUCINATION",
-            "is_hallucination": True,
+            "decision": "UNVERIFIED_NEUTRAL",
+            "is_hallucination": False,
             "is_contradiction": False,
+            "is_unverified": True,
             "entailment_prob": round(avg_entail, 4),
             "contradiction_prob": round(avg_contra, 4),
             "neutral_prob": round(avg_neutral, 4),
@@ -144,7 +158,7 @@ class WindowedNLIVerifier:
     def verify_entailment(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
         Verify if the hypothesis is factually entailed by the premise.
-        Evaluates contradiction probability against the decision threshold.
+        Distinguishes Contradiction (Hallucination), Entailment (Supported), and Neutral (Unverified).
         """
         start_time = time.perf_counter()
         
@@ -159,16 +173,22 @@ class WindowedNLIVerifier:
         p_entailment = float(probs[self.entail_idx].item()) if len(probs) > self.entail_idx else 0.0
         p_neutral = float(probs[self.neutral_idx].item()) if len(probs) > self.neutral_idx else 0.0
 
-        # Rigorous Factual Verification (Zero Regex Overrides):
+        # Rigorous Factual Verification:
         if p_contradiction >= self.threshold:
             decision = "HALLUCINATION_CONTRADICTION"
             is_hallucination = True
+            is_contradiction = True
+            is_unverified = False
         elif p_entailment >= self.threshold:
             decision = "FACTUAL_ENTAILMENT"
             is_hallucination = False
+            is_contradiction = False
+            is_unverified = False
         else:
-            decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
-            is_hallucination = True
+            decision = "UNVERIFIED_NEUTRAL"
+            is_hallucination = False
+            is_contradiction = False
+            is_unverified = True
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 
@@ -177,7 +197,8 @@ class WindowedNLIVerifier:
             "hypothesis": hypothesis,
             "decision": decision,
             "is_hallucination": is_hallucination,
-            "is_contradiction": p_contradiction >= self.threshold,
+            "is_contradiction": is_contradiction,
+            "is_unverified": is_unverified,
             "entailment_prob": round(p_entailment, 4),
             "contradiction_prob": round(p_contradiction, 4),
             "neutral_prob": round(p_neutral, 4),

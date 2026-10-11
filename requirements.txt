@@ -1,6 +1,6 @@
 # GuardShield AI - Pinned Production Dependencies
 torch==2.6.0
-transformers==4.57.0
+transformers==4.57.6
 datasets==5.0.1
 accelerate==1.14.0
 sentencepiece==0.2.2

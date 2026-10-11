@@ -92,16 +92,26 @@ def measure_real_pipeline_latency(num_samples: int = 100):
     p95 = round(float(np.percentile(latencies, 95)), 2)
     std_val = round(float(np.std(latencies)), 2)
     
+    import hashlib
+    def compute_sha256(filepath):
+        p = Path(filepath)
+        if not p.is_file(): return None
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            while chunk := f.read(65536): h.update(chunk)
+        return h.hexdigest()
+
     import subprocess
     try:
-        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR)).decode().strip()
+        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
-        git_commit = "cf77b6fa17717d433d12ff8e3645be4082d20c99"
+        git_commit = "unknown"
 
     summary = {
         "metadata": {
             "experiment": "Real Empirical Sequential End-to-End Pipeline Latency",
             "git_commit": git_commit,
+            "weights_sha256": compute_sha256(BASE_DIR / "models" / "deberta_v3_prescan_v3" / "model.safetensors"),
             "sample_count": num_samples,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "device": device.upper(),

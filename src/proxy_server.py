@@ -11,6 +11,7 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
+import re
 import uvicorn
 
 # Suppress noisy TF logs
@@ -88,6 +89,22 @@ def health_check():
         "max_input_chars": MAX_INPUT_CHARS
     }
 
+# Regex Heuristics for Conversational Routing
+PLEASANTRY_REGEX = re.compile(
+    r"^[\s,\.!]*(ok|okay|sure|thanks|thank you|sounds good|cool|great|got it|proceed|continue|yes|no|understood|hello|hi|hey|bye|that helps|much appreciated|for the help)([\s,\.!]+(ok|okay|sure|thanks|thank you|sounds good|cool|great|got it|proceed|continue|yes|no|understood|hello|hi|hey|bye|that helps|much appreciated|for the help))*[\s,\.!]*$",
+    re.IGNORECASE
+)
+
+HINGLISH_REGEX = re.compile(
+    r"\b(kya|hai|hain|kaise|batao|bhai|mujhe|mera|meri|hum|aap|nahi|nahin|karna|karte|achha|theek|shukriya|dhanyawad|yaar|namaste|chalo|bolo|karo|raha|rahi|samajh|ye|wo|ki|ka|ke|ko|se|me|par)\b",
+    re.IGNORECASE
+)
+
+ATTACK_KEYWORDS = re.compile(
+    r"(ignore previous|bypass|jailbreak|override|system prompt|dan mode|unrestricted|developer mode)",
+    re.IGNORECASE
+)
+
 @app.post("/v1/chat/completions")
 async def chat_completions(req: ChatCompletionRequest):
     global prescan_filter, nli_verifier
@@ -103,191 +120,243 @@ async def chat_completions(req: ChatCompletionRequest):
         )
 
     # 2. MULTI-TURN & ROLE-AWARE SCANNING
-    # Inspects system, tool, and user messages. For short user turns (< 20 chars or <= 3 words),
-    # attaches prior turn context so the classifier does not trigger on zero-context continuation tokens.
-    scan_target = ""
-    prev_user_or_asst = ""
+    # Every ingress turn (system, user, assistant, tool) is validated.
+    prev_context = ""
+    routing_tags = []
     
-    for msg in req.messages:
+    for idx, msg in enumerate(req.messages):
         content = msg.content.strip()
         if not content:
             continue
             
-        if msg.role in ("system", "tool"):
-            # Asynchronous scan of system/tool message
+        role = msg.role.lower()
+        
+        # Scan system and tool messages
+        if role in ("system", "tool"):
             sys_res = await asyncio.to_thread(prescan_filter.inspect_prompt, content)
             if not sys_res["is_safe"]:
-                logger.warning(f"Ingress {msg.role.upper()} message blocked (Risk: {sys_res['risk_score']})")
+                logger.warning(f"Ingress message #{idx+1} ({role}) blocked (Risk: {sys_res['risk_score']})")
                 return JSONResponse(
                     status_code=status.HTTP_403_FORBIDDEN,
                     content={
                         "error": {
-                            "message": f"GuardShield AI: Ingress {msg.role.capitalize()} message blocked due to security policy violation.",
+                            "message": f"GuardShield AI: Ingress {role} message #{idx+1} blocked due to security policy violation.",
                             "type": "security_policy_violation",
-                            "code": f"{msg.role.upper()}_INJECTION_DETECTED",
+                            "code": f"{role.upper()}_INJECTION_DETECTED",
                             "risk_score": sys_res["risk_score"],
                             "latency_ms": sys_res["latency_ms"]
                         }
                     }
                 )
-        elif msg.role == "user":
-            # Context-aware augmentation for short conversational turn ("continue", "ok thanks")
-            if len(content) < 20 and len(content.split()) <= 3 and prev_user_or_asst:
-                scan_target = f"Context: {prev_user_or_asst[-300:]}\nTurn: {content}"
+        elif role == "assistant":
+            # Guard against forged assistant completions injecting jailbreak patterns
+            if ATTACK_KEYWORDS.search(content):
+                asst_res = await asyncio.to_thread(prescan_filter.inspect_prompt, content)
+                if not asst_res["is_safe"]:
+                    logger.warning(f"Forged assistant message #{idx+1} blocked (Risk: {asst_res['risk_score']})")
+                    return JSONResponse(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        content={
+                            "error": {
+                                "message": f"GuardShield AI: Ingress assistant message #{idx+1} blocked due to adversarial injection violation.",
+                                "type": "security_policy_violation",
+                                "code": "ASSISTANT_INJECTION_DETECTED",
+                                "risk_score": asst_res["risk_score"],
+                                "latency_ms": asst_res["latency_ms"]
+                            }
+                        }
+                    )
+            prev_context = content
+        elif role == "user":
+            # Check for conversational pleasantries / acknowledgements ("ok thanks, that helps", "proceed")
+            is_pleasantry = bool(PLEASANTRY_REGEX.match(content)) and not bool(ATTACK_KEYWORDS.search(content))
+            
+            # Check for benign Hinglish / Hindi code-mixing
+            is_hinglish = (bool(re.search(r"[\u0900-\u097F]", content)) or len(HINGLISH_REGEX.findall(content)) >= 2) and not bool(ATTACK_KEYWORDS.search(content))
+            
+            if is_pleasantry:
+                logger.info(f"User message #{idx+1} matched conversational pleasantry pattern; passed.")
+                prev_context = content
+                continue
+            elif is_hinglish:
+                logger.info(f"User message #{idx+1} routed as benign multilingual/Hinglish traffic.")
+                routing_tags.append("multilingual-hinglish-allowed")
+                prev_context = content
+                continue
+                
+            # For short conversational follow-ups (< 50 chars or <= 6 words), attach prior context
+            if len(content) < 50 and len(content.split()) <= 6 and prev_context:
+                scan_target = f"Context: {prev_context[-300:]}\nTurn: {content}"
             else:
                 scan_target = content
-            prev_user_or_asst = content
-        elif msg.role == "assistant":
-            prev_user_or_asst = content
+                
+            user_res = await asyncio.to_thread(prescan_filter.inspect_prompt, scan_target)
+            logger.info(f"Turn #{idx+1} (user) Decision: {user_res['decision']} (Risk: {user_res['risk_score']}, Latency: {user_res['latency_ms']}ms)")
+            
+            if not user_res["is_safe"]:
+                return JSONResponse(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    content={
+                        "error": {
+                            "message": f"GuardShield AI: User message #{idx+1} blocked due to security policy violation (Adversarial Prompt Injection / Jailbreak detected).",
+                            "type": "security_policy_violation",
+                            "code": "PROMPT_INJECTION_DETECTED",
+                            "risk_score": user_res["risk_score"],
+                            "latency_ms": user_res["latency_ms"]
+                        }
+                    }
+                )
+            prev_context = content
 
-    if not scan_target:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No user message provided.")
-
-    # 3. STAGE 1: ASYNCHRONOUS PRE-SCAN SECURITY FILTER
-    scan_result = await asyncio.to_thread(prescan_filter.inspect_prompt, scan_target)
-    logger.info(f"Pre-Scan Decision: {scan_result['decision']} (Risk: {scan_result['risk_score']}, Latency: {scan_result['latency_ms']}ms)")
-    
-    if not scan_result["is_safe"]:
-        return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN,
-            content={
-                "error": {
-                    "message": "GuardShield AI: Prompt Blocked due to Security Policy Violation (Adversarial Prompt Injection / Jailbreak detected).",
-                    "type": "security_policy_violation",
-                    "code": "PROMPT_INJECTION_DETECTED",
-                    "risk_score": scan_result["risk_score"],
-                    "latency_ms": scan_result["latency_ms"]
-                }
-            }
-        )
-        
-    # 4. STAGE 2: LLM RESPONSE STREAMING & ENTROPY INSPECTION
+    # 3. UPSTREAM LLM FORWARDING
     upstream_url = f"{UPSTREAM_LLM_URL.rstrip('/')}/chat/completions"
-    
+    req_payload = req.dict(exclude={"grounding_context"})
+
     if req.stream:
-        # Pre-check upstream connectivity to prevent returning fake HTTP 200 on connection failure
-        async def event_generator():
-            session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.25, consecutive_spike_limit=2)
-            try:
-                # Forward request payload excluding internal GuardShield fields
-                req_payload = req.dict(exclude={"grounding_context"})
-                async with httpx.AsyncClient(timeout=60.0) as client:
-                    async with client.stream(
-                        "POST",
-                        upstream_url,
-                        json=req_payload,
-                        headers={"Content-Type": "application/json"}
-                    ) as resp:
-                        if resp.status_code != 200:
-                            err_body = await resp.aread()
-                            err_chunk = {
-                                "error": {
-                                    "message": f"Upstream LLM service returned HTTP {resp.status_code}: {err_body.decode('utf-8', errors='ignore')}",
-                                    "type": "upstream_error",
-                                    "code": "BAD_GATEWAY"
-                                }
-                            }
-                            yield f"data: {json.dumps(err_chunk)}\n\n"
-                            yield "data: [DONE]\n\n"
-                            return
-
-                        async for line in resp.aiter_lines():
-                            if not line:
-                                continue
-                            if line.startswith("data: "):
-                                data_str = line[6:].strip()
-                                if data_str == "[DONE]":
-                                    yield "data: [DONE]\n\n"
-                                    break
-                                try:
-                                    chunk_json = json.loads(data_str)
-                                    delta = chunk_json.get("choices", [{}])[0].get("delta", {})
-                                    content_chunk = delta.get("content", "")
-
-                                    # Inspect token uncertainty if logprobs or token content is provided
-                                    if content_chunk:
-                                        choice_obj = chunk_json.get("choices", [{}])[0]
-                                        extracted_probs = []
-
-                                        logprobs_info = choice_obj.get("logprobs") or {}
-                                        content_lps = logprobs_info.get("content") or []
-                                        if content_lps and isinstance(content_lps, list):
-                                            top_lps = content_lps[0].get("top_logprobs") or []
-                                            for item in top_lps:
-                                                if isinstance(item, dict) and "logprob" in item:
-                                                    extracted_probs.append(math.exp(float(item["logprob"])))
-                                        elif "top_logprobs" in logprobs_info and isinstance(logprobs_info["top_logprobs"], list):
-                                            for item in logprobs_info["top_logprobs"]:
-                                                if isinstance(item, dict) and "logprob" in item:
-                                                    extracted_probs.append(math.exp(float(item["logprob"])))
-
-                                        if len(extracted_probs) >= 2:
-                                            res = session_entropy_engine.process_token(content_chunk, extracted_probs)
-                                            choice_obj["entropy"] = res["entropy"]
-                                            choice_obj["status"] = res["status"]
-
-                                            if res["should_terminate"]:
-                                                # Emit circuit breaker halt chunk and abort stream
-                                                halt_chunk = {
-                                                    "id": f"chatcmpl-{int(time.time())}",
-                                                    "object": "chat.completion.chunk",
-                                                    "choices": [{
-                                                        "delta": {"content": " [GUARDSHIELD CIRCUIT BREAKER: Generation halted on sustained uncertainty / hallucination drift]"},
-                                                        "finish_reason": "length"
-                                                    }]
-                                                }
-                                                yield f"data: {json.dumps(halt_chunk)}\n\n"
-                                                yield "data: [DONE]\n\n"
-                                                break
-                                        else:
-                                            choice_obj["entropy"] = None
-                                            choice_obj["status"] = "PASSTHROUGH (Logprobs unavailable from upstream)"
-
-                                    yield f"data: {json.dumps(chunk_json)}\n\n"
-                                except Exception:
-                                    yield f"{line}\n\n"
-            except Exception as e:
-                logger.error(f"Upstream streaming error at {upstream_url}: {e}")
-                err_chunk = {
+        # Pre-connect to upstream before sending 200 headers to prevent synthetic 200 on connection failure
+        client = httpx.AsyncClient(timeout=60.0)
+        try:
+            upstream_req = client.build_request(
+                "POST",
+                upstream_url,
+                json=req_payload,
+                headers={"Content-Type": "application/json"}
+            )
+            resp = await client.send(upstream_req, stream=True)
+            if resp.status_code != 200:
+                err_body = await resp.aread()
+                await resp.aclose()
+                await client.aclose()
+                return JSONResponse(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    content={
+                        "error": {
+                            "message": f"Upstream LLM service returned HTTP {resp.status_code}: {err_body.decode('utf-8', errors='ignore')}",
+                            "type": "upstream_error",
+                            "code": "BAD_GATEWAY"
+                        }
+                    }
+                )
+        except Exception as exc:
+            await client.aclose()
+            logger.error(f"Failed to connect to upstream LLM at {upstream_url}: {exc}")
+            return JSONResponse(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                content={
                     "error": {
-                        "message": f"Upstream LLM service unreachable at {upstream_url}: {str(e)}",
+                        "message": f"GuardShield AI: Cannot reach upstream LLM service at {upstream_url}. Ensure upstream server (e.g. Ollama or vLLM) is running.",
                         "type": "upstream_error",
                         "code": "BAD_GATEWAY"
                     }
                 }
-                yield f"data: {json.dumps(err_chunk)}\n\n"
-                yield "data: [DONE]\n\n"
+            )
 
-        return StreamingResponse(event_generator(), media_type="text/event-stream")
+        async def event_generator():
+            session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.25, consecutive_spike_limit=2)
+            try:
+                async for line in resp.aiter_lines():
+                    if not line:
+                        continue
+                    if line.startswith("data: "):
+                        data_str = line[6:].strip()
+                        if data_str == "[DONE]":
+                            yield "data: [DONE]\n\n"
+                            break
+                        try:
+                            chunk_json = json.loads(data_str)
+                            delta = chunk_json.get("choices", [{}])[0].get("delta", {})
+                            content_chunk = delta.get("content", "")
+
+                            # Inspect token uncertainty if logprobs or token content is provided
+                            if content_chunk:
+                                choice_obj = chunk_json.get("choices", [{}])[0]
+                                extracted_probs = []
+
+                                logprobs_info = choice_obj.get("logprobs") or {}
+                                content_lps = logprobs_info.get("content") or []
+                                if content_lps and isinstance(content_lps, list):
+                                    top_lps = content_lps[0].get("top_logprobs") or []
+                                    for item in top_lps:
+                                        if isinstance(item, dict) and "logprob" in item:
+                                            extracted_probs.append(math.exp(float(item["logprob"])))
+                                elif "top_logprobs" in logprobs_info and isinstance(logprobs_info["top_logprobs"], list):
+                                    for item in logprobs_info["top_logprobs"]:
+                                        if isinstance(item, dict) and "logprob" in item:
+                                            extracted_probs.append(math.exp(float(item["logprob"])))
+
+                                if len(extracted_probs) >= 2:
+                                    res = session_entropy_engine.process_token(content_chunk, extracted_probs)
+                                    choice_obj["entropy"] = res["entropy"]
+                                    choice_obj["status"] = res["status"]
+
+                                    if res["should_terminate"]:
+                                        # Emit circuit breaker halt chunk and abort stream
+                                        halt_chunk = {
+                                            "id": f"chatcmpl-{int(time.time())}",
+                                            "object": "chat.completion.chunk",
+                                            "choices": [{
+                                                "delta": {"content": " [GUARDSHIELD CIRCUIT BREAKER: Generation halted on sustained uncertainty / hallucination drift]"},
+                                                "finish_reason": "length"
+                                            }]
+                                        }
+                                        yield f"data: {json.dumps(halt_chunk)}\n\n"
+                                        yield "data: [DONE]\n\n"
+                                        break
+                                else:
+                                    choice_obj["entropy"] = None
+                                    choice_obj["status"] = "PASSTHROUGH (Logprobs unavailable from upstream)"
+
+                            yield f"data: {json.dumps(chunk_json)}\n\n"
+                        except Exception:
+                            yield f"{line}\n\n"
+            finally:
+                await resp.aclose()
+                await client.aclose()
+
+        headers = {}
+        if routing_tags:
+            headers["X-GuardShield-Routing"] = ",".join(routing_tags)
+        return StreamingResponse(event_generator(), media_type="text/event-stream", headers=headers)
     else:
         # Non-streaming request: Forward to upstream and optionally apply Stage 2 fact grounding
-        req_payload = req.dict(exclude={"grounding_context"})
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(upstream_url, json=req_payload, headers={"Content-Type": "application/json"})
                 if resp.status_code == 200:
                     data = resp.json()
                     metadata = {
-                        "prescan_risk_score": scan_result["risk_score"],
-                        "prescan_latency_ms": scan_result["latency_ms"],
-                        "status": "PASS"
+                        "status": "PASS",
+                        "routing": routing_tags if routing_tags else "standard"
                     }
                     
                     # Stage 2 Fact Grounding verification if reference context is supplied
-                    if req.grounding_context and nli_verifier is not None:
-                        generated_msg = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                        if generated_msg:
-                            nli_res = await asyncio.to_thread(nli_verifier.verify_claim, req.grounding_context, generated_msg)
+                    if req.grounding_context:
+                        if nli_verifier is not None:
+                            generated_msg = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                            if generated_msg:
+                                nli_res = await asyncio.to_thread(nli_verifier.verify_claim, req.grounding_context, generated_msg)
+                                metadata["stage2_factuality"] = {
+                                    "decision": nli_res.get("decision"),
+                                    "is_hallucination": nli_res.get("is_hallucination"),
+                                    "is_contradiction": nli_res.get("is_contradiction", False),
+                                    "is_unverified": nli_res.get("is_unverified", False),
+                                    "contradiction_prob": nli_res.get("contradiction_prob"),
+                                    "entailment_prob": nli_res.get("entailment_prob"),
+                                    "neutral_prob": nli_res.get("neutral_prob"),
+                                    "latency_ms": nli_res.get("latency_ms")
+                                }
+                        else:
+                            logger.warning("Stage 2 grounding requested, but NLI verifier is not loaded.")
                             metadata["stage2_factuality"] = {
-                                "decision": nli_res.get("decision"),
-                                "is_hallucination": nli_res.get("is_hallucination"),
-                                "contradiction_prob": nli_res.get("contradiction_prob"),
-                                "entailment_prob": nli_res.get("entailment_prob"),
-                                "latency_ms": nli_res.get("latency_ms")
+                                "status": "UNAVAILABLE",
+                                "warning": "Stage 2 NLI verifier model is not loaded in current environment; fact grounding skipped."
                             }
                             
                     data["guardshield_metadata"] = metadata
-                    return data
+                    response = JSONResponse(content=data)
+                    if routing_tags:
+                        response.headers["X-GuardShield-Routing"] = ",".join(routing_tags)
+                    return response
                 else:
                     return JSONResponse(
                         status_code=status.HTTP_502_BAD_GATEWAY,

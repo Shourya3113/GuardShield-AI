@@ -1,8 +1,11 @@
 {
   "metadata": {
     "model": "TfidfVectorizer(ngram=(1,2), max_features=10000) + LogisticRegression(C=1.0)",
-    "git_commit": "cf77b6fa17717d433d12ff8e3645be4082d20c99",
-    "timestamp": "2026-10-11 18:27:51"
+    "git_commit": "7cd714f901cc7ae495bae58e6102792c278deb3f",
+    "train_dataset_sha256": "433f0ed264d976f39d858f5ed25287d50b76d3c7ee863826d9b649e3e05129ff",
+    "in_dist_dataset_sha256": "498a3d56e97a67e0a457b98a3651f935d758f7e4ff842e4799c0436071bf263c",
+    "ood_dataset_sha256": "b692f109f92e0a0f154478fc800f6aa25ad48ef27993a88186f622f968d29319",
+    "timestamp": "2026-10-12 00:45:18"
   },
   "in_distribution": {
     "sample_count": 698,

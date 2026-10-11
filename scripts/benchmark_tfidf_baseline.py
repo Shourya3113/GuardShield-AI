@@ -27,11 +27,21 @@ SPLITS_DIR = BASE_DIR / "data" / "processed" / "splits_v3"
 REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+import hashlib
+
+def compute_sha256(filepath):
+    p = Path(filepath)
+    if not p.is_file(): return None
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        while chunk := f.read(65536): h.update(chunk)
+    return h.hexdigest()
+
 def get_git_commit():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR)).decode().strip()
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
-        return "cf77b6fa17717d433d12ff8e3645be4082d20c99"
+        return "unknown"
 
 def run_tfidf_baseline():
     print("\n" + "=" * 80)
@@ -57,7 +67,8 @@ def run_tfidf_baseline():
     print(f"Model trained in {fit_time}s.")
 
     # 2. Evaluate In-Distribution Test Set (698 samples)
-    with open(SPLITS_DIR / "test_in_distribution.json", "r", encoding="utf-8") as f:
+    in_path = SPLITS_DIR / "test_in_distribution.json"
+    with open(in_path, "r", encoding="utf-8") as f:
         in_dist_data = json.load(f)
 
     X_in = [item["prompt"] for item in in_dist_data]
@@ -77,7 +88,8 @@ def run_tfidf_baseline():
     print(f"  • F1-Score:  {in_f1:.4f}")
 
     # 3. Evaluate Zero-Shot Out-of-Distribution Test Set (500 samples)
-    with open(SPLITS_DIR / "test_out_of_distribution.json", "r", encoding="utf-8") as f:
+    ood_path = SPLITS_DIR / "test_out_of_distribution.json"
+    with open(ood_path, "r", encoding="utf-8") as f:
         ood_data = json.load(f)
 
     X_ood = [item["prompt"] for item in ood_data]
@@ -116,6 +128,9 @@ def run_tfidf_baseline():
         "metadata": {
             "model": "TfidfVectorizer(ngram=(1,2), max_features=10000) + LogisticRegression(C=1.0)",
             "git_commit": get_git_commit(),
+            "train_dataset_sha256": compute_sha256(train_path),
+            "in_dist_dataset_sha256": compute_sha256(in_path),
+            "ood_dataset_sha256": compute_sha256(ood_path),
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
         },
         "in_distribution": {
