@@ -193,7 +193,7 @@ class GuardShieldPipeline:
         print(f"\n[2/3] Loading Generative Backbone ({resolved_name}) with Entropy Hooks...")
         t0 = time.time()
         dtype = torch.float16 if self.device == "cuda" else torch.float32
-        tok_kwargs = {"trust_remote_code": True}
+        tok_kwargs = {"trust_remote_code": False}
         try:
             from huggingface_hub import try_to_load_from_cache
             if isinstance(try_to_load_from_cache(resolved_name, "tokenizer_config.json"), str):
@@ -206,7 +206,7 @@ class GuardShieldPipeline:
             self.gen_tokenizer.pad_token = self.gen_tokenizer.eos_token
 
         model_kwargs = {
-            "trust_remote_code": True,
+            "trust_remote_code": False,
         }
         if "phi" in resolved_name.lower():
             model_kwargs["attn_implementation"] = "eager"
@@ -294,10 +294,13 @@ class GuardShieldPipeline:
                     print(f"  Failed to restore previous model: {ex_restore}\n")
 
 
-    def _retrieve_wikipedia_grounding(self, prompt: str, generated_text: Optional[str] = None) -> Optional[Tuple[str, str]]:
+    def _retrieve_wikipedia_grounding(self, prompt: str) -> Optional[Tuple[str, str]]:
         """
         Dynamically retrieves authoritative factual context from Wikipedia API (sub-300ms).
-        Uses search query ranking and lexical overlap to find the most factually relevant article.
+        CRITICAL FOR EVALUATION INTEGRITY:
+        Retrieval queries are built SOLELY from the user query/prompt, NEVER from the
+        candidate model generation, preventing circular confirmation bias.
+        Requires a minimum keyword overlap score >= 2 to prevent hallucinated drift.
         """
         import urllib.request
         import urllib.parse
@@ -313,19 +316,18 @@ class GuardShieldPipeline:
         headers = {'User-Agent': 'GuardShieldAI-Sidecar/1.0 (Academic Verification Tool)'}
         candidates = []
 
-        # 1. Clean prompt search query (e.g. "capital of Australia", "invented World Wide Web")
+        # 1. Clean prompt search query derived strictly from the prompt
         if clean_prompt:
             candidates.append(clean_prompt)
 
-        # 2. Extract multi-word proper noun phrases from prompt AND generated text
-        full_text = f"{prompt} {generated_text or ''}"
-        multi_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+(?:\s+[A-Z][a-zA-Z0-9_-]+)+\b', full_text)
+        # 2. Extract multi-word proper noun phrases strictly from prompt
+        multi_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+(?:\s+[A-Z][a-zA-Z0-9_-]+)+\b', prompt)
         for mw in multi_words:
             if mw not in candidates and len(mw) > 3:
                 candidates.append(mw)
 
-        # 3. Extract single proper nouns (e.g. "Canberra", "Australia", "Mars")
-        single_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b', full_text)
+        # 3. Extract single proper nouns strictly from prompt
+        single_words = re.findall(r'\b[A-Z][a-zA-Z0-9_-]+\b', prompt)
         for sw in single_words:
             if sw.lower() not in ['what', 'where', 'when', 'who', 'how', 'why', 'the', 'is', 'are']:
                 if sw not in candidates and len(sw) > 2:
@@ -333,26 +335,26 @@ class GuardShieldPipeline:
 
         retrieved_articles = {}  # title -> extract
 
-        # Search Wikipedia API for top candidate titles
-        for q in candidates[:4]:
+        # Search Wikipedia API for top candidate titles (capped to 2 queries for strict latency budget)
+        for q in candidates[:2]:
             if not q:
                 continue
-            # Try direct summary endpoint
+            # Direct summary endpoint
             try:
                 url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(q)}"
                 req = urllib.request.Request(url, headers=headers)
-                with urllib.request.urlopen(req, timeout=2.5) as resp:
+                with urllib.request.urlopen(req, timeout=1.5) as resp:
                     data = json.loads(resp.read().decode('utf-8'))
                     if "extract" in data and data["extract"]:
                         retrieved_articles[q] = data["extract"]
             except Exception:
                 pass
 
-            # Search API to discover target pages (e.g. "Canberra" from "capital of Australia")
+            # Search API to discover target pages
             try:
                 search_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(q)}&utf8=&format=json"
                 req = urllib.request.Request(search_url, headers=headers)
-                with urllib.request.urlopen(req, timeout=2.5) as resp:
+                with urllib.request.urlopen(req, timeout=1.5) as resp:
                     s_data = json.loads(resp.read().decode('utf-8'))
                     results = s_data.get("query", {}).get("search", [])
                     for r in results[:2]:
@@ -360,7 +362,7 @@ class GuardShieldPipeline:
                         if title not in retrieved_articles:
                             sum_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(title)}"
                             sum_req = urllib.request.Request(sum_url, headers=headers)
-                            with urllib.request.urlopen(sum_req, timeout=2.5) as sum_resp:
+                            with urllib.request.urlopen(sum_req, timeout=1.5) as sum_resp:
                                 sum_data = json.loads(sum_resp.read().decode('utf-8'))
                                 if "extract" in sum_data and sum_data["extract"]:
                                     retrieved_articles[title] = sum_data["extract"]
@@ -370,24 +372,22 @@ class GuardShieldPipeline:
         if not retrieved_articles:
             return None
 
-        # Rank retrieved articles by relevance to BOTH the question and the generated answer
-        target_words = set(re.findall(r'\b\w{3,}\b', (f"{prompt} {generated_text or ''}").lower()))
+        # Rank retrieved articles by lexical relevance to the USER PROMPT ONLY (no generated_text bonus)
+        prompt_words = set(re.findall(r'\b\w{3,}\b', prompt.lower()))
         best_title = None
-        best_score = -1
+        best_score = 0
         best_extract = None
 
         for title, extract in retrieved_articles.items():
             extract_words = set(re.findall(r'\b\w{3,}\b', extract.lower()))
-            overlap = len(target_words & extract_words)
-            # Heavy bonus if the article title matches an entity in the generated answer (e.g. "Canberra", "Tim Berners-Lee")
-            if generated_text and title.lower() in generated_text.lower():
-                overlap += 10
+            overlap = len(prompt_words & extract_words)
             if overlap > best_score:
                 best_score = overlap
                 best_title = title
                 best_extract = extract
 
-        if best_extract:
+        # Require minimum confidence gate (at least 2 overlapping content words)
+        if best_extract and best_score >= 2:
             first_sentence = best_extract.split(". ")[0] + "."
             return best_extract, first_sentence
 
@@ -421,7 +421,7 @@ class GuardShieldPipeline:
 
         # 3. Dynamic Wikipedia Knowledge Retrieval (if network accessible)
         try:
-            wiki_res = self._retrieve_wikipedia_grounding(prompt, generated_text)
+            wiki_res = self._retrieve_wikipedia_grounding(prompt)
             if wiki_res:
                 premise, verified_fact = wiki_res
                 return premise, verified_fact, "DYNAMIC_WIKIPEDIA_RETRIEVAL"
@@ -528,7 +528,7 @@ class GuardShieldPipeline:
 
         for step in range(max_new_tokens):
             with torch.no_grad():
-                outputs = self.gen_model(current_ids, use_cache=False)
+                outputs = self.gen_model(current_ids, use_cache=True)
                 next_logits = outputs.logits[:, -1, :]
                 probs = torch.softmax(next_logits, dim=-1)[0]
                 top3_p, top3_idx = torch.topk(probs, 3)

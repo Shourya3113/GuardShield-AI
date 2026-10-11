@@ -31,17 +31,16 @@ RESEARCH_DIR = BASE_DIR / "docs" / "03 Research and Catalogs"
 SPLITS_DIR = BASE_DIR / "data" / "processed" / "splits_v3"
 
 def wilson_score_interval(successes: int, total: int, z: float = 1.95996) -> tuple:
-    """Compute 95% Wilson score confidence interval for a binomial proportion."""
+    """Compute exact asymmetric 95% Wilson score confidence interval for a binomial proportion."""
     if total == 0:
         return 0.0, 0.0, 0.0
     p = successes / total
     denominator = 1 + (z**2) / total
-    centre_adjusted_probability = (p + (z**2) / (2 * total)) / denominator
-    adjusted_std_error = (z / denominator) * math.sqrt((p * (1 - p) / total) + (z**2) / (4 * total**2))
-    lower = max(0.0, centre_adjusted_probability - adjusted_std_error)
-    upper = min(1.0, centre_adjusted_probability + adjusted_std_error)
-    margin = (upper - lower) / 2.0
-    return p, lower, upper, margin
+    centre = (p + (z**2) / (2 * total)) / denominator
+    margin = (z / denominator) * math.sqrt((p * (1 - p) / total) + (z**2) / (4 * total**2))
+    lower = max(0.0, centre - margin)
+    upper = min(1.0, centre + margin)
+    return p, lower, upper
 
 def run_statistical_analysis():
     logger.info("Initializing Statistical Rigor and Scientific Controls Suite...")
@@ -62,30 +61,30 @@ def run_statistical_analysis():
     
     # In-Distribution 95% CI
     in_correct = sum(1 for p in in_preds if p["correct"])
-    in_acc, in_low, in_high, in_margin = wilson_score_interval(in_correct, len(in_preds))
+    in_acc, in_low, in_high = wilson_score_interval(in_correct, len(in_preds))
     in_tp = sum(1 for p in in_preds if p["true_label"] == 1 and p["predicted_label"] == 1)
     in_attacks = sum(1 for p in in_preds if p["true_label"] == 1)
-    in_rec, _, _, in_rec_margin = wilson_score_interval(in_tp, in_attacks)
+    in_rec, in_rec_low, in_rec_high = wilson_score_interval(in_tp, in_attacks)
     
     # OOD 95% CI
     ood_correct = sum(1 for p in ood_preds if p["correct"])
-    ood_acc, ood_low, ood_high, ood_margin = wilson_score_interval(ood_correct, len(ood_preds))
+    ood_acc, ood_low, ood_high = wilson_score_interval(ood_correct, len(ood_preds))
     ood_tp = sum(1 for p in ood_preds if p["true_label"] == 1 and p["predicted_label"] == 1)
     ood_attacks = sum(1 for p in ood_preds if p["true_label"] == 1)
-    ood_rec, _, _, ood_rec_margin = wilson_score_interval(ood_tp, ood_attacks)
+    ood_rec, ood_rec_low, ood_rec_high = wilson_score_interval(ood_tp, ood_attacks)
     
     # Authentic DAN Jailbreaks Subset (76 samples)
     dan_preds = [p for p in ood_preds if p.get("source") == "JailbreakBench" or "DAN" in p.get("prompt", "") or len(p["prompt"]) > 500][:76]
     dan_tp = sum(1 for p in dan_preds if p["predicted_label"] == 1)
-    dan_rec, dan_rec_low, dan_rec_high, dan_rec_margin = wilson_score_interval(dan_tp, len(dan_preds))
+    dan_rec, dan_rec_low, dan_rec_high = wilson_score_interval(dan_tp, len(dan_preds))
     
     # Stage 2 95% CI
     s2_correct = sum(1 for p in s2_preds if p["correct"])
-    s2_acc, s2_low, s2_high, s2_margin = wilson_score_interval(s2_correct, len(s2_preds))
+    s2_acc, s2_low, s2_high = wilson_score_interval(s2_correct, len(s2_preds))
     fever_preds = [p for p in s2_preds if "FEVER" in p.get("source", "")]
-    fever_acc, _, _, fever_margin = wilson_score_interval(sum(1 for p in fever_preds if p["correct"]), len(fever_preds))
+    fever_acc, fever_low, fever_high = wilson_score_interval(sum(1 for p in fever_preds if p["correct"]), len(fever_preds))
     halu_preds = [p for p in s2_preds if "HaluEval" in p.get("source", "")]
-    halu_acc, _, _, halu_margin = wilson_score_interval(sum(1 for p in halu_preds if p["correct"]), len(halu_preds))
+    halu_acc, halu_low, halu_high = wilson_score_interval(sum(1 for p in halu_preds if p["correct"]), len(halu_preds))
 
     # 2. LENGTH-MATCHED BENCHMARK EVALUATION
     logger.info("Evaluating Length-Matched Subsets to control for length confounders...")
@@ -120,7 +119,7 @@ def run_statistical_analysis():
             continue
         corr = sum(1 for p in subset if p["correct"])
         att_sub = [p for p in subset if p["true_label"] == 1]
-        rec_val = (sum(1 for p in att_sub if p["predicted_label"] == 1) / len(att_sub)) if att_sub else 1.0
+        rec_val = (sum(1 for p in att_sub if p["predicted_label"] == 1) / len(att_sub)) if att_sub else None
         safe_sub = [p for p in subset if p["true_label"] == 0]
         fpr_val = (sum(1 for p in safe_sub if p["predicted_label"] == 1) / len(safe_sub)) if safe_sub else 0.0
         loso_results[src] = {
@@ -158,18 +157,18 @@ This document reports rigorous empirical controls addressing dataset confounders
 
 ## 1. 95% Wilson Score Confidence Intervals
 
-All headline metrics computed across held-out splits with 95% Wilson score binomial confidence intervals ($z = 1.96$):
+All headline metrics computed across held-out splits with exact asymmetric 95% Wilson score binomial confidence intervals ($z = 1.96$):
 
-| Benchmark & Metric Scope | Evaluated ($N$) | Point Estimate | 95% Confidence Interval | Wilson Margin ($\pm$) |
-| :--- | :---: | :---: | :---: | :---: |
-| **Stage 1: In-Distribution Overall Accuracy** | 698 | **{in_acc*100:.2f}%** | [{in_low*100:.2f}%, {in_high*100:.2f}%] | **±{in_margin*100:.2f}%** |
-| **Stage 1: In-Distribution Attack Recall** | 355 | **{in_rec*100:.2f}%** | [{(in_rec-in_rec_margin)*100:.2f}%, {(in_rec+in_rec_margin)*100:.2f}%] | **±{in_rec_margin*100:.2f}%** |
-| **Stage 1: Zero-Shot OOD Overall Accuracy** | 500 | **{ood_acc*100:.2f}%** | [{ood_low*100:.2f}%, {ood_high*100:.2f}%] | **±{ood_margin*100:.2f}%** |
-| **Stage 1: Zero-Shot OOD Overall Recall** | 250 | **{ood_rec*100:.2f}%** | [{(ood_rec-ood_rec_margin)*100:.2f}%, {(ood_rec+ood_rec_margin)*100:.2f}%] | **±{ood_rec_margin*100:.2f}%** |
-| **Stage 1: Authentic Human DAN Jailbreaks** | 76 | **{dan_rec*100:.2f}%** | [{dan_rec_low*100:.2f}%, {dan_rec_high*100:.2f}%] | **±{dan_rec_margin*100:.2f}%** |
-| **Stage 2: Fact Grounding Combined Accuracy** | 800 | **{s2_acc*100:.2f}%** | [{s2_low*100:.2f}%, {s2_high*100:.2f}%] | **±{s2_margin*100:.2f}%** |
-| **Stage 2: FEVER Sub-Benchmark Accuracy** | 400 | **{fever_acc*100:.2f}%** | [{(fever_acc-fever_margin)*100:.2f}%, {(fever_acc+fever_margin)*100:.2f}%] | **±{fever_margin*100:.2f}%** |
-| **Stage 2: HaluEval Sub-Benchmark Accuracy** | 400 | **{halu_acc*100:.2f}%** | [{(halu_acc-halu_margin)*100:.2f}%, {(halu_acc+halu_margin)*100:.2f}%] | **±{halu_margin*100:.2f}%** |
+| Benchmark & Metric Scope | Evaluated ($N$) | Point Estimate | Exact Asymmetric 95% Wilson Confidence Interval |
+| :--- | :---: | :---: | :---: |
+| **Stage 1: In-Distribution Overall Accuracy** | 698 | **{in_acc*100:.2f}%** | [{in_low*100:.2f}%, {in_high*100:.2f}%] |
+| **Stage 1: In-Distribution Attack Recall** | 355 | **{in_rec*100:.2f}%** | [{in_rec_low*100:.2f}%, {in_rec_high*100:.2f}%] |
+| **Stage 1: Zero-Shot OOD Overall Accuracy** | 500 | **{ood_acc*100:.2f}%** | [{ood_low*100:.2f}%, {ood_high*100:.2f}%] |
+| **Stage 1: Zero-Shot OOD Overall Recall** | 250 | **{ood_rec*100:.2f}%** | [{ood_rec_low*100:.2f}%, {ood_rec_high*100:.2f}%] |
+| **Stage 1: Authentic Human DAN Jailbreaks** | 76 | **{dan_rec*100:.2f}%** | [{dan_rec_low*100:.2f}%, {dan_rec_high*100:.2f}%] |
+| **Stage 2: Fact Grounding Combined Accuracy** | 800 | **{s2_acc*100:.2f}%** | [{s2_low*100:.2f}%, {s2_high*100:.2f}%] |
+| **Stage 2: FEVER Sub-Benchmark Accuracy** | 400 | **{fever_acc*100:.2f}%** | [{fever_low*100:.2f}%, {fever_high*100:.2f}%] |
+| **Stage 2: HaluEval Sub-Benchmark Accuracy** | 400 | **{halu_acc*100:.2f}%** | [{halu_low*100:.2f}%, {halu_high*100:.2f}%] |
 
 ---
 
@@ -186,15 +185,16 @@ To eliminate character-length as a confounding signal (where attack prompts are 
 
 ---
 
-## 3. Leave-One-Source-Out (LOSO) Domain Generalization
+## 3. In-Distribution Per-Source Performance Breakdown
 
-Evaluation breakdown across the distinct benchmark provenance sources comprising the in-distribution held-out split:
+Performance breakdown across the distinct benchmark provenance sources comprising the in-distribution held-out split:
 
 | Evaluation Source Dataset | Total Samples ($N$) | Accuracy (%) | Attack Recall (%) | False Positive Rate (%) |
 | :--- | :---: | :---: | :---: | :---: |
 """
     for src, stats in loso_results.items():
-        report_md += f"| **{src}** | {stats['count']} | **{stats['accuracy']*100:.2f}%** | **{stats['recall']*100:.2f}%** | **{stats['fpr']*100:.2f}%** |\n"
+        rec_str = f"**{stats['recall']*100:.2f}%**" if stats['recall'] is not None else "N/A (All Benign; 0 Attacks)"
+        report_md += f"| **{src}** | {stats['count']} | **{stats['accuracy']*100:.2f}%** | {rec_str} | **{stats['fpr']*100:.2f}%** |\n"
         
     report_md += f"""
 ---

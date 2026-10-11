@@ -144,35 +144,13 @@ class GuardShieldEvaluator:
         return metrics, latencies
 
 # ==============================================================================
-# 2. Published Literature Baselines (Cited Ground Truth, Never Mocked)
+# 2. External Baselines Configuration
 # ==============================================================================
-# These figures are statically cited directly from peer-reviewed publications
-# for comparative context, clearly separated from measured hardware telemetry.
-LITERATURE_BASELINES = {
-    "llama_guard_3_8b": {
-        "citation": "Meta AI, 2024",
-        "model_size": "8.0 Billion",
-        "indist_accuracy": 93.8,
-        "indist_precision": 95.6,
-        "indist_f1": 0.939,
-        "xstest_fpr": 4.8,
-        "latency_mean_ms": 240.0,
-        "latency_p95_ms": 265.0,
-        "peak_vram_mb": 16384.0,
-        "streaming": "No (Block-Level)"
-    },
-    "selfcheckgpt_5x": {
-        "citation": "Manakul et al., EMNLP 2023",
-        "model_size": "Multi-Sample (8B)",
-        "indist_accuracy": 78.2,
-        "indist_precision": 72.5,
-        "indist_f1": 0.753,
-        "latency_mean_ms": 3120.0,
-        "latency_p95_ms": 3380.0,
-        "peak_vram_mb": 24576.0,
-        "streaming": "No (Offline Sampling)"
-    }
-}
+# In accordance with peer-reviewed empirical evaluation rigor, baseline metrics 
+# are measured live on identical benchmark splits when weights are accessible,
+# rather than printing unverified constants.
+LITERATURE_BASELINES = {}
+
 
 # ==============================================================================
 # 3. Meta Llama-Guard-3-8B Live Hardware Evaluator
@@ -332,18 +310,15 @@ def export_latex_tables(results: Dict[str, Any], out_dir: Path):
         lg_row = f"Meta Llama-Guard-3 (8B) & 8.0 Billion & {lg_live['indist']['accuracy']}\\% & {lg_live['indist']['precision']}\\% & {lg_live['indist']['f1']} & {lg_live['xstest']['fpr']}\\% \\\\"
         lg_lat_row = f"Meta Llama-Guard-3 & {lg_live['latency_mean']:.1f} ms & {lg_live['latency_p95']:.1f} ms & {lg_live.get('peak_vram_mb', 16384.0):.1f} MB & No (Block-Level) \\\\"
     else:
-        # Cite verified literature baseline with explicit footnote marker
-        lit_lg = LITERATURE_BASELINES["llama_guard_3_8b"]
-        lg_row = f"Meta Llama-Guard-3 (8B)$^\\dagger$ & {lit_lg['model_size']} & {lit_lg['indist_accuracy']}\\% & {lit_lg['indist_precision']}\\% & {lit_lg['indist_f1']} & {lit_lg['xstest_fpr']}\\% \\\\"
-        lg_lat_row = f"Meta Llama-Guard-3$^\\dagger$ & {lit_lg['latency_mean_ms']:.1f} ms & {lit_lg['latency_p95_ms']:.1f} ms & {lit_lg['peak_vram_mb']:.0f} MB & {lit_lg['streaming']} \\\\"
+        lg_row = "Meta Llama-Guard-3 (8B) & 8.0 Billion & [Requires HF Auth] & [Requires HF Auth] & -- & -- \\\\"
+        lg_lat_row = "Meta Llama-Guard-3 & [Requires HF Auth] & -- & ~16,384 MB & No (Block-Level) \\\\"
 
     # SelfCheckGPT row
     sc_live = results.get("selfcheckgpt")
     if sc_live and sc_live.get("metrics"):
         sc_lat_row = f"SelfCheckGPT (Live) & {sc_live['latency_mean']:.1f} ms & {sc_live['latency_p95']:.1f} ms & -- & No (Offline Sampling) \\\\"
     else:
-        lit_sc = LITERATURE_BASELINES["selfcheckgpt_5x"]
-        sc_lat_row = f"SelfCheckGPT (5x)$^\\ddagger$ & {lit_sc['latency_mean_ms']:.1f} ms & {lit_sc['latency_p95_ms']:.1f} ms & {lit_sc['peak_vram_mb']:.0f} MB & {lit_sc['streaming']} \\\\"
+        sc_lat_row = "SelfCheckGPT (Multi-Sample) & [Requires Causal LM] & -- & ~24,576 MB & No (Offline Sampling) \\\\"
 
     # Table 1: Ingress Security
     t1_code = f"""% Camera-Ready Table 1: Ingress Security Benchmark
@@ -360,7 +335,7 @@ def export_latex_tables(results: Dict[str, Any], out_dir: Path):
 \\hline
 \\end{{tabular}}
 \\vspace{{1mm}}
-\\raggedright{{\\footnotesize $^\\dagger$Baseline figures reported from Meta AI (2024).}}
+\\raggedright{{\\footnotesize Baselines require authenticated access to Meta weights; marked as unexecuted in air-gapped test runs.}}
 \\end{{table*}}
 """
     with open(out_dir / "table1_ingress_security.tex", "w", encoding="utf-8") as f:
@@ -513,11 +488,11 @@ def main():
     export_latex_tables(results, out_path)
 
     # Print Summary Terminal Table
-    lg_f1 = f"{results['llama_guard']['indist']['f1']}" if results.get("llama_guard") and results["llama_guard"].get("indist") else f"{LITERATURE_BASELINES['llama_guard_3_8b']['indist_f1']} (Lit)"
-    lg_fpr = f"{results['llama_guard']['xstest']['fpr']}%" if results.get("llama_guard") and results["llama_guard"].get("xstest") else f"{LITERATURE_BASELINES['llama_guard_3_8b']['xstest_fpr']}% (Lit)"
-    lg_lat = f"{results['llama_guard']['latency_mean']:.1f} ms" if results.get("llama_guard") and results["llama_guard"].get("latency_mean") is not None else f"{LITERATURE_BASELINES['llama_guard_3_8b']['latency_mean_ms']:.1f} ms (Lit)"
+    lg_f1 = f"{results['llama_guard']['indist']['f1']}" if results.get("llama_guard") and results["llama_guard"].get("indist") else "Unexecuted"
+    lg_fpr = f"{results['llama_guard']['xstest']['fpr']}%" if results.get("llama_guard") and results["llama_guard"].get("xstest") else "Unexecuted"
+    lg_lat = f"{results['llama_guard']['latency_mean']:.1f} ms" if results.get("llama_guard") and results["llama_guard"].get("latency_mean") is not None else "Unexecuted"
 
-    sc_lat = f"{results['selfcheckgpt']['latency_mean']:.1f} ms" if results.get("selfcheckgpt") and results["selfcheckgpt"].get("latency_mean") is not None else f"{LITERATURE_BASELINES['selfcheckgpt_5x']['latency_mean_ms']:.1f} ms (Lit)"
+    sc_lat = f"{results['selfcheckgpt']['latency_mean']:.1f} ms" if results.get("selfcheckgpt") and results["selfcheckgpt"].get("latency_mean") is not None else "Unexecuted"
 
     print("\n" + "=" * 95)
     print("  HEAD-TO-HEAD BENCHMARK SUMMARY (READY FOR RESEARCH PAPER)")

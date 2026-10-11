@@ -25,6 +25,7 @@ EXCLUDE_DIRS = {
     "scratch",
     "logs",
     "checkpoints",
+    "05 Admin and Credentials",
 }
 EXCLUDE_FILES = {
     "optimizer.pt",
@@ -32,6 +33,7 @@ EXCLUDE_FILES = {
     "scaler.pt",
     "scheduler.pt",
     "trainer_state.json",
+    "copy_signatures.py",
 }
 EXCLUDE_EXTS = {
     ".pyc",
@@ -61,11 +63,19 @@ def create_full_project_zip(output_path: Path = OUTPUT_ZIP) -> Path:
     with zipfile.ZipFile(output_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9, allowZip64=True) as zf:
         for root, dirs, files in os.walk(BASE_DIR):
             # Prune excluded directories in-place
-            dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS and not d.startswith("checkpoint-")]
+            dirs[:] = [
+                d for d in dirs 
+                if d not in EXCLUDE_DIRS 
+                and not d.startswith("checkpoint-")
+                and "admin" not in d.lower() 
+                and "credential" not in d.lower()
+            ]
             
             for f in files:
                 ext = os.path.splitext(f)[1].lower()
-                if f in EXCLUDE_FILES or ext in EXCLUDE_EXTS:
+                if f in EXCLUDE_FILES or ext in EXCLUDE_EXTS or "signature" in f.lower():
+                    continue
+                if "admin" in root.lower() or "credential" in root.lower():
                     continue
                 
                 full_path = Path(root) / f

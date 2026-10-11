@@ -52,19 +52,32 @@ class WindowedNLIVerifier:
             except Exception:
                 pass
 
-        # 3. Fallback to local DeBERTa weights directory if cross-encoder download is restricted
+        # 3. Strict failure if model cannot be loaded (no silent untrained fallback)
         if not loaded:
-            logger.info("Using local DeBERTa architecture for NLI verification.")
-            local_deberta = config.BASE_DIR / "models" / "deberta_v3_prescan_v3"
-            if local_deberta.exists():
-                self.tokenizer = AutoTokenizer.from_pretrained(str(local_deberta), use_fast=False)
-                self.model = AutoModelForSequenceClassification.from_pretrained(str(local_deberta))
-            else:
-                self.tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small", use_fast=False)
-                self.model = AutoModelForSequenceClassification.from_pretrained("microsoft/deberta-v3-small", num_labels=3)
+            raise RuntimeError(
+                f"Failed to load NLI verifier model '{model_name}'. "
+                "In offline or air-gapped environments, please ensure pre-cached weights are available, "
+                "or connect to the internet to download the cross-encoder checkpoint."
+            )
             
         self.model.to(self.device)
         self.model.eval()
+        
+        # Dynamically resolve label indices from model configuration
+        id2label = getattr(self.model.config, "id2label", {})
+        self.contra_idx = 0
+        self.entail_idx = 1
+        self.neutral_idx = 2
+        if id2label:
+            for idx, label in id2label.items():
+                lbl = str(label).lower()
+                if "contra" in lbl:
+                    self.contra_idx = int(idx)
+                elif "entail" in lbl:
+                    self.entail_idx = int(idx)
+                elif "neut" in lbl:
+                    self.neutral_idx = int(idx)
+        logger.info(f"NLI Label Mapping: Contradiction={self.contra_idx}, Entailment={self.entail_idx}, Neutral={self.neutral_idx}")
         
         # Warmup pass
         warmup = self.tokenizer("Premise text", "Hypothesis text", return_tensors="pt").to(self.device)
@@ -75,44 +88,25 @@ class WindowedNLIVerifier:
     def verify_claim(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
         Runs claim-level windowed NLI verification.
-        Splits multi-sentence hypotheses into declarative windows so that
-        the core answer is verified even if additional context or elaboration follows.
+        Splits multi-sentence hypotheses into declarative sentences.
+        Requires all asserted claims to be factually entailed; any contradictory
+        or ungrounded claim flags hallucination.
         """
         import re
         raw_sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', hypothesis) if s.strip()]
-        # Discard fragments that have fewer than 3 words and lack terminal punctuation
         sentences = [
             s for s in raw_sentences 
             if len(s.split()) >= 3 or s.endswith(('.', '!', '?'))
         ]
         if not sentences:
-            sentences = raw_sentences
+            sentences = [hypothesis]
 
-        if len(sentences) <= 1:
-            # Also extract the primary clause before commas/appositives (e.g. "X was invented by Y, a British scientist...")
-            first_sent = sentences[0] if sentences else hypothesis
-            sub_clauses = [c.strip() for c in re.split(r'[,;]', first_sent) if len(c.strip().split()) >= 3]
-            if len(sub_clauses) > 1:
-                # Test full sentence and main assertion
-                cand_res = [self.verify_entailment(premise, c) for c in [first_sent, sub_clauses[0]]]
-                # If main clause entails and has no contradiction, take it
-                entailed = [r for r in cand_res if r["decision"] in ("FACTUAL_ENTAILMENT", "FACTUALLY_CONSISTENT_REFUTATION")]
-                if entailed:
-                    best = max(entailed, key=lambda r: (r["decision"] == "FACTUAL_ENTAILMENT", r["entailment_prob"]))
-                    best["hypothesis"] = hypothesis
-                    return best
-            return self.verify_entailment(premise, first_sent)
+        if len(sentences) == 1:
+            return self.verify_entailment(premise, sentences[0])
 
-        # Multi-sentence hypothesis
+        # Multi-sentence verification
         start_time = time.perf_counter()
-        candidate_units = list(sentences)
-        for s in sentences:
-            clauses = [c.strip() for c in re.split(r'[,;]', s) if len(c.strip().split()) >= 3]
-            for c in clauses:
-                if c not in candidate_units:
-                    candidate_units.append(c)
-
-        sent_results = [self.verify_entailment(premise, u) for u in candidate_units]
+        sent_results = [self.verify_entailment(premise, s) for s in sentences]
 
         # 1. Any sentence directly contradicting the premise marks a hallucination
         contradictions = [r for r in sent_results if r["is_contradiction"]]
@@ -122,18 +116,15 @@ class WindowedNLIVerifier:
             worst["hypothesis"] = hypothesis
             return worst
 
-        # 2. At least one sentence entails the premise or is a valid refutation, and no contradictions exist
-        valid_factual = [
-            r for r in sent_results 
-            if r["decision"] in ("FACTUAL_ENTAILMENT", "FACTUALLY_CONSISTENT_REFUTATION")
-        ]
-        if valid_factual:
-            best = max(valid_factual, key=lambda r: (r["decision"] == "FACTUAL_ENTAILMENT", r["entailment_prob"]))
-            best["latency_ms"] = round((time.perf_counter() - start_time) * 1000.0, 2)
-            best["hypothesis"] = hypothesis
-            return best
+        # 2. Strict factuality: All sentences must be entailed
+        all_entailed = all(r["decision"] == "FACTUAL_ENTAILMENT" for r in sent_results)
+        if all_entailed:
+            min_entail = min(sent_results, key=lambda r: r["entailment_prob"])
+            min_entail["latency_ms"] = round((time.perf_counter() - start_time) * 1000.0, 2)
+            min_entail["hypothesis"] = hypothesis
+            return min_entail
 
-        # 3. None entail and none contradict -> Ungrounded Neutral
+        # 3. If any sentence is ungrounded / neutral, it cannot be masked by an entailed sentence
         avg_contra = sum(r["contradiction_prob"] for r in sent_results) / len(sent_results)
         avg_entail = sum(r["entailment_prob"] for r in sent_results) / len(sent_results)
         avg_neutral = sum(r["neutral_prob"] for r in sent_results) / len(sent_results)
@@ -164,16 +155,11 @@ class WindowedNLIVerifier:
             logits = outputs.logits
             probs = torch.softmax(logits, dim=-1)[0]
             
-        # Label mapping: 0 = Contradiction, 1 = Entailment, 2 = Neutral
-        p_contradiction = float(probs[0].item())
-        p_entailment = float(probs[1].item()) if len(probs) > 1 else 0.5
-        p_neutral = float(probs[2].item()) if len(probs) > 2 else 0.0
+        p_contradiction = float(probs[self.contra_idx].item()) if len(probs) > self.contra_idx else 0.0
+        p_entailment = float(probs[self.entail_idx].item()) if len(probs) > self.entail_idx else 0.0
+        p_neutral = float(probs[self.neutral_idx].item()) if len(probs) > self.neutral_idx else 0.0
 
-        # Rigorous Factual Verification:
-        # A claim is Factual if p_entailment meets threshold.
-        # If contradiction >= threshold -> Direct Contradiction
-        # If negative refutation of a non-existent entity with low contradiction -> Factually Consistent Refutation
-        # If neutral is dominant & ungrounded affirmative speculation -> Ungrounded Neutral Hallucination
+        # Rigorous Factual Verification (Zero Regex Overrides):
         if p_contradiction >= self.threshold:
             decision = "HALLUCINATION_CONTRADICTION"
             is_hallucination = True
@@ -181,20 +167,8 @@ class WindowedNLIVerifier:
             decision = "FACTUAL_ENTAILMENT"
             is_hallucination = False
         else:
-            # Check for negative refutation of false presuppositions
-            # (e.g., "There is no capital of Mars as it is a planet, not a country")
-            import re
-            is_refutation = bool(re.search(
-                r'\b(?:there is no|there are no|has no|have no|does not have|do not have|is not a|are not a|not a country|no capital|doesn\'t have|isn\'t a|cannot have|no evidence)\b',
-                hypothesis,
-                re.IGNORECASE
-            ))
-            if is_refutation and p_contradiction < 0.15:
-                decision = "FACTUALLY_CONSISTENT_REFUTATION"
-                is_hallucination = False
-            else:
-                decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
-                is_hallucination = True
+            decision = "UNGROUNDED_NEUTRAL_HALLUCINATION"
+            is_hallucination = True
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 

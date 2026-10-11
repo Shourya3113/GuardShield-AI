@@ -366,10 +366,11 @@ def evaluate_stage2_streaming_entropy(model_name: str = "gpt2"):
                     drift_entropies.append(h)
 
     except Exception as e:
-        logger.warning(f"Could not run live causal model for entropy benchmark ({e}). Using verified empirical holdout logs.")
-        # Genuine measured logs from prior offline forward passes, not synthetic normal randoms
-        grounded_entropies = [0.016, 0.021, 0.025, 0.101, 0.029, 0.145, 0.231, 0.089, 0.054, 0.312]
-        drift_entropies = [1.553, 1.561, 1.235, 1.524, 1.410, 1.575, 1.488, 1.390, 1.512, 1.440]
+        logger.error(f"Live causal model execution failed for entropy benchmark: {e}")
+        raise RuntimeError(
+            f"Cannot evaluate streaming entropy: live causal model '{model_name}' could not be executed ({e}). "
+            "In accordance with peer-reviewed research integrity standards, hardcoded fallback constants have been removed."
+        )
 
     grounded_np = np.array(grounded_entropies)
     drift_np = np.array(drift_entropies)
