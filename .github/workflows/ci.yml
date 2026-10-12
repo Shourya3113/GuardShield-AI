@@ -30,4 +30,4 @@ jobs:
       # proxy logic is exercised with a deterministic stub classifier.
       - name: Run Smoke Tests
         run: |
-          python -m pytest tests/test_smoke.py -v -rs
+          python -m pytest tests/ -v -rs

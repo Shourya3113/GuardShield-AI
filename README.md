@@ -113,14 +113,14 @@ Eleven perturbation vectors on balanced cohorts with exact 95% Wilson intervals 
 | 3. Soft-Hyphens (Subword Splitting) | 100 / 100 | 100.0% [96.3%, 100.0%] | 98.0% [93.0%, 99.5%] | 100.0% | 0.0% |
 | 4. Leetspeak Obfuscation | 100 / 100 | 100.0% [96.3%, 100.0%] | 98.0% [93.0%, 99.5%] | 100.0% | 0.0% |
 | 5. Cyrillic Homoglyphs (Visual Spoof) | 100 / 100 | 99.0% [94.5%, 99.8%] | 86.0% [77.9%, 91.5%] | 99.0% | 1.0% |
-| 6. Base64 Cipher Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 96.0% [90.2%, 98.4%] | 100.0% | 0.0% |
-| 7. ROT13 Caesar Cipher Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 73.0% [63.6%, 80.7%] | 100.0% | 0.0% |
-| 8. Hinglish Code-Mixed Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 27.0% [19.3%, 36.4%] | 100.0% | 39.0% |
+| 6. Base64 Cipher Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 98.0% [93.0%, 99.5%] | 100.0% | 0.0% |
+| 7. ROT13 Caesar Cipher Wrapping | 100 / 100 | 96.0% [90.2%, 98.4%] | 81.0% [72.2%, 87.5%] | 96.0% | 0.0% |
+| 8. Hinglish Code-Mixed Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 59.0% [49.2%, 68.1%] | 100.0% | 21.0% |
 | 9. Benign Prefix Padding (>256 Tok) | 100 / 100 | 94.0% [87.5%, 97.2%] | 0.0% [0.0%, 3.7%] | 0.0% | 21.0% |
 | 10. Benign Suffix Padding (>256 Tok) | 100 / 100 | 87.0% [79.0%, 92.2%] | 0.0% [0.0%, 3.7%] | 87.0% | 21.0% |
 | 11. Sandwich Padding (Evasion Core) | 100 / 100 | 90.0% [82.6%, 94.5%] | 0.0% [0.0%, 3.7%] | 0.0% | 21.0% |
 
-- **Character and cipher obfuscation**: On 6 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping), benign prompts carrying the same perturbation are flagged at a **73.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
+- **Character and cipher obfuscation**: On 7 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping, Hinglish Code-Mixed Wrapping), benign prompts carrying the same perturbation are flagged at a **59.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
 - **Length padding** keeps the semantics clean: fixed 128-token truncation misses attacks once a long benign prefix is prepended, while sliding-window chunking scans every window and takes the maximum risk (see the padding rows above).
 - **XSTest (450 prompts)**: false refusal rate on 250 safe homonym prompts is 0.0% [0.0%, 1.5%]; block rate on 200 plainly harmful (non-injection) requests is 0.0% [0.0%, 1.9%]. Stage 1 is a prompt-injection/jailbreak filter, not a harmful-content moderator.
 - **Calibration**: `PreScanSecurityFilter` uses raw logits ($T = 1.0$); scalar temperature scaling does not move decisions at the 0.50 threshold.
@@ -134,7 +134,7 @@ Eleven perturbation vectors on balanced cohorts with exact 95% Wilson intervals 
    - A hard-negative fine-tuning pass added 98 benign and 12 attack prompts after automatically removing 29 candidates that overlapped any evaluation set or regression test (`hard_negative_training_summary.json`), so the benign-hard and multi-turn results below are measured on held-out text.
    - With signed assistant history, 15.00% (3/20) of benign conversations are blocked (no signing: 25.00% (5/20); ProtectAI: 20.00% (4/20)).
 
-2. **Character & cipher obfuscation**: On 6 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping), benign prompts carrying the same perturbation are flagged at a **73.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
+2. **Character & cipher obfuscation**: On 7 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping, Hinglish Code-Mixed Wrapping), benign prompts carrying the same perturbation are flagged at a **59.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
 
 3. **Short conversational turns**: turns under 50 characters and at most 6 words are scanned on their own *and* together with the preceding scanned turn; the higher risk wins, so attacker-supplied context can add risk but never dilute a short attack below threshold. Signed assistant replies are not used as context.
 

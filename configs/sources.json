@@ -1,0 +1,67 @@
+{
+  "_comment": "Text pools for the paired-perturbation audit. Revisions are pinned commit SHAs. 'contamination' records which guards are known or likely to have trained on the source (see paper1/SPEC.md section 3).",
+  "sources": {
+    "gandalf": {
+      "type": "hf_parquet",
+      "repo": "Lakera/gandalf_ignore_instructions",
+      "revision": "04737b65e90a6794ec227012e4a255a7def6344b",
+      "files": [
+        "data/train-00000-of-00001-ded53be747ff55cd.parquet",
+        "data/validation-00000-of-00001-94481a2a09ff2fff.parquet",
+        "data/test-00000-of-00001-bc92128b9288a6d1.parquet"
+      ],
+      "text_field": "text",
+      "constant_label": 1,
+      "max_chars": 1500,
+      "role": "attack",
+      "contamination": "Unknown for commercial/vendor guards; not in GuardShield training."
+    },
+    "deepset_test": {
+      "type": "hf_parquet",
+      "repo": "deepset/prompt-injections",
+      "revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+      "files": ["data/test-00000-of-00001-701d16158af87368.parquet"],
+      "text_field": "text",
+      "label_field": "label",
+      "attack_values": [1],
+      "max_chars": 1500,
+      "role": "mixed",
+      "contamination": "deepset/fmops trained on deepset train split; GuardShield trained on deepset data; ProtectAI v2 training mix unknown. Report as in-distribution for those guards."
+    },
+    "dolly": {
+      "type": "hf_jsonl",
+      "repo": "databricks/databricks-dolly-15k",
+      "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+      "files": ["databricks-dolly-15k.jsonl"],
+      "text_field": "instruction",
+      "filter": {"context": ""},
+      "constant_label": 0,
+      "max_chars": 1500,
+      "role": "benign",
+      "contamination": "Generic instruction data; may appear as benign training data for some guards."
+    },
+    "notinject": {
+      "type": "hf_parquet",
+      "repo": "leolee99/NotInject",
+      "revision": "847ae76cf8fea5ed325429e569ae8cfef022d2e0",
+      "files": [
+        "data/NotInject_one-00000-of-00001.parquet",
+        "data/NotInject_two-00000-of-00001.parquet",
+        "data/NotInject_three-00000-of-00001.parquet"
+      ],
+      "text_field": "prompt",
+      "constant_label": 0,
+      "role": "benign",
+      "contamination": "PIGuard was designed against NotInject (its own benchmark); treat PIGuard results on it as favourable."
+    },
+    "guardshield_test": {
+      "type": "local_json",
+      "path": "data/processed/splits_v3/test_in_distribution.json",
+      "text_field": "prompt",
+      "label_field": "label",
+      "attack_values": [1],
+      "role": "mixed",
+      "contamination": "In-distribution for GuardShield (home advantage). Use only for the GuardShield-specific analysis."
+    }
+  }
+}

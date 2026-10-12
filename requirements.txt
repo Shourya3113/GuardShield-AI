@@ -25,3 +25,7 @@ httpx==0.28.1
 python-docx>=1.1.0
 python-pptx>=0.6.21
 reportlab>=4.0.0
+
+# Paper 1 guard audit harness (guard_audit/)
+pyarrow>=15.0.0
+huggingface_hub>=0.30.0

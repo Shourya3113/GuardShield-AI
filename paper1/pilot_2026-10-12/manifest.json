@@ -1,0 +1,84 @@
+{
+  "dataset_sha256": "2fa986936fec6ed68a49b18780b3370c676e10b723608fb02eab9e55a233b06b",
+  "args": {
+    "sources": "D:\\projects\\GuardShield_AI\\configs\\sources.json",
+    "attack_sources": [
+      "gandalf"
+    ],
+    "benign_sources": [
+      "dolly"
+    ],
+    "families": [
+      "all"
+    ],
+    "n_pairs": 150,
+    "calibration_size": 300,
+    "seed": 13,
+    "out": "runs/pilot_obf",
+    "func": null
+  },
+  "source_specs": {
+    "gandalf": {
+      "type": "hf_parquet",
+      "repo": "Lakera/gandalf_ignore_instructions",
+      "revision": "04737b65e90a6794ec227012e4a255a7def6344b",
+      "files": [
+        "data/train-00000-of-00001-ded53be747ff55cd.parquet",
+        "data/validation-00000-of-00001-94481a2a09ff2fff.parquet",
+        "data/test-00000-of-00001-bc92128b9288a6d1.parquet"
+      ],
+      "text_field": "text",
+      "constant_label": 1,
+      "max_chars": 1500,
+      "role": "attack",
+      "contamination": "Unknown for commercial/vendor guards; not in GuardShield training."
+    },
+    "dolly": {
+      "type": "hf_jsonl",
+      "repo": "databricks/databricks-dolly-15k",
+      "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+      "files": [
+        "databricks-dolly-15k.jsonl"
+      ],
+      "text_field": "instruction",
+      "filter": {
+        "context": ""
+      },
+      "constant_label": 0,
+      "max_chars": 1500,
+      "role": "benign",
+      "contamination": "Generic instruction data; may appear as benign training data for some guards."
+    }
+  },
+  "pool_sizes": {
+    "attacks": 1000,
+    "benign": 10362
+  },
+  "n_pairs": 150,
+  "n_calibration": 300,
+  "families": [
+    "clean",
+    "zero_width",
+    "soft_hyphen",
+    "leetspeak",
+    "homoglyph",
+    "base64_wrap",
+    "base64_scaffold",
+    "rot13_wrap",
+    "rot13_scaffold",
+    "fullwidth",
+    "diacritics",
+    "spaced_letters"
+  ],
+  "median_pair_length_gap_chars": 0,
+  "n_items": 3900,
+  "environment": {
+    "git_commit": "0aa9019358b7700b55ad4cb06118e480357c7254-dirty",
+    "timestamp": "2026-10-12T10:41:37Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  }
+}
