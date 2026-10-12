@@ -16,6 +16,9 @@ sys.path.append(str(Path(__file__).resolve().parent))
 import config
 
 def run_comparative_benchmark() -> Dict[str, Any]:
+    # WARNING: only the GuardShield row is measured. The baseline rows below are hardcoded
+    # placeholders (no Llama-Guard-3 / SelfCheckGPT run exists) and must not be reported as results.
+    logger.warning("Baseline rows in this table are UNMEASURED placeholders, not experimental results.")
     print("=" * 80)
     print("  GuardShield AI — Comparative Guardrail & Latency Benchmark (Week 8)")
     print("=" * 80)
@@ -56,6 +59,7 @@ def run_comparative_benchmark() -> Dict[str, Any]:
         },
         {
             "system": "Meta Llama-Guard-3 (Baseline)",
+            "provenance": "UNMEASURED: hardcoded placeholder values, never produced by an experiment. Do not report.",
             "model_size": "8.0B Parameters",
             "injection_accuracy": "84.20%",
             "injection_precision": "88.10%",
@@ -68,6 +72,7 @@ def run_comparative_benchmark() -> Dict[str, Any]:
         },
         {
             "system": "SelfCheckGPT (Baseline)",
+            "provenance": "UNMEASURED: hardcoded placeholder values, never produced by an experiment. Do not report.",
             "model_size": "Multi-Sample LLM (5x)",
             "injection_accuracy": "N/A (Output Only)",
             "injection_precision": "N/A",
@@ -80,6 +85,7 @@ def run_comparative_benchmark() -> Dict[str, Any]:
         },
         {
             "system": "Continuous Cross-Encoder (Dense)",
+            "provenance": "UNMEASURED: hardcoded placeholder values, never produced by an experiment. Do not report.",
             "model_size": "86M Cross-Encoder",
             "injection_accuracy": "N/A",
             "injection_precision": "N/A",

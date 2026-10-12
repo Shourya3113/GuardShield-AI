@@ -26,9 +26,10 @@ class WindowedNLIVerifier:
     Triggered during entropy spikes to evaluate factual consistency against reference premises.
     Outputs: Entailment (Factual), Neutral (Uncertain), or Contradiction (Hallucination).
     """
-    def __init__(self, model_name: str = "cross-encoder/nli-deberta-v3-small", threshold: float = 0.50):
+    def __init__(self, model_name: str = "cross-encoder/nli-deberta-v3-small", threshold: float = 0.50, max_length: int = 256):
         self.model_name = model_name
         self.threshold = threshold
+        self.max_length = max_length
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
         logger.info(f"Initializing NLIVerifier on {self.device.upper()}...")
@@ -155,20 +156,63 @@ class WindowedNLIVerifier:
             "latency_ms": round(elapsed_ms, 2)
         }
 
+    def _premise_windows(self, premise: str, hypothesis: str) -> List[str]:
+        """
+        Splits a premise that does not fit next to the hypothesis in `max_length` tokens into
+        sentence-aligned windows of about half the token budget with a one-sentence overlap,
+        so evidence beyond the first window is not truncated away.
+        """
+        import re
+        premise_ids = self.tokenizer.encode(premise, add_special_tokens=False)
+        hyp_len = len(self.tokenizer.encode(hypothesis, add_special_tokens=False))
+        budget = self.max_length - hyp_len - 3  # [CLS] premise [SEP] hypothesis [SEP]
+        if len(premise_ids) <= budget or budget < 32:
+            return [premise]
+
+        sentences = [s for s in re.split(r'(?<=[.!?])\s+', premise) if s.strip()]
+        lengths = [len(self.tokenizer.encode(s, add_special_tokens=False)) for s in sentences]
+        target = budget // 2
+        windows = []
+        i = 0
+        while i < len(sentences):
+            j, total = i, 0
+            while j < len(sentences) and (j == i or total + lengths[j] <= target):
+                total += lengths[j]
+                j += 1
+            windows.append(" ".join(sentences[i:j]))  # over-long single sentences are truncated by the tokenizer
+            if j >= len(sentences):
+                break
+            i = max(i + 1, j - 1)
+        return windows
+
     def verify_entailment(self, premise: str, hypothesis: str) -> Dict[str, Any]:
         """
         Verify if the hypothesis is factually entailed by the premise.
         Distinguishes Contradiction (Hallucination), Entailment (Supported), and Neutral (Unverified).
         """
         start_time = time.perf_counter()
-        
-        inputs = self.tokenizer(premise, hypothesis, return_tensors="pt", truncation=True, max_length=256).to(self.device)
-        
+
+        premise_windows = self._premise_windows(premise, hypothesis)
+        inputs = self.tokenizer(
+            premise_windows, [hypothesis] * len(premise_windows),
+            return_tensors="pt", truncation=True, max_length=self.max_length, padding=True
+        ).to(self.device)
+
         with torch.no_grad():
             outputs = self.model(**inputs)
-            logits = outputs.logits
-            probs = torch.softmax(logits, dim=-1)[0]
-            
+            window_probs = torch.softmax(outputs.logits, dim=-1)
+
+        if len(premise_windows) == 1:
+            probs = window_probs[0]
+        else:
+            # Long premise: support anywhere in the evidence suffices (best-entailing window);
+            # otherwise report the most contradicting window.
+            best_entail = int(torch.argmax(window_probs[:, self.entail_idx]))
+            if float(window_probs[best_entail, self.entail_idx]) >= self.threshold:
+                probs = window_probs[best_entail]
+            else:
+                probs = window_probs[int(torch.argmax(window_probs[:, self.contra_idx]))]
+
         p_contradiction = float(probs[self.contra_idx].item()) if len(probs) > self.contra_idx else 0.0
         p_entailment = float(probs[self.entail_idx].item()) if len(probs) > self.entail_idx else 0.0
         p_neutral = float(probs[self.neutral_idx].item()) if len(probs) > self.neutral_idx else 0.0

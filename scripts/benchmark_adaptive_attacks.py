@@ -55,7 +55,7 @@ REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(BASE_DIR / "src"))
-from prescan_filter import PreScanSecurityFilter
+from prescan_filter import PreScanSecurityFilter, weights_sha256
 
 # ------------------------------------------------------------------------------
 # Wilson Score Confidence Interval Helper
@@ -401,6 +401,7 @@ def run_adaptive_benchmarks():
     out_payload = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "evaluator_model": engine.model_dir.name,
+        "weights_sha256": weights_sha256(engine.model_dir),
         "device": engine.device,
         "temperature": engine.temperature,
         "perturbation_evaluations": results,

@@ -18,9 +18,9 @@ Modern Large Language Models (LLMs) deployed in production environments face two
 2. **Hallucinatory Egress**: Fabricated assertions, unsupported extrapolations, and factual inconsistencies generated during open-ended decoding.
 
 **GuardShield AI** provides a synchronous dual-stage defense pipeline combining:
-- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44.3M backbone, 142.6M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~41.25 ms (p50)** with sliding-window chunking, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
-- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~42.80 ms p50**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
-- **Measured End-to-End Pipeline Latency**: Sequential Stage 1 + Stage 2 execution overhead measures **60.52 ms (p50)** / **62.58 ms (mean)** across 100 sequential queries on CUDA, logged per-sample in [`raw_eval_pipeline_e2e.json`](docs/01%20Reports/raw_eval_pipeline_e2e.json).
+- **Stage 1 (Pre-Scan Filter)**: A lightweight, fine-tuned transformer classifier (`microsoft/deberta-v3-small`: 44.3M backbone, 142.6M total parameters including the 128k SentencePiece vocabulary) that inspects ingress prompts in **~26.53 ms (p50)** with sliding-window chunking, blocking injections, jailbreaks, and length-padded attacks before they consume expensive downstream LLM decoding passes.
+- **Stage 2 (Post-Generation Fact Grounding)**: A cross-encoder Natural Language Inference (NLI) verifier (`cross-encoder/nli-deberta-v3-small`) that performs premise-hypothesis entailment verification (**~22.96 ms p50**) to validate LLM assertions against authoritative retrieval context in RAG architectures.
+- **Measured End-to-End Pipeline Latency**: Sequential Stage 1 + Stage 2 execution overhead measures **41.52 ms (p50)** / **44.80 ms (mean)** across 100 sequential queries on CUDA, logged per-sample in [`raw_eval_pipeline_e2e.json`](docs/01%20Reports/raw_eval_pipeline_e2e.json).
 
 ```mermaid
 graph LR
@@ -37,113 +37,112 @@ graph LR
 
 ---
 
+<!-- BEGIN GENERATED RESULTS (scripts/generate_readme_tables.py) -->
 ## 📊 V3 Mega Research Benchmark Evaluation (5,948 Curated Samples)
 
 GuardShield AI has been empirically evaluated across **7 published academic and industry benchmark datasets**:
 - **Security & Adversarial Benchmarks (5,148 samples)**:
-  - *In-Distribution (4,648 samples)*: Partitioned into 3,253 Train, 697 Validation, and 698 Test samples across Stanford Online Safety (SPML), Jayavibhav Injection Suite, and Deepset Prompt Injections.
-  - *Out-of-Distribution Zero-Shot (500 samples)*: 250 novel ChatGPT JailbreakBench attacks + 250 held-out benign queries.
+  - *In-Distribution (4,648 samples)*: Partitioned into 3,253 Train, 697 Validation, and 698 Test samples across Stanford Online Safety (SPML), Jayavibhav Injection Suite, Deepset Prompt Injections, and TruthfulQA benign queries.
+  - *Out-of-Distribution Zero-Shot (500 samples)*: 76 human-written ChatGPT jailbreaks + 174 synthetic template-shift injections + 250 held-out benign queries.
 - **Factuality & Hallucination Grounding Benchmarks (800 unique pairs)**:
-  - 400 unique claim-evidence pairs from **FEVER (NAACL 2018)** (200 Supported, 200 Refuted).
-  - 400 unique grounded-hallucinated QA pairs from **HaluEval (EMNLP 2023)** (200 Grounded, 200 Hallucinated).
+  - 400 claim-evidence pairs from **FEVER (NAACL 2018)**.
+  - 400 grounded/hallucinated QA pairs from **HaluEval (EMNLP 2023)**.
 
 ### Empirical Evaluation Summary
 
 | Defense Component | Evaluation Dataset / Split | Sample Size ($N$) | Accuracy (%) | Precision (%) | Recall (%) | F1-Score | FPR (%) | Median Latency (ms) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **98.71%** | **99.43%** | **98.03%** | **0.9872** | **0.58%** | **41.25 ms** |
-| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **90.20%** | **99.02%** | **81.20%** | **0.8923** | **0.80%** | **41.07 ms** |
-| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **73.12%** | **76.35%** | **67.00%** | **0.7137** | **20.75%** | **42.80 ms** |
-| **Dual-Stage Pipeline** | **Empirical Sequential Pipeline Overhead (5-Repeat)** | **500** | — | — | — | — | — | **60.52 ms** (IQR: 10.75 ms) |
+| **Stage 1: Pre-Scan** | **In-Distribution Test Split** | **698** | **99.00%** | **99.43%** | **98.59%** | **0.9901** | **0.58%** | **26.53 ms** |
+| **Stage 1: Pre-Scan** | **Out-of-Distribution Zero-Shot** | **500** | **98.20%** | **99.18%** | **97.20%** | **0.9818** | **0.80%** | **26.13 ms** |
+| **Stage 2: Fact Verifier** | **Multi-Source Fact Grounding (FEVER + HaluEval)** | **800** | **73.00%** | **76.29%** | **66.75%** | **0.7120** | **20.75%** | **22.96 ms** |
+| **Dual-Stage Pipeline** | **Sequential Pipeline Overhead (5-Repeat)** | **500** | — | — | — | — | — | **41.52 ms** (IQR: 11.95 ms) |
 
-*Note: All Stage 1 metrics reflect pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 evaluates windowed premise-hypothesis fact verification using verify_claim with multi-sentence clause decomposition across 800 authentic, non-duplicated academic benchmark pairs: FEVER (86.50% Accuracy, 88.50% Recall, 0.9498 AUROC) and HaluEval QA (59.75% Accuracy, 45.50% Recall, 0.6127 AUROC). Neutral assertions without sufficient evidence are categorized as UNVERIFIED_NEUTRAL rather than conflated with hallucinations, reducing the combined false positive rate from 60.50% down to 20.75% while achieving 0.8132 overall AUROC. Complete prediction-level logs with per-sample scores, latencies, cryptographic file hashes, and git commit hashes are committed in `docs/01 Reports/raw_eval_*.json`.*
+*Stage 1 metrics are pure neural inference with sliding-window chunking (no keyword heuristics). Stage 2 runs `verify_claim` with multi-sentence decomposition: FEVER 86.25% accuracy / 0.9496 AUROC, HaluEval QA 59.75% accuracy / 0.6127 AUROC. Neutral claims without sufficient evidence are reported as `UNVERIFIED_NEUTRAL` rather than as hallucinations. Per-sample predictions, latencies, dataset/weights SHA-256 hashes and git commits are in `docs/01 Reports/raw_eval_*.json`; all Stage 1 numbers on this page come from weights `cd1e81a29c1eb942`.*
 
 #### Stage 2 Disaggregated Fact Grounding Breakdown (FEVER vs. HaluEval)
 
 | Fact Grounding Benchmark Split | Sample Size ($N$) | Accuracy (%) | Contradiction Recall (%) | Precision (%) | FPR (%) | AUROC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **FEVER (NAACL 2018)** | 400 | 86.50% | 88.50% (177/200) | 85.10% | 15.50% (31 false alarms) | 0.9498 |
-| **HaluEval QA (EMNLP 2023)** | 400 | 59.75% | 45.50% (91/200) | 63.64% | 26.00% (52 false alarms) | 0.6127 |
-| **Combined Authentic Suite** | **800** | **73.12%** | **67.00%** (268/400) | **76.35%** | **20.75%** (83 false alarms) | **0.8132** |
+| FEVER (NAACL 2018) | 400 | 86.25% | 88.00% (176/200) | 85.02% | 15.50% (31 false alarms) | 0.9496 |
+| HaluEval QA (EMNLP 2023) | 400 | 59.75% | 45.50% (91/200) | 63.64% | 26.00% (52 false alarms) | 0.6127 |
+| **Combined Authentic Suite** | 800 | 73.00% | 66.75% (267/400) | 76.29% | 20.75% (83 false alarms) | 0.8131 |
 
 ---
 
 ### Comparative Baselines: GuardShield vs. TF-IDF & ProtectAI DeBERTa-v3
 
-To rigorously evaluate defense efficacy against both classical surface-lexical baselines and modern industry SLMs, we benchmarked GuardShield against TF-IDF + Logistic Regression and ProtectAI's `deberta-v3-base-prompt-injection-v2` (125M parameters) on identical splits:
+GuardShield is compared with TF-IDF + Logistic Regression and ProtectAI's `deberta-v3-base-prompt-injection-v2` (184.0M parameters) on identical splits:
 
 | Model Architecture | Total Parameters | In-Distribution Accuracy | In-Distribution Recall | OOD Zero-Shot Accuracy | OOD Zero-Shot Recall | Human DAN Recall | Template Shift Recall | Latency (p50) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **TF-IDF + Logistic Regression (Baseline)** | Linear (10k n-grams) | 94.41% | 91.55% | 71.60% | 45.60% | 92.11% (70/76) | 25.29% (44/174) | < 1 ms |
 | **ProtectAI DeBERTa-v3-base (External SLM)** | 184.0M (Base) | 93.84% | 88.73% | 88.20% | 78.80% | 86.84% (66/76) | 75.29% (131/174) | 65.26 ms |
-| **GuardShield DeBERTa-v3 (Ours)** | **142.6M (Small)** | **98.71%** | **98.03%** | **90.20%** | **81.20%** | **92.11%** (70/76) | **100.00%** (174/174) | **41.25 ms** |
+| **GuardShield DeBERTa-v3 (Ours)** | **142.6M (Small)** | **99.00%** | **98.59%** | **98.20%** | **97.20%** | **90.79% (69/76)** | **100.00% (174/174)** | **26.53 ms** |
 
-**Granular Zero-Shot OOD Generalization Breakdown**:
-- **Authentic Human DAN Jailbreaks (76 prompts)**: On real, human-authored ChatGPT jailbreaks, GuardShield achieves **92.11% recall** (70 of 76 detected) against ProtectAI's **86.84%** (66 of 76) and TF-IDF's **92.11%** (70 of 76). Because colloquial jailbreak prompts share explicit keyword markers (`"jailbroken"`, `"DAN"`, `"unfiltered"`), lexical features detect them effectively.
-- **Controlled Structural Template Shifts (174 prompts)**: Evaluated on 174 injection variations derived from 5 fixed structural templates with slot variations, TF-IDF collapses to **25.29% recall** (44/174), while GuardShield's contextual transformer representation maintains **100.00% recall** (174/174).
-- **Overall OOD Attack Recall**: Across all 250 zero-shot attacks, GuardShield achieves **97.60% recall** (244 of 250) with a low false positive rate of **1.20%**.
-- **In-Distribution Domain Breakdown**: Held-out in-distribution recall varies across provenance sources: Stanford SPML (**99.19%**, 301/303), Jayavibhav (**98.46%**, 128/130), and Deepset (**88.37%**, 38/43).
-- **Statistical Rigor & Controls**: 95% Wilson score confidence intervals ($98.42\% \pm 0.96\%$), length-matched control experiments (length heuristic 60.61% vs. GuardShield 98.48%), and long-prompt sliding-window audits (66 prompts $\ge 200$ chars, 4.55% FPR) are detailed in [`statistical_rigor_and_controls.md`](docs/03%20Research%20and%20Catalogs/statistical_rigor_and_controls.md).
+**Granular Zero-Shot OOD Breakdown**:
+- **Human-written DAN jailbreaks (76 prompts)**: GuardShield 90.79% (69/76), ProtectAI 86.84% (66/76), TF-IDF 92.11% (70/76). These prompts share explicit lexical markers ("jailbroken", "DAN"), which is why TF-IDF does well here.
+- **Synthetic template-shift injections (174 prompts, 5 structural templates with slot variations)**: GuardShield 100.00% (174/174), ProtectAI 75.29% (131/174), TF-IDF 25.29% (44/174).
+- **All OOD attacks**: GuardShield recall 97.20% (243/250) with a benign false positive rate of 0.80% (2/250).
+- **In-distribution attack recall by source**: Deepset Benchmark 93.02% (40/43), Jayavibhav Benchmark (327K Corpus) 98.46% (64/65), Stanford SPML (16K Benchmark) 99.60% (246/247).
+- **Statistical rigor**: in-distribution accuracy 99.00% (95% Wilson CI 97.94%–99.51%). Length-matched controls and long-prompt audits are in [`statistical_rigor_and_controls.md`](docs/03%20Research%20and%20Catalogs/statistical_rigor_and_controls.md).
 
 ---
 
 ### 💬 Multi-Turn Benign Dialogue Robustness Benchmark (N=20 Conversations, 100 Turns)
 
-To evaluate real-world conversational utility and prevent compounding false-positive blocks across dialogue turns, GuardShield was benchmarked against ProtectAI DeBERTa-v3 across 20 authentic multi-turn conversations spanning algorithmic follow-ups, machine learning derivations, TCP/UDP networking, Hinglish/Hindi dialogue, and creative role-play:
+All 20 conversations (algorithmic follow-ups, ML derivations, networking, Hinglish/Hindi dialogue, creative role-play) are benign, so every flag is a false positive. GuardShield is scored with the proxy's own multi-turn logic (`proxy_server.scan_messages`); ProtectAI scores each turn in isolation:
 
-| Architecture / Evaluation Configuration | Total Turns Scanned ($N=100$) | User-Turns FPR ($N=60$) | Assistant-Turns FPR ($N=40$) | Raw Conv. Block Rate ($N=20$) | Signed History Conv. Block Rate |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **ProtectAI DeBERTa-v3-base (External SLM)** | 7.00% (7/100) | 8.33% (5/60) | 5.00% (2/40) | 20.00% (4/20) | — (Stateless / No signing) |
-| **GuardShield AI (Raw Unsigned Scan)** | 1.00% (1/100) | 0.00% (0/60) | 2.50% (1/40) | 5.00% (1/20) | — |
-| **GuardShield AI (With Signed History)** | **1.00%** | **0.00%** (0/60) | **0.00%** (Signed) | — | **0.00%** (0/20 blocked) |
+| Configuration | Turns Flagged (all, $N=100$) | User Turns Flagged ($N=60$) | Assistant Turns Flagged ($N=40$) | Conversations Blocked ($N=20$) |
+| :--- | :---: | :---: | :---: | :---: |
+| **ProtectAI DeBERTa-v3-base (stateless)** | 7.00% (7/100) | 8.33% (5/60) | 5.00% (2/40) | 20.00% (4/20) |
+| **GuardShield AI (no signed history)** | 11.00% (11/100) | 8.33% (5/60) | 15.00% (6/40) | 25.00% (5/20) |
+| **GuardShield AI (signed assistant history)** | — | **6.67% (4/60)** | not scanned (signed) | **15.00% (3/20)** |
 
-*Key Architectural Insight: Scanning raw assistant turns with ingress classifiers compounds false alarms (e.g. ProtectAI blocks 20.00% of conversations). GuardShield's cryptographic HMAC session signing verifies authentic relayed assistant replies, achieving **0.00% conversation false blocks (0/20)** while preserving unconditional neural scanning for user turns and forged assistant attacks.*
+*Scanning relayed assistant turns with an ingress classifier compounds false alarms. With HMAC-signed assistant history, verified assistant replies are not rescanned while user turns and unsigned or forged assistant turns are always scanned.*
 
 ---
 
 ### 🛡️ Adaptive Adversarial Robustness & Evasion Defense
 
-To evaluate robustness against advanced bypass vectors, GuardShield was benchmarked against 11 perturbation vectors on balanced cohorts ($N=100$ attacks, $N=100$ benign) with exact 95% Wilson confidence intervals (detailed in [`table_adaptive_robustness.md`](docs/01%20Reports/table_adaptive_robustness.md)):
+Eleven perturbation vectors on balanced cohorts with exact 95% Wilson intervals (details in [`table_adaptive_robustness.md`](docs/01%20Reports/table_adaptive_robustness.md)):
 
-**1. Critical Empirical Finding: High False Positive Rates on Character Obfuscation (90%–100% FPR)**:
-Across 7 of the 11 evaluated perturbation vectors (Zero-Width Spaces, Soft-Hyphens, Leetspeak, Cyrillic Homoglyphs, Base64, ROT13, and Hinglish Code-Mixing), evaluating benign prompts transformed with the exact same perturbations results in a False Positive Rate of **90.0% to 100.0%**.
-This demonstrates that the ingress classifier does not decode obfuscated syntax; rather, out-of-distribution token fragmentation, unknown subword splits, and cipher wrappers push the model into high-uncertainty anomaly rejection regardless of underlying intent. Therefore, 100% recall on these perturbation rows reflects blanket rejection of non-standard text rather than semantic comprehension.
+| Perturbation Vector | $N$ (attack / benign) | GuardShield Recall [95% CI] | GuardShield Benign FPR [95% CI] | Fixed 128-Token Truncation Recall | Keyword Blocklist Recall |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| 1. Raw Ingress (Baseline) | 100 / 100 | 98.0% [93.0%, 99.5%] | 0.0% [0.0%, 3.7%] | 98.0% | 21.0% |
+| 2. Zero-Width Spaces (Invisible Chars) | 100 / 100 | 100.0% [96.3%, 100.0%] | 96.0% [90.2%, 98.4%] | 100.0% | 0.0% |
+| 3. Soft-Hyphens (Subword Splitting) | 100 / 100 | 100.0% [96.3%, 100.0%] | 98.0% [93.0%, 99.5%] | 100.0% | 0.0% |
+| 4. Leetspeak Obfuscation | 100 / 100 | 100.0% [96.3%, 100.0%] | 98.0% [93.0%, 99.5%] | 100.0% | 0.0% |
+| 5. Cyrillic Homoglyphs (Visual Spoof) | 100 / 100 | 99.0% [94.5%, 99.8%] | 86.0% [77.9%, 91.5%] | 99.0% | 1.0% |
+| 6. Base64 Cipher Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 96.0% [90.2%, 98.4%] | 100.0% | 0.0% |
+| 7. ROT13 Caesar Cipher Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 73.0% [63.6%, 80.7%] | 100.0% | 0.0% |
+| 8. Hinglish Code-Mixed Wrapping | 100 / 100 | 100.0% [96.3%, 100.0%] | 27.0% [19.3%, 36.4%] | 100.0% | 39.0% |
+| 9. Benign Prefix Padding (>256 Tok) | 100 / 100 | 94.0% [87.5%, 97.2%] | 0.0% [0.0%, 3.7%] | 0.0% | 21.0% |
+| 10. Benign Suffix Padding (>256 Tok) | 100 / 100 | 87.0% [79.0%, 92.2%] | 0.0% [0.0%, 3.7%] | 87.0% | 21.0% |
+| 11. Sandwich Padding (Evasion Core) | 100 / 100 | 90.0% [82.6%, 94.5%] | 0.0% [0.0%, 3.7%] | 0.0% | 21.0% |
 
-**2. Adversarial Length-Padding Evasion Defense (Clean Semantics)**:
-Conversely, on adversarial length-padding where the underlying semantics remain clean and uncorrupted:
-- **Benign Prefix Padding (>256 tokens prepended)**: Fixed 128-token truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield's sliding-window chunking maintains **98.0% recall** [93.0%, 99.45%] with **2.0% FPR** [0.55%, 7.0%].
-- **Sandwich Padding (benign prefix + suffix)**: Fixed truncation collapses to **0.0% recall** [0.0%, 3.7%]. GuardShield achieves **95.0% recall** [88.82%, 97.85%] with **2.0% FPR** [0.55%, 7.0%].
-- **Suffix Padding**: GuardShield achieves **94.0% recall** [87.52%, 97.22%] with **0.0% FPR** [0.0%, 3.7%].
-
-**3. Disaggregated XSTest Evaluation ($N=450$)**:
-- **Safe Homonym Prompts ($N=250$)**: GuardShield achieves **0.0% False Refusal Rate (FRR)** [0.0%, 1.51%].
-- **Contrast Unsafe Prompts ($N=200$)**: Evaluated on direct toxic/harmful requests (non-injection), GuardShield achieves **0.0% block rate** [0.0%, 1.88%]. This confirms Stage 1's precise architectural specialization as a prompt-injection/jailbreak ingress filter, passing plain non-adversarial queries to upstream policy moderators.
-
-**4. Calibration & Operational Boundaries**:
-- `PreScanSecurityFilter` defaults to raw model logits ($T = 1.0$). At the 0.50 decision threshold, post-hoc scalar temperature scaling does not change classification boundaries; addressing out-of-distribution uncertainty under real distribution shifts requires domain-specific hard-negative multilingual training rather than simple scalar scaling or superficial regex bypasses.
+- **Character and cipher obfuscation**: On 6 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping), benign prompts carrying the same perturbation are flagged at a **73.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
+- **Length padding** keeps the semantics clean: fixed 128-token truncation misses attacks once a long benign prefix is prepended, while sliding-window chunking scans every window and takes the maximum risk (see the padding rows above).
+- **XSTest (450 prompts)**: false refusal rate on 250 safe homonym prompts is 0.0% [0.0%, 1.5%]; block rate on 200 plainly harmful (non-injection) requests is 0.0% [0.0%, 1.9%]. Stage 1 is a prompt-injection/jailbreak filter, not a harmful-content moderator.
+- **Calibration**: `PreScanSecurityFilter` uses raw logits ($T = 1.0$); scalar temperature scaling does not move decisions at the 0.50 threshold.
 
 ---
 
 ## ⚠️ Known Limitations & Operational Boundaries
 
-To maintain rigorous scientific integrity, we explicitly document the operational failure modes and boundary conditions identified during independent auditing:
+1. **Benign-hard, multilingual and multi-turn false positives**:
+   - On the 85-probe benign-hard suite, GuardShield flags 16.92% (11/65) of benign prompts (ProtectAI: 18.46% (12/65)) while catching 100.00% (20/20) of its attacks. Highest benign FPR categories: Hinglish Benign 40.00% (4/10); Hindi Benign 40.00% (4/10); Benign Role-Play Framing 30.00% (3/10).
+   - A hard-negative fine-tuning pass added 98 benign and 12 attack prompts after automatically removing 29 candidates that overlapped any evaluation set or regression test (`hard_negative_training_summary.json`), so the benign-hard and multi-turn results below are measured on held-out text.
+   - With signed assistant history, 15.00% (3/20) of benign conversations are blocked (no signing: 25.00% (5/20); ProtectAI: 20.00% (4/20)).
 
-1. **Multi-Turn Dialogue & Multilingual Anomaly Calibration**:
-   - Ingress classifiers fine-tuned solely on single-turn benchmark prompts can exhibit token-fragmentation false alarms on benign follow-ups, code queries, and transliterated Hinglish.
-   - *Calibration & Hard-Negative Training*: GuardShield was calibrated with hard-negative multi-turn and Hinglish training data, reducing the diagnostic benign-hard False Positive Rate to **3.08% (2/65)** (substantially outperforming ProtectAI's 18.46% FPR).
-   - *Cryptographic Signed History*: To eliminate compounding false positives across turns without opening security bypasses, the sidecar proxy (`src/proxy_server.py`) cryptographically signs each authentic assistant response using HMAC-SHA256. Verified relayed assistant turns are recognized as trusted dialogue history, achieving **0.00% conversation false blocks (0/20)** on our 100-turn multi-turn benchmark (vs. ProtectAI's 20.00% block rate), while unsigned or forged assistant turns are scanned unconditionally.
+2. **Character & cipher obfuscation**: On 6 of the 11 vectors (Zero-Width Spaces (Invisible Chars), Soft-Hyphens (Subword Splitting), Leetspeak Obfuscation, Cyrillic Homoglyphs (Visual Spoof), Base64 Cipher Wrapping, ROT13 Caesar Cipher Wrapping), benign prompts carrying the same perturbation are flagged at a **73.0%–98.0% FPR**. Recall on those rows therefore reflects blanket rejection of non-standard text (token fragmentation, cipher wrappers), not semantic decoding of the payload.
 
-2. **Character & Cipher Obfuscation Rejection (Blanket Rejection)**:
-   - On 7 of the 11 evaluated evasion vectors (Zero-Width Spaces, Soft-Hyphens, Leetspeak, Cyrillic Homoglyphs, Base64, ROT13, and Hinglish Code-Mixing), benign queries transformed with the same perturbations trigger a **90.0% to 100.0% False Positive Rate**.
-   - The model rejects corrupted text as out-of-distribution noise rather than semantically decoding the obfuscated payload.
+3. **Short conversational turns**: turns under 50 characters and at most 6 words are scanned on their own *and* together with the preceding scanned turn; the higher risk wins, so attacker-supplied context can add risk but never dilute a short attack below threshold. Signed assistant replies are not used as context.
 
-3. **Short Conversational Turns & Context Dependency**:
-   - Isolated short messages (e.g. *"ok thanks, that helps"*, *"continue"*, *"yes"*) lack syntactic structure and may trigger false positives if evaluated in zero-context isolation.
-   - *Mitigation*: The sidecar proxy preserves multi-turn conversation memory, evaluating messages under 50 characters or $\le 6$ words within their dialogue discourse context (`Context: ...\nTurn: ...`) while maintaining strict neural classification integrity without regex shortcuts.
+4. **Assistant signing key**: set `GUARDSHIELD_PROXY_SECRET` in deployment. Without it the proxy generates an ephemeral per-process key, so client-held signatures stop verifying after a restart or across multiple workers (those turns are then scanned like any untrusted turn).
 
-4. **Stage 2 Fact Verification Domain Sensitivity**:
-   - While the cross-encoder NLI model achieves **86.50% accuracy and 0.9498 AUROC** on clean, single-sentence claims from FEVER, performance drops to **59.75% accuracy and 0.6127 AUROC** on complex open-domain QA pairs from HaluEval.
-   - When evidence is partially missing from the retrieved premise, the verifier assigns an **`UNVERIFIED_NEUTRAL`** verdict. GuardShield reports these as separate ungrounded outcomes rather than conflating lack of retrieval context with active counter-factual hallucination.
+5. **Stage 2 domain sensitivity**: the cross-encoder reaches 86.25% accuracy / 0.9496 AUROC on single-sentence FEVER claims but 59.75% / 0.6127 on open-domain HaluEval QA. Grounding contexts longer than the 256-token window are split into sentence-aligned windows; a claim counts as supported if any window entails it.
+
+<!-- END GENERATED RESULTS -->
 
 ---
 
@@ -173,7 +172,7 @@ GuardShield_AI/
 │   └── raw/                       # Original ingested corpus samples
 ├── docs/
 │   ├── 01 Reports/                # Academic progress reports, presentations, and confusion matrices
-│   ├── 02 Weekly WPRs/            # Formal Weekly Progress Reports (WPR 1 through WPR 9)
+│   ├── 02 Weekly WPRs/            # Formal Weekly Progress Reports (WPR 1 through WPR 11)
 │   ├── 03 Research and Catalogs/  # LaTeX tables, dataset catalogs, and research gap formulation
 │   └── 04 Diagrams/               # System architecture and WBS diagrams
 ├── models/
@@ -182,7 +181,8 @@ GuardShield_AI/
 ├── scripts/
 │   ├── build_live_colab_suite.py  # Script generating the interactive Colab notebook
 │   ├── build_wpr9.py              # Automated WPR document generation script
-│   └── export_mega_datasets.py    # Master dataset export and validation utilities
+│   ├── train_stage1_hard_negatives.py # Decontaminated hard-negative fine-tuning pass
+│   └── generate_readme_tables.py  # Rebuilds README results from docs/01 Reports logs
 ├── src/
 │   ├── config.py                  # Centralized path and hyperparameter configuration
 │   ├── demo_master.py             # CLI demonstration suite for all pipeline components
@@ -215,15 +215,16 @@ pip install -r requirements.txt
 ### 2. Model Checkpoints & Pre-Trained Weights
 Because binary model checkpoints exceed 500MB, they are not committed to git. Set them up via either option:
 
-- **Option A (Train weights locally on your GPU in ~5 mins)**:
+- **Option A (Train weights locally on your GPU in ~10 mins)**:
   ```bash
   python src/train_prescan_v3.py
+  python scripts/train_stage1_hard_negatives.py
   ```
 - **Option B (Verify or download checkpoints using the weight manager)**:
   ```bash
   python scripts/download_weights.py
   ```
-*(Note: Automated CI runs in lightweight verification mode using `GUARDSHIELD_ALLOW_UNTRAINED_FALLBACK=1`.)*
+*(Note: CI has no fine-tuned weights; proxy logic is tested with a deterministic stub classifier and the trained-model probes in `tests/test_smoke.py` are skipped.)*
 
 ### 3. Run the Full V3 Benchmark Suite
 Evaluate both Stage 1 and Stage 2 across in-distribution test sets, zero-shot out-of-distribution attacks, and factuality benchmarks:
@@ -238,6 +239,8 @@ Launch the FastAPI sidecar proxy on `http://127.0.0.1:8000`:
 ```bash
 python src/proxy_server.py
 ```
+
+Set `GUARDSHIELD_PROXY_SECRET` to a long random value (and `UPSTREAM_LLM_URL` if the LLM is not at `http://localhost:11434/v1`). Without the secret, assistant-history signatures use an ephemeral per-process key and stop verifying after a restart.
 
 ### 5. Interactive Command-Line Demonstration
 Test custom prompts against the dual-stage defense in real-time:

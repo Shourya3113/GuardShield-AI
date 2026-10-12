@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "src"))
 
-from prescan_filter import PreScanSecurityFilter
+from prescan_filter import PreScanSecurityFilter, weights_sha256
 from nli_verifier import WindowedNLIVerifier
 
 REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
@@ -23,7 +23,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_git_commit():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
+        return subprocess.check_output(["git", "describe", "--always", "--dirty", "--abbrev=40"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
         return "unknown"
 
@@ -38,8 +38,6 @@ def compute_sha256(filepath):
     return h.hexdigest()
 
 GIT_COMMIT_HASH = get_git_commit()
-STAGE1_WEIGHTS_PATH = BASE_DIR / "models" / "deberta_v3_prescan_v3" / "model.safetensors"
-STAGE1_WEIGHTS_SHA256 = compute_sha256(STAGE1_WEIGHTS_PATH)
 
 def export_stage1_eval(split_file, split_name, out_filename):
     print(f"\nEvaluating Stage 1 on {split_name} ({split_file})...")
@@ -92,7 +90,7 @@ def export_stage1_eval(split_file, split_name, out_filename):
             "git_commit": GIT_COMMIT_HASH,
             "evaluated_file": split_file,
             "dataset_sha256": compute_sha256(dataset_path),
-            "weights_sha256": STAGE1_WEIGHTS_SHA256,
+            "weights_sha256": weights_sha256(engine.model_dir),
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "sample_count": len(records),
             "model_path": str(engine.model_dir),

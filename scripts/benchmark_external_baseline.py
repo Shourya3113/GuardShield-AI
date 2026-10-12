@@ -37,7 +37,7 @@ MODEL_ID = "protectai/deberta-v3-base-prompt-injection-v2"
 
 def get_git_commit():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
+        return subprocess.check_output(["git", "describe", "--always", "--dirty", "--abbrev=40"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
         return "unknown"
 

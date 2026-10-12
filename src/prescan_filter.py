@@ -20,6 +20,34 @@ logger = logging.getLogger("PreScanFilter")
 sys.path.append(str(Path(__file__).resolve().parent))
 import config
 
+def _weight_files(path: Path):
+    # training_args.bin is not a weight file
+    return sorted(list(path.glob("model*.safetensors")) + list(path.glob("pytorch_model*.bin"))) if path.is_dir() else []
+
+def _has_weights(path: Path) -> bool:
+    return bool(_weight_files(path))
+
+def weights_sha256(model_dir: Path) -> str:
+    """SHA-256 over the checkpoint's weight file(s); identifies exactly which weights produced a report."""
+    import hashlib
+    h = hashlib.sha256()
+    files = _weight_files(Path(model_dir))
+    if not files:
+        return None
+    for f in files:
+        with open(f, "rb") as fh:
+            while chunk := fh.read(1 << 20):
+                h.update(chunk)
+    return h.hexdigest()
+
+def find_trained_checkpoint() -> Path:
+    """Returns the preferred fine-tuned Stage 1 checkpoint directory (v4 large -> v4 base -> v3 -> v1), or None."""
+    models_dir = config.BASE_DIR / "models"
+    for name in ("deberta_v3_large_prescan_v4", "deberta_v3_base_prescan_v4", "deberta_v3_prescan_v3", "deberta_v3_prescan"):
+        if _has_weights(models_dir / name):
+            return models_dir / name
+    return None
+
 class PreScanSecurityFilter:
     """
     High-Performance Pre-Scan Security Filter.
@@ -31,23 +59,13 @@ class PreScanSecurityFilter:
         self.temperature = max(0.01, float(temperature))
         self.device = "cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu")
         
-        # Resolve model directory with graceful fallbacks (v4 large -> v4 base -> v3 -> v1)
-        v4_large = config.BASE_DIR / "models" / "deberta_v3_large_prescan_v4"
-        v4_base = config.BASE_DIR / "models" / "deberta_v3_base_prescan_v4"
-        v3_path = config.BASE_DIR / "models" / "deberta_v3_prescan_v3"
-        v1_path = config.BASE_DIR / "models" / "deberta_v3_prescan"
-        
-        resolved_path = None
-        if model_dir and Path(model_dir).exists():
+        # An explicit model_dir must exist; otherwise resolve with graceful fallbacks (v4 large -> v4 base -> v3 -> v1)
+        if model_dir is not None:
+            if not _has_weights(Path(model_dir)):
+                raise FileNotFoundError(f"No model weights found in requested model_dir '{model_dir}'.")
             resolved_path = Path(model_dir)
-        elif v4_large.exists() and (any(v4_large.glob("*.safetensors")) or any(v4_large.glob("*.bin"))):
-            resolved_path = v4_large
-        elif v4_base.exists() and (any(v4_base.glob("*.safetensors")) or any(v4_base.glob("*.bin"))):
-            resolved_path = v4_base
-        elif v3_path.exists() and (any(v3_path.glob("*.safetensors")) or any(v3_path.glob("*.bin"))):
-            resolved_path = v3_path
-        elif v1_path.exists() and (any(v1_path.glob("*.safetensors")) or any(v1_path.glob("*.bin"))):
-            resolved_path = v1_path
+        else:
+            resolved_path = find_trained_checkpoint()
 
         logger.info(f"Initializing PreScanSecurityFilter on {self.device.upper()}...")
         if resolved_path:
@@ -66,7 +84,7 @@ class PreScanSecurityFilter:
                 self.model_dir = Path("microsoft/deberta-v3-small")
             else:
                 raise FileNotFoundError(
-                    f"Fine-tuned model weights not found in '{v3_path}' or '{v1_path}'.\n"
+                    f"Fine-tuned model weights not found under '{config.BASE_DIR / 'models'}'.\n"
                     "GuardShield AI requires trained classifier weights to make secure ingress decisions.\n"
                     "Please do one of the following:\n"
                     "  1. Train weights locally using your GPU:\n"

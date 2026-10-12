@@ -21,12 +21,13 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the pinned CPU build first so requirements.txt does not pull the multi-GB CUDA wheel
+          pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
-          pip install pytest httpx psutil
+          pip install pytest
 
+      # Fine-tuned weights are not committed, so model-dependent probes are skipped here;
+      # proxy logic is exercised with a deterministic stub classifier.
       - name: Run Smoke Tests
-        env:
-          GUARDSHIELD_ALLOW_UNTRAINED_FALLBACK: "1"
         run: |
-          python -m pytest tests/test_smoke.py -v
+          python -m pytest tests/test_smoke.py -v -rs

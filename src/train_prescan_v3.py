@@ -150,9 +150,11 @@ def train_prescan_v3():
     logger.info(f"Saving Fine-Tuned Model Weights & Tokenizer -> {OUTPUT_MODEL_DIR}")
     trainer.save_model(str(OUTPUT_MODEL_DIR))
     tokenizer.save_pretrained(str(OUTPUT_MODEL_DIR))
-    
+    # The checkpoint is now the plain base model; any previous hard-negative pass no longer applies.
+    (OUTPUT_MODEL_DIR / "hard_negative_training_summary.json").unlink(missing_ok=True)
+
     meta = {
-        "model_architecture": "DeBERTa-v3-small (86M)",
+        "model_architecture": "DeBERTa-v3-small (44.3M backbone, 142.6M total params)",
         "train_samples": len(train_dataset),
         "val_samples": len(val_dataset),
         "epochs": 3,

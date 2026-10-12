@@ -49,6 +49,8 @@ tmp/
 # Note: Keep training configurations, tokenizers, and metadata JSONs
 models/**/checkpoint-*/
 models/**/checkpoints/
+models/**/checkpoints_retrain/
+models/*backup*/
 *.safetensors
 *.pt
 *.pth

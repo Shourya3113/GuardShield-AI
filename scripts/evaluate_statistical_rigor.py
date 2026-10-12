@@ -181,7 +181,7 @@ To eliminate character-length as a confounding signal (where attack prompts are 
 | **Length Heuristic Threshold (Len $\\ge 190$)** | **{matched_acc_heuristic*100:.2f}%** | Near-random guessing on length-controlled text |
 | **GuardShield DeBERTa-v3 (Ours)** | **{matched_acc_deberta*100:.2f}%** | **Robust semantic classification independent of length** |
 
-**Conclusion**: When prompt lengths are strictly held equal between safe and attack queries, the surface length heuristic collapses, while GuardShield maintains over 97% accuracy, verifying that classification is driven by adversarial intent rather than prompt length.
+**Conclusion**: When prompt lengths are held equal between safe and attack queries, the length heuristic reaches {matched_acc_heuristic*100:.2f}% while GuardShield reaches {matched_acc_deberta*100:.2f}%, so its decisions are not explained by prompt length alone.
 
 ---
 
@@ -206,7 +206,7 @@ We audited benign technical and educational passages exceeding 200–500 charact
 - **False Positive Rate on Long Prompts**: **{long_fp_rate*100:.2f}%** ({int(long_fp_rate*len(long_results))} false alarms across {len(long_results)} prompts)
 - **Median Sliding-Window Latency (p50)**: **{long_p50:.2f} ms** (Mean: **{long_mean:.2f} ms**)
 
-The empirical audit confirms that sliding-window chunking maintains high specificity on extended safe inputs, with only {int(long_fp_rate*len(long_results))} borderline technical prompt flagged in {len(long_results)} benign samples.
+Sliding-window chunking flagged {int(round(long_fp_rate*len(long_results)))} of {len(long_results)} long benign prompts.
 """
 
     report_path = RESEARCH_DIR / "statistical_rigor_and_controls.md"

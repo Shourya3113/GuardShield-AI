@@ -37,7 +37,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "src"))
 
-from prescan_filter import PreScanSecurityFilter
+from prescan_filter import PreScanSecurityFilter, weights_sha256
 from nli_verifier import WindowedNLIVerifier
 
 REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
@@ -46,7 +46,7 @@ RAW_OUTPUT_FILE = REPORTS_DIR / "raw_eval_pipeline_e2e.json"
 
 def get_git_commit():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
+        return subprocess.check_output(["git", "describe", "--always", "--dirty", "--abbrev=40"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
         return "unknown"
 
@@ -161,13 +161,12 @@ def measure_real_pipeline_latency(num_repeats: int = 5, samples_per_repeat: int 
     iqr_s2 = round(float(p75_s2 - p25_s2), 2)
     mean_s2 = round(float(np.mean(s2_arr)), 2)
 
-    weights_path = BASE_DIR / "models" / "deberta_v3_prescan_v3" / "model.safetensors"
 
     summary = {
         "metadata": {
             "experiment": "Real Empirical Sequential End-to-End Pipeline Latency (5 Repeats)",
             "git_commit": get_git_commit(),
-            "weights_sha256": compute_sha256(weights_path),
+            "weights_sha256": weights_sha256(prescan.model_dir),
             "num_repeats": num_repeats,
             "samples_per_repeat": samples_per_repeat,
             "total_samples_measured": len(all_e2e_latencies),

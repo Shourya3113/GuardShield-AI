@@ -3,7 +3,6 @@ import sys
 import json
 import time
 import math
-import shutil
 import logging
 from pathlib import Path
 import numpy as np
@@ -27,7 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SPLITS_DIR = BASE_DIR / "data" / "processed" / "splits_v3"
 REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
 RESEARCH_DIR = BASE_DIR / "docs" / "03 Research and Catalogs"
-DOWNLOADS_DIR = Path(os.path.expanduser(r"~\Downloads"))
 
 sys.path.insert(0, str(BASE_DIR / "src"))
 from prescan_filter import PreScanSecurityFilter
@@ -124,8 +122,6 @@ def evaluate_prescan_split(test_path: Path, split_name: str, cm_filename: str, c
     plt.savefig(cm_path, dpi=300)
     plt.close()
     
-    if DOWNLOADS_DIR.exists():
-        shutil.copy(str(cm_path), str(DOWNLOADS_DIR / cm_filename))
     logger.info(f"Saved {cm_filename} -> {cm_path}")
     return results
 
@@ -224,8 +220,6 @@ def evaluate_factuality_mega():
     cm_path = REPORTS_DIR / "confusion_matrix_v3_factuality.png"
     plt.savefig(cm_path, dpi=300)
     plt.close()
-    if DOWNLOADS_DIR.exists():
-        shutil.copy(str(cm_path), str(DOWNLOADS_DIR / "confusion_matrix_v3_factuality.png"))
     logger.info(f"Saved Confusion Matrix 2 -> {cm_path}")
     return results
 
@@ -319,8 +313,6 @@ def export_mega_benchmark_tables(res_in, res_ood, res_fact):
     with open(tex_path, "w", encoding="utf-8") as f:
         f.write(tex_table)
         
-    if DOWNLOADS_DIR.exists():
-        shutil.copy(str(tex_path), str(DOWNLOADS_DIR / "mega_benchmark_results_table.tex"))
     logger.info(f"Saved LaTeX & Markdown Tables -> {RESEARCH_DIR}")
 
 def run_mega_evaluation():

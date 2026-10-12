@@ -3,7 +3,6 @@ import sys
 import json
 import random
 import logging
-import shutil
 import requests
 import pandas as pd
 from pathlib import Path
@@ -18,7 +17,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PROCESSED_DIR = BASE_DIR / "data" / "processed"
 SPLITS_V3_DIR = PROCESSED_DIR / "splits_v3"
 MEGA_DATASETS_DIR = BASE_DIR / "data" / "mega_research_datasets"
-DOWNLOADS_DIR = Path(os.path.expanduser(r"~\Downloads"))
 
 SPLITS_V3_DIR.mkdir(parents=True, exist_ok=True)
 MEGA_DATASETS_DIR.mkdir(parents=True, exist_ok=True)
@@ -299,8 +297,6 @@ def prepare_and_export_v3_suite():
     # Master Stage 1 CSV
     master_s1_csv = MEGA_DATASETS_DIR / "GuardShield_Mega_Security_Benchmark_5000.csv"
     pd.DataFrame(stage1_in_dist + stage1_ood).to_csv(master_s1_csv, index=False, encoding="utf-8-sig")
-    if DOWNLOADS_DIR.exists():
-        shutil.copy(str(master_s1_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Security_Benchmark_5000.csv"))
 
     # -------------------------------------------------------------
     # Stage 2: Export Factuality Splits
@@ -316,8 +312,6 @@ def prepare_and_export_v3_suite():
     stage2_combined = halueval_final + fever_final
     master_s2_csv = MEGA_DATASETS_DIR / "GuardShield_Mega_Factuality_Benchmark_1100.csv"
     pd.DataFrame(stage2_combined).to_csv(master_s2_csv, index=False, encoding="utf-8-sig")
-    if DOWNLOADS_DIR.exists():
-        shutil.copy(str(master_s2_csv), str(DOWNLOADS_DIR / "GuardShield_Mega_Factuality_Benchmark_1100.csv"))
 
     total_security = len(stage1_in_dist) + len(stage1_ood)
     total_factuality = len(stage2_combined)

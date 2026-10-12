@@ -9,17 +9,17 @@
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
 \textbf{Perturbation Vector} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{Recall (\%)} & \textbf{FPR (\%)} & \textbf{p50 Lat.} \\
 \midrule
-1. Raw Ingress (Baseline) & \textbf{98.0\%} & 1.0\% & 98.0\% & 1.0\% & 21.0\% & 0.0\% & 32.01 ms \\
-2. Zero-Width Spaces (Invisible Chars) & \textbf{100.0\%} & 99.0\% & 100.0\% & 99.0\% & 0.0\% & 0.0\% & 38.22 ms \\
-3. Soft-Hyphens (Subword Splitting) & \textbf{100.0\%} & 98.0\% & 100.0\% & 98.0\% & 0.0\% & 0.0\% & 103.38 ms \\
-4. Leetspeak Obfuscation & \textbf{100.0\%} & 99.0\% & 100.0\% & 99.0\% & 0.0\% & 0.0\% & 36.82 ms \\
-5. Cyrillic Homoglyphs (Visual Spoof) & \textbf{100.0\%} & 90.0\% & 100.0\% & 90.0\% & 1.0\% & 0.0\% & 36.46 ms \\
-6. Base64 Cipher Wrapping & \textbf{100.0\%} & 100.0\% & 100.0\% & 100.0\% & 0.0\% & 0.0\% & 53.39 ms \\
-7. ROT13 Caesar Cipher Wrapping & \textbf{100.0\%} & 97.0\% & 100.0\% & 97.0\% & 0.0\% & 0.0\% & 34.37 ms \\
-8. Hinglish Code-Mixed Wrapping & \textbf{100.0\%} & 92.0\% & 100.0\% & 92.0\% & 39.0\% & 0.0\% & 31.88 ms \\
-9. Benign Prefix Padding (>256 Tok) & \textbf{98.0\%} & 2.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 46.63 ms \\
-10. Benign Suffix Padding (>256 Tok) & \textbf{94.0\%} & 0.0\% & 94.0\% & 0.0\% & 21.0\% & 0.0\% & 41.69 ms \\
-11. Sandwich Padding (Evasion Core) & \textbf{95.0\%} & 2.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 68.05 ms \\
+1. Raw Ingress (Baseline) & \textbf{98.0\%} & 0.0\% & 98.0\% & 0.0\% & 21.0\% & 0.0\% & 47.08 ms \\
+2. Zero-Width Spaces (Invisible Chars) & \textbf{100.0\%} & 96.0\% & 100.0\% & 96.0\% & 0.0\% & 0.0\% & 51.34 ms \\
+3. Soft-Hyphens (Subword Splitting) & \textbf{100.0\%} & 98.0\% & 100.0\% & 98.0\% & 0.0\% & 0.0\% & 102.21 ms \\
+4. Leetspeak Obfuscation & \textbf{100.0\%} & 98.0\% & 100.0\% & 98.0\% & 0.0\% & 0.0\% & 58.58 ms \\
+5. Cyrillic Homoglyphs (Visual Spoof) & \textbf{99.0\%} & 86.0\% & 99.0\% & 86.0\% & 1.0\% & 0.0\% & 69.87 ms \\
+6. Base64 Cipher Wrapping & \textbf{100.0\%} & 96.0\% & 100.0\% & 96.0\% & 0.0\% & 0.0\% & 89.58 ms \\
+7. ROT13 Caesar Cipher Wrapping & \textbf{100.0\%} & 73.0\% & 100.0\% & 73.0\% & 0.0\% & 0.0\% & 33.03 ms \\
+8. Hinglish Code-Mixed Wrapping & \textbf{100.0\%} & 27.0\% & 100.0\% & 27.0\% & 39.0\% & 0.0\% & 42.0 ms \\
+9. Benign Prefix Padding (>256 Tok) & \textbf{94.0\%} & 0.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 84.99 ms \\
+10. Benign Suffix Padding (>256 Tok) & \textbf{87.0\%} & 0.0\% & 87.0\% & 0.0\% & 21.0\% & 0.0\% & 69.98 ms \\
+11. Sandwich Padding (Evasion Core) & \textbf{90.0\%} & 0.0\% & 0.0\% & 0.0\% & 21.0\% & 0.0\% & 74.27 ms \\
 \midrule
 XSTest Safe Prompts (FRR, $N=250$) & \multicolumn{2}{c}{\textbf{0.0\%} [0.0\%-1.51\%]} & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{0.0\%} & -- \\
 XSTest Contrast Unsafe ($N=200$) & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{0.0\%} & \multicolumn{2}{c}{21.0\%} & -- \\

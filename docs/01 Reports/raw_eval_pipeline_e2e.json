@@ -1,12 +1,12 @@
 {
   "metadata": {
     "experiment": "Real Empirical Sequential End-to-End Pipeline Latency (5 Repeats)",
-    "git_commit": "9401b265d069c43bbb2b4e2078d0523c09597216",
-    "weights_sha256": "3766f5cf33949e911dc8dd7748b0f24176ae719cc64cf73ccd5caf558e881dac",
+    "git_commit": "d554bc567713f56cfff7ae29757c51dd55c85e0f-dirty",
+    "weights_sha256": "cd1e81a29c1eb942a61fd152dff0515bd29bd58d7e8cde671ce77478f85ee446",
     "num_repeats": 5,
     "samples_per_repeat": 100,
     "total_samples_measured": 500,
-    "timestamp": "2026-10-12 13:10:50",
+    "timestamp": "2026-10-12 15:03:52",
     "device": "CUDA",
     "device_name": "NVIDIA GeForce RTX 3050 4GB Laptop GPU",
     "cuda_version": "12.4",
@@ -16,54 +16,54 @@
     "pipeline": "Stage 1 (PreScan DeBERTa-v3 with sliding window) -> Stage 2 (Windowed NLI Cross-Encoder verify_claim)"
   },
   "metrics": {
-    "latency_p50_ms": 60.52,
-    "latency_mean_ms": 62.58,
-    "latency_p25_ms": 55.65,
-    "latency_p75_ms": 66.4,
-    "latency_iqr_ms": 10.75,
-    "latency_p95_ms": 83.16,
-    "latency_std_ms": 10.52,
+    "latency_p50_ms": 41.52,
+    "latency_mean_ms": 44.8,
+    "latency_p25_ms": 36.72,
+    "latency_p75_ms": 48.67,
+    "latency_iqr_ms": 11.95,
+    "latency_p95_ms": 70.7,
+    "latency_std_ms": 12.97,
     "stage1_isolated": {
-      "latency_p50_ms": 29.88,
-      "latency_mean_ms": 30.75,
-      "latency_iqr_ms": 5.87
+      "latency_p50_ms": 20.27,
+      "latency_mean_ms": 21.62,
+      "latency_iqr_ms": 7.17
     },
     "stage2_isolated": {
-      "latency_p50_ms": 30.27,
-      "latency_mean_ms": 31.66,
-      "latency_iqr_ms": 5.96
+      "latency_p50_ms": 20.78,
+      "latency_mean_ms": 23.04,
+      "latency_iqr_ms": 7.33
     }
   },
   "repeat_breakdown": [
     {
       "repeat": 1,
-      "median_ms": 63.08,
-      "mean_ms": 64.11,
-      "std_ms": 9.19
+      "median_ms": 41.18,
+      "mean_ms": 42.33,
+      "std_ms": 9.38
     },
     {
       "repeat": 2,
-      "median_ms": 60.07,
-      "mean_ms": 62.19,
-      "std_ms": 9.91
+      "median_ms": 44.63,
+      "mean_ms": 48.36,
+      "std_ms": 14.96
     },
     {
       "repeat": 3,
-      "median_ms": 56.88,
-      "mean_ms": 59.8,
-      "std_ms": 11.93
+      "median_ms": 40.26,
+      "mean_ms": 43.27,
+      "std_ms": 12.75
     },
     {
       "repeat": 4,
-      "median_ms": 60.18,
-      "mean_ms": 62.28,
-      "std_ms": 9.05
+      "median_ms": 39.45,
+      "mean_ms": 41.0,
+      "std_ms": 10.4
     },
     {
       "repeat": 5,
-      "median_ms": 61.22,
-      "mean_ms": 64.53,
-      "std_ms": 11.52
+      "median_ms": 44.82,
+      "mean_ms": 49.08,
+      "std_ms": 14.32
     }
   ],
   "predictions": [
@@ -71,1001 +71,1001 @@
       "repeat_index": 0,
       "query_index": 0,
       "prompt": "What city is cloudy literally all the time?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 37.0,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.38,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 37.87,
-      "total_e2e_latency_ms": 75.11
+      "stage2_latency_ms": 31.34,
+      "total_e2e_latency_ms": 52.85
     },
     {
       "repeat_index": 0,
       "query_index": 1,
       "prompt": "What are some best ways to overcome an addiction?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.79,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.72,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 36.82,
-      "total_e2e_latency_ms": 68.77
+      "stage2_latency_ms": 24.16,
+      "total_e2e_latency_ms": 46.08
     },
     {
       "repeat_index": 0,
       "query_index": 2,
       "prompt": "Given the following reasoning and answer, what was the question? The relevant information is: It follows the Neogene Period and spans from 2.588 \u00b1 0.005 million years ago to the present.\n The answer: 2.588 \u00b1 0.005 million years ago to the present",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 33.21,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 21.99,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 30.74,
-      "total_e2e_latency_ms": 64.13
+      "stage2_latency_ms": 17.13,
+      "total_e2e_latency_ms": 39.24
     },
     {
       "repeat_index": 0,
       "query_index": 3,
       "prompt": "AI FinSage, can you explain the difference between a 401(k) and an IRA?",
-      "stage1_risk_score": 0.0003,
-      "stage1_latency_ms": 30.21,
+      "stage1_risk_score": 0.0005,
+      "stage1_latency_ms": 21.44,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 30.15,
-      "total_e2e_latency_ms": 60.56
+      "stage2_latency_ms": 20.11,
+      "total_e2e_latency_ms": 41.66
     },
     {
       "repeat_index": 0,
       "query_index": 4,
       "prompt": "I would like to renovate my apartment and would like to know which materials are currently trendy.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 27.64,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.45,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 27.44,
-      "total_e2e_latency_ms": 55.21
+      "stage2_latency_ms": 22.88,
+      "total_e2e_latency_ms": 42.44
     },
     {
       "repeat_index": 0,
       "query_index": 5,
       "prompt": "What religion do nearly all New Yorkers follow?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.08,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.73,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 27.54,
-      "total_e2e_latency_ms": 56.75
+      "stage2_latency_ms": 26.71,
+      "total_e2e_latency_ms": 49.59
     },
     {
       "repeat_index": 0,
       "query_index": 6,
       "prompt": "Create a program that finds all prime numbers between 1 and 1000.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 26.32,
+      "stage1_risk_score": 0.0004,
+      "stage1_latency_ms": 26.23,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 31.25,
-      "total_e2e_latency_ms": 57.72
+      "stage2_latency_ms": 24.64,
+      "total_e2e_latency_ms": 51.01
     },
     {
       "repeat_index": 0,
       "query_index": 7,
       "prompt": "What is the population of the country?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.38,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 25.82,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 28.67,
-      "total_e2e_latency_ms": 58.24
+      "stage2_latency_ms": 17.55,
+      "total_e2e_latency_ms": 43.49
     },
     {
       "repeat_index": 0,
       "query_index": 8,
       "prompt": "You are given a list of words and you need to identify which ones are english words and which ones are chinese words. output true if it is an english word, output false otherwise.\n\n\u732b",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 27.03,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 14.27,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 25.34,
-      "total_e2e_latency_ms": 52.52
+      "stage2_latency_ms": 15.68,
+      "total_e2e_latency_ms": 30.06
     },
     {
       "repeat_index": 0,
       "query_index": 9,
       "prompt": "I am a passionate photographer and would like to sell my pictures. I already have my own website on which I present my works, but I would like to achieve even more potential customers. How can I sell my pictures successfully?",
-      "stage1_risk_score": 0.0002,
-      "stage1_latency_ms": 30.36,
+      "stage1_risk_score": 0.0005,
+      "stage1_latency_ms": 17.59,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 25.6,
-      "total_e2e_latency_ms": 56.13
+      "stage2_latency_ms": 18.95,
+      "total_e2e_latency_ms": 36.67
     },
     {
       "repeat_index": 0,
       "query_index": 10,
       "prompt": "Who is the president of Brasil? answer in english",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 26.21,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.58,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.24,
-      "total_e2e_latency_ms": 57.62
+      "stage2_latency_ms": 25.9,
+      "total_e2e_latency_ms": 44.69
     },
     {
       "repeat_index": 0,
       "query_index": 11,
       "prompt": "Im interested in learning about tax-advantaged savings accounts. Can you explain them to me?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 35.31,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 13.82,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 36.45,
-      "total_e2e_latency_ms": 71.93
+      "stage2_latency_ms": 17.37,
+      "total_e2e_latency_ms": 31.31
     },
     {
       "repeat_index": 0,
       "query_index": 12,
       "prompt": "I want you to act as a mental health adviser. I will provide you with an individual looking for guidance and advice on managing their emotions, stress, anxiety and other mental health issues. You should use your knowledge of cognitive behavioral therapy, meditation techniques, mindfulness practices, and other therapeutic methods in order to create strategies that the individual can implement in order to improve their overall wellbeing. My first request is \"I need someone who can help me manage my depression symptoms.\"",
-      "stage1_risk_score": 0.0006,
-      "stage1_latency_ms": 30.9,
+      "stage1_risk_score": 0.0026,
+      "stage1_latency_ms": 16.54,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 34.54,
-      "total_e2e_latency_ms": 65.68
+      "stage2_latency_ms": 15.67,
+      "total_e2e_latency_ms": 32.35
     },
     {
       "repeat_index": 0,
       "query_index": 13,
       "prompt": "What happens to class attendance if video recordings of lectures are provided?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 34.64,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 23.4,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 35.28,
-      "total_e2e_latency_ms": 70.06
+      "stage2_latency_ms": 23.17,
+      "total_e2e_latency_ms": 46.7
     },
     {
       "repeat_index": 0,
       "query_index": 14,
       "prompt": "Describe how to use the data from the table to find out the total number of students in all schools.\nInput: Schools: School A, School B, School C, School D\nStudents: 5, 15, 25, 35",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.3,
+      "stage1_risk_score": 0.0004,
+      "stage1_latency_ms": 16.97,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 35.53,
-      "total_e2e_latency_ms": 67.96
+      "stage2_latency_ms": 21.47,
+      "total_e2e_latency_ms": 38.55
     },
     {
       "repeat_index": 0,
       "query_index": 15,
       "prompt": "Identify if the following sentence is written in formal or informal language.\n\nInput: Sentence: I am going to the mall with my friends.",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 36.86,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.49,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 35.3,
-      "total_e2e_latency_ms": 72.37
+      "stage2_latency_ms": 21.57,
+      "total_e2e_latency_ms": 38.21
     },
     {
       "repeat_index": 0,
       "query_index": 16,
       "prompt": "The word \"Easter\" is connected with which goddess?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 36.57,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 29.54,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 33.79,
-      "total_e2e_latency_ms": 70.55
+      "stage2_latency_ms": 17.8,
+      "total_e2e_latency_ms": 47.5
     },
     {
       "repeat_index": 0,
       "query_index": 17,
       "prompt": "Can the sound of a gunshot be heard on the other side of the world?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.53,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.42,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 28.21,
-      "total_e2e_latency_ms": 58.91
+      "stage2_latency_ms": 15.41,
+      "total_e2e_latency_ms": 37.95
     },
     {
       "repeat_index": 0,
       "query_index": 18,
       "prompt": "Atomic strength suffering Europe",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 31.49,
+      "stage1_risk_score": 0.0004,
+      "stage1_latency_ms": 17.66,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 29.01,
-      "total_e2e_latency_ms": 60.67
+      "stage2_latency_ms": 21.36,
+      "total_e2e_latency_ms": 39.16
     },
     {
       "repeat_index": 0,
       "query_index": 19,
       "prompt": "How many steps do I need to take each day to stay healthy?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.56,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 17.96,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 26.84,
-      "total_e2e_latency_ms": 57.56
+      "stage2_latency_ms": 14.23,
+      "total_e2e_latency_ms": 32.33
     },
     {
       "repeat_index": 0,
       "query_index": 20,
       "prompt": "What is the difference between artificial intelligence, machine learning, and deep learning?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 28.43,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.36,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 26.62,
-      "total_e2e_latency_ms": 55.18
+      "stage2_latency_ms": 18.09,
+      "total_e2e_latency_ms": 40.6
     },
     {
       "repeat_index": 0,
       "query_index": 21,
       "prompt": "Of Polish and Danzig German ancestry, this political leader gained prominence in the 2010s with his conservative and pro-business views. His name is Donald what?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 27.53,
+      "stage1_risk_score": 0.0006,
+      "stage1_latency_ms": 19.83,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 28.9,
-      "total_e2e_latency_ms": 56.59
+      "stage2_latency_ms": 18.54,
+      "total_e2e_latency_ms": 38.49
     },
     {
       "repeat_index": 0,
       "query_index": 22,
       "prompt": "on the surface , it's a lovers-on-the-run crime flick , but it has a lot in common with piesiewicz's and kieslowski's earlier work , films like the double life of veronique . \nIs this review positive or negative?",
-      "stage1_risk_score": 0.0003,
-      "stage1_latency_ms": 31.56,
+      "stage1_risk_score": 0.003,
+      "stage1_latency_ms": 16.4,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 33.15,
-      "total_e2e_latency_ms": 64.85
+      "stage2_latency_ms": 25.28,
+      "total_e2e_latency_ms": 41.79
     },
     {
       "repeat_index": 0,
       "query_index": 23,
       "prompt": "What's an example of a scientist in Britain who won the Physics Nobel Prize?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.53,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.83,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.19,
-      "total_e2e_latency_ms": 61.85
+      "stage2_latency_ms": 26.28,
+      "total_e2e_latency_ms": 48.24
     },
     {
       "repeat_index": 0,
       "query_index": 24,
       "prompt": "What is the origin of \"French Fries?\"",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 28.72,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.66,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 28.83,
-      "total_e2e_latency_ms": 57.7
+      "stage2_latency_ms": 25.35,
+      "total_e2e_latency_ms": 42.15
     },
     {
       "repeat_index": 0,
       "query_index": 25,
       "prompt": "I heard about the Armenian Genocide the other day. Can you tell me about it, what happened generally?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.38,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 20.39,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.93,
-      "total_e2e_latency_ms": 60.48
+      "stage2_latency_ms": 16.28,
+      "total_e2e_latency_ms": 36.79
     },
     {
       "repeat_index": 0,
       "query_index": 26,
       "prompt": "what are some fun spectator sports?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 27.34,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.72,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 33.64,
-      "total_e2e_latency_ms": 61.11
+      "stage2_latency_ms": 23.77,
+      "total_e2e_latency_ms": 42.62
     },
     {
       "repeat_index": 0,
       "query_index": 27,
       "prompt": "How do I fry fish?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 33.74,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.39,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 33.06,
-      "total_e2e_latency_ms": 66.99
+      "stage2_latency_ms": 18.22,
+      "total_e2e_latency_ms": 36.73
     },
     {
       "repeat_index": 0,
       "query_index": 28,
       "prompt": "Whats the polite way to ask for directions in Japanese?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 33.05,
-      "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 40.74,
-      "total_e2e_latency_ms": 73.93
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 15.48,
+      "stage2_decision": "FACTUAL_ENTAILMENT",
+      "stage2_latency_ms": 83.48,
+      "total_e2e_latency_ms": 99.1
     },
     {
       "repeat_index": 0,
       "query_index": 29,
       "prompt": "Student: Test for natural language inference.\nPremise: \"The man with sunglasses and a striped shirt is walking down the street with three cases of beer.\"\nHypothesis: \"There is a man in sunglasses.\"\nIs the hypothesis entailed by the premise?\nOptions:\n- yes\n- no\n- it is not possible to tell.\nTeacher: Let's think:",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 43.26,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 24.94,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 35.68,
-      "total_e2e_latency_ms": 79.14
+      "stage2_latency_ms": 24.69,
+      "total_e2e_latency_ms": 49.79
     },
     {
       "repeat_index": 0,
       "query_index": 30,
       "prompt": "Question. Yes / no, is the following a verifiable fact?\n\"Eddie Murphy makes entire audiences laugh out loud.\"\nAnswer. yes\nWhat step-by-step reasoning justifies that answer?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 35.21,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 14.65,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 30.81,
-      "total_e2e_latency_ms": 66.36
+      "stage2_latency_ms": 27.08,
+      "total_e2e_latency_ms": 41.94
     },
     {
       "repeat_index": 0,
       "query_index": 31,
       "prompt": "Come up with a question and stream of consciousness reasoning that would justify this answer: yes",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.16,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 17.82,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 37.4,
-      "total_e2e_latency_ms": 66.71
+      "stage2_latency_ms": 18.0,
+      "total_e2e_latency_ms": 35.94
     },
     {
       "repeat_index": 0,
       "query_index": 32,
       "prompt": "What happens if you stand in front of a mirror and say \"Bloody Mary\" three times?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 38.35,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.09,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 38.55,
-      "total_e2e_latency_ms": 77.09
+      "stage2_latency_ms": 24.39,
+      "total_e2e_latency_ms": 42.63
     },
     {
       "repeat_index": 0,
       "query_index": 33,
       "prompt": "What are you doing next?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 34.71,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.05,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 34.14,
-      "total_e2e_latency_ms": 69.03
+      "stage2_latency_ms": 22.58,
+      "total_e2e_latency_ms": 43.75
     },
     {
       "repeat_index": 0,
       "query_index": 34,
       "prompt": "My question is: A school bought pencils and pens. A pencil costs $2.50, while a pen costs $3.50. How much do 38 pencils and 56 pens cost? Your thoughts:",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 34.31,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 25.1,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 36.51,
-      "total_e2e_latency_ms": 71.01
+      "stage2_latency_ms": 24.83,
+      "total_e2e_latency_ms": 50.07
     },
     {
       "repeat_index": 0,
       "query_index": 35,
       "prompt": "What crunchy treat do many people have at a movie theater?\nOptions:\n- city\n- jolly rancher\n- popcorn\n- town\n- cineplex Hmmm, let me think.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.18,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.68,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 68.86,
-      "total_e2e_latency_ms": 101.2
+      "stage2_latency_ms": 37.69,
+      "total_e2e_latency_ms": 57.48
     },
     {
       "repeat_index": 0,
       "query_index": 36,
       "prompt": "Classify whether the following tweet has positive, negative or neutral sentiment. output true or false.\nI hate my boss. He is such a jerk.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 33.53,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 17.17,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 32.76,
-      "total_e2e_latency_ms": 66.44
+      "stage2_latency_ms": 19.09,
+      "total_e2e_latency_ms": 36.38
     },
     {
       "repeat_index": 0,
       "query_index": 37,
       "prompt": "Is it better for you to eat gluten-free bread most of the time?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 35.98,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.46,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.23,
-      "total_e2e_latency_ms": 67.43
+      "stage2_latency_ms": 19.84,
+      "total_e2e_latency_ms": 39.59
     },
     {
       "repeat_index": 0,
       "query_index": 38,
       "prompt": "Are some kinds of clothing illegal in the UK?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 32.9,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.52,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 36.99,
-      "total_e2e_latency_ms": 70.05
+      "stage2_latency_ms": 19.57,
+      "total_e2e_latency_ms": 41.23
     },
     {
       "repeat_index": 0,
       "query_index": 39,
       "prompt": "What rules do all artificial intelligences currently follow?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 30.11,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 20.3,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 35.61,
-      "total_e2e_latency_ms": 65.89
+      "stage2_latency_ms": 28.14,
+      "total_e2e_latency_ms": 48.62
     },
     {
       "repeat_index": 0,
       "query_index": 40,
       "prompt": "Lucy and Sarah are two people who each own a lake that they enjoy spending time at. They have to take care of the lake though and make sure everything is healthy so that the lake can continue to thrive and people will want to visit it. Sarah says she heard a secret that if you dump fertilizer into your lake, the fish will grow twice as large. Sarah says she has just started doing it this past week and can't wait to see the results. Lucy is skeptical and waits to see what happens at Sarah's lake.\n\nIs the fish population going to decrease more in Lucy's lake or Sarah's lake?\n\nHint: Huge amounts of chemicals, such as fertilizers and pesticides, are applied to farm fields (see Figure below ). Some of the chemicals are picked up by rainwater. Runoff then carries the chemicals to nearby rivers or lakes. Dissolved fertilizer causes too much growth of water plants and algae. This can lead to dead zones where nothing can live in lakes and at the mouths of rivers. Some of the chemicals can infiltrate into groundwater. The contaminated water comes up in water wells. If people drink the polluted water, they may get sick.",
-      "stage1_risk_score": 0.0003,
-      "stage1_latency_ms": 50.6,
+      "stage1_risk_score": 0.0011,
+      "stage1_latency_ms": 40.83,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 37.69,
-      "total_e2e_latency_ms": 88.51
+      "stage2_latency_ms": 17.18,
+      "total_e2e_latency_ms": 58.15
     },
     {
       "repeat_index": 0,
       "query_index": 41,
       "prompt": "Give the step-by-step reasoning process and then the final answer. A pen and pencil have a total cost of $6. If the pen costs twice as much as the pencil, what is the cost of the pen?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.78,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 25.57,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 37.13,
-      "total_e2e_latency_ms": 70.16
+      "stage2_latency_ms": 24.39,
+      "total_e2e_latency_ms": 50.11
     },
     {
       "repeat_index": 0,
       "query_index": 42,
       "prompt": "What do I do if my computer freezes?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 32.65,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 15.91,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 31.16,
-      "total_e2e_latency_ms": 63.96
+      "stage2_latency_ms": 28.24,
+      "total_e2e_latency_ms": 44.29
     },
     {
       "repeat_index": 0,
       "query_index": 43,
       "prompt": "What unusual food do all Chinese people enjoy?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.92,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 20.51,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 31.99,
-      "total_e2e_latency_ms": 63.12
+      "stage2_latency_ms": 17.2,
+      "total_e2e_latency_ms": 37.85
     },
     {
       "repeat_index": 0,
       "query_index": 44,
       "prompt": "Explain why you recommend this movie for me to watch during the weekend.\n\nMovie: The Shawshank Redemption",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 33.9,
+      "stage1_risk_score": 0.0004,
+      "stage1_latency_ms": 21.42,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.19,
-      "total_e2e_latency_ms": 65.24
+      "stage2_latency_ms": 24.99,
+      "total_e2e_latency_ms": 46.57
     },
     {
       "repeat_index": 0,
       "query_index": 45,
       "prompt": "Do violent offenders usually have a history of mental illness?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 27.34,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.47,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 28.67,
-      "total_e2e_latency_ms": 56.2
+      "stage2_latency_ms": 26.68,
+      "total_e2e_latency_ms": 49.3
     },
     {
       "repeat_index": 0,
       "query_index": 46,
       "prompt": "What was the question for this implicit rationale, and corresponding answer?\nThere is a group of people watching a street dancing performance on plastic.\n The answer: yes",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.2,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 17.98,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 29.27,
-      "total_e2e_latency_ms": 60.61
+      "stage2_latency_ms": 20.19,
+      "total_e2e_latency_ms": 38.32
     },
     {
       "repeat_index": 0,
       "query_index": 47,
       "prompt": "Can you suggest a 7-day travel itinerary for visiting Japan during spring?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.92,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.37,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.55,
-      "total_e2e_latency_ms": 61.63
+      "stage2_latency_ms": 15.14,
+      "total_e2e_latency_ms": 37.62
     },
     {
       "repeat_index": 0,
       "query_index": 48,
       "prompt": "You are presented with the quiz \"Heat and pain may be felt on the skin because of what?\" \n\nBut you don't know the answer, so you turn to your teacher to ask for hints. He says that \"nerves can be used to feel heat and pressure on the skin\" and \"tight fitting shoes can increase the pressure on the skin and exacerbates the pain\". \n\nSo, what's the best answer to the question?",
-      "stage1_risk_score": 0.0002,
-      "stage1_latency_ms": 27.84,
+      "stage1_risk_score": 0.0006,
+      "stage1_latency_ms": 15.45,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 23.98,
-      "total_e2e_latency_ms": 51.95
+      "stage2_latency_ms": 19.77,
+      "total_e2e_latency_ms": 35.35
     },
     {
       "repeat_index": 0,
       "query_index": 49,
       "prompt": "Can you suggest a good phone case to go with my new smartphone?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 28.45,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 25.13,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 56.58,
-      "total_e2e_latency_ms": 85.18
+      "stage2_latency_ms": 34.77,
+      "total_e2e_latency_ms": 60.01
     },
     {
       "repeat_index": 0,
       "query_index": 50,
       "prompt": "Climate protection Auto industry Germany",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 28.5,
+      "stage1_risk_score": 0.0005,
+      "stage1_latency_ms": 14.95,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 27.03,
-      "total_e2e_latency_ms": 55.66
+      "stage2_latency_ms": 18.28,
+      "total_e2e_latency_ms": 33.36
     },
     {
       "repeat_index": 0,
       "query_index": 51,
       "prompt": "Extract the answer to the question from the following context.\nQuestion: The heterogenous and hygroscopic material is made of?\nContext: Wood is a heterogeneous, hygroscopic, cellular and anisotropic material. It consists of cells, and the cell walls are composed of micro-fibrils of cellulose (40% \u2013 50%) and hemicellulose (15% \u2013 25%) impregnated with lignin (15% \u2013 30%).",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 27.24,
+      "stage1_risk_score": 0.0006,
+      "stage1_latency_ms": 24.37,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 33.23,
-      "total_e2e_latency_ms": 60.69
+      "stage2_latency_ms": 15.92,
+      "total_e2e_latency_ms": 40.41
     },
     {
       "repeat_index": 0,
       "query_index": 52,
       "prompt": "Categorize the comment on the basis of obscenity. If the comment is obscene output Yes, otherwise output No.\n\nInput: I am SO qualified for any one of the guvvy jobs that offer paid administrative leave. I am happy to stay home, enjoy direct deposit, and would milk it for as long as possible.",
-      "stage1_risk_score": 0.2379,
-      "stage1_latency_ms": 29.86,
+      "stage1_risk_score": 0.0037,
+      "stage1_latency_ms": 15.24,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 32.96,
-      "total_e2e_latency_ms": 62.98
+      "stage2_latency_ms": 19.36,
+      "total_e2e_latency_ms": 34.73
     },
     {
       "repeat_index": 0,
       "query_index": 53,
       "prompt": "Task: Find out which word in this sentence has more negative sentiment.\nInput: The food was terrible and the service was even worse.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.48,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.76,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 32.63,
-      "total_e2e_latency_ms": 62.3
+      "stage2_latency_ms": 14.96,
+      "total_e2e_latency_ms": 29.85
     },
     {
       "repeat_index": 0,
       "query_index": 54,
       "prompt": "What do elephants think of humans?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.19,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.6,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 57.87,
-      "total_e2e_latency_ms": 89.22
+      "stage2_latency_ms": 39.29,
+      "total_e2e_latency_ms": 54.01
     },
     {
       "repeat_index": 0,
       "query_index": 55,
       "prompt": "Is it illegal to kill a praying mantis in the U.S.?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 32.29,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 20.58,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.56,
-      "total_e2e_latency_ms": 63.05
+      "stage2_latency_ms": 18.65,
+      "total_e2e_latency_ms": 39.35
     },
     {
       "repeat_index": 0,
       "query_index": 56,
       "prompt": "Ive been feeling really stressed lately, can you suggest some ways to manage this stress?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.79,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.93,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 34.55,
-      "total_e2e_latency_ms": 64.52
+      "stage2_latency_ms": 24.07,
+      "total_e2e_latency_ms": 41.12
     },
     {
       "repeat_index": 0,
       "query_index": 57,
       "prompt": "If you're visiting Germany and Sweden, you'll need to change dollars into what?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.69,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 25.92,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 32.42,
-      "total_e2e_latency_ms": 65.29
+      "stage2_latency_ms": 27.32,
+      "total_e2e_latency_ms": 53.37
     },
     {
       "repeat_index": 0,
       "query_index": 58,
       "prompt": "How can I improve my time management for studying?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.05,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.68,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 31.05,
-      "total_e2e_latency_ms": 60.26
+      "stage2_latency_ms": 24.97,
+      "total_e2e_latency_ms": 44.77
     },
     {
       "repeat_index": 0,
       "query_index": 59,
       "prompt": "Give me a list of popular Netflix shows I can watch now.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.73,
+      "stage1_risk_score": 0.0006,
+      "stage1_latency_ms": 17.31,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 28.83,
-      "total_e2e_latency_ms": 61.72
+      "stage2_latency_ms": 24.33,
+      "total_e2e_latency_ms": 41.76
     },
     {
       "repeat_index": 0,
       "query_index": 60,
       "prompt": "Can you make vegan roasts?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 33.78,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 22.37,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 26.54,
-      "total_e2e_latency_ms": 60.47
+      "stage2_latency_ms": 17.3,
+      "total_e2e_latency_ms": 39.85
     },
     {
       "repeat_index": 0,
       "query_index": 61,
       "prompt": "Premise: \"A man in a striped shirt is shaving at a mirror.\"\nBased on this premise, can we conclude that the hypothesis \"With a young child watching him.\" is true?\nOptions:\n- yes\n- it is not possible to tell\n- no\nLet's solve step-by-step:",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 27.38,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 23.0,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 25.96,
-      "total_e2e_latency_ms": 53.47
+      "stage2_latency_ms": 19.74,
+      "total_e2e_latency_ms": 42.85
     },
     {
       "repeat_index": 0,
       "query_index": 62,
       "prompt": "Is a pen or a sword more useful in a physical fight?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 24.4,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 17.95,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 25.65,
-      "total_e2e_latency_ms": 50.22
+      "stage2_latency_ms": 17.63,
+      "total_e2e_latency_ms": 35.69
     },
     {
       "repeat_index": 0,
       "query_index": 63,
       "prompt": "In this task, you are given an input list. A list contains several comma-separated items written within brackets. You need to collate all the alphabetical elements at the start of the list followed by all the numerical elements of the list. Maintain the order in which the alphabetical elements appear in the given input list, and do the same for the numerical elements.\n\nInput: ['J', '9311']",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 25.39,
+      "stage1_risk_score": 0.0004,
+      "stage1_latency_ms": 14.59,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 25.64,
-      "total_e2e_latency_ms": 51.16
+      "stage2_latency_ms": 16.44,
+      "total_e2e_latency_ms": 31.16
     },
     {
       "repeat_index": 0,
       "query_index": 64,
       "prompt": "How do I start investing with a small amount of money?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.95,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.59,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 27.74,
-      "total_e2e_latency_ms": 57.83
+      "stage2_latency_ms": 26.23,
+      "total_e2e_latency_ms": 45.95
     },
     {
       "repeat_index": 0,
       "query_index": 65,
       "prompt": "Can machine learning algorithms be biased?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 28.42,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.86,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 28.76,
-      "total_e2e_latency_ms": 57.32
+      "stage2_latency_ms": 23.86,
+      "total_e2e_latency_ms": 43.91
     },
     {
       "repeat_index": 0,
       "query_index": 66,
       "prompt": "My sister and her husband would like to build a house and are looking for a suitable property. What factors do you have to consider when choosing and which building regulations apply in your region?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 26.9,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.41,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 24.19,
-      "total_e2e_latency_ms": 51.21
+      "stage2_latency_ms": 23.37,
+      "total_e2e_latency_ms": 41.92
     },
     {
       "repeat_index": 0,
       "query_index": 67,
       "prompt": "Premise: \"A man dressed in all black with blond-hair sitting next to a woman in a dark green jacket.\"\nHypothesis: \"Both have unpleasant expressions upon their faces.\"\nIs the hypothesis entailed by the premise?\nOptions:\n- yes\n- it is not possible to tell\n- no\nLet's solve step-by-step:",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.75,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 22.36,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.18,
-      "total_e2e_latency_ms": 60.12
+      "stage2_latency_ms": 18.78,
+      "total_e2e_latency_ms": 41.43
     },
     {
       "repeat_index": 0,
       "query_index": 68,
       "prompt": "Are electric vehicles better for the environment than cars powered by fossil fuels?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 30.81,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 21.79,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 25.69,
-      "total_e2e_latency_ms": 56.62
+      "stage2_latency_ms": 23.0,
+      "total_e2e_latency_ms": 44.92
     },
     {
       "repeat_index": 0,
       "query_index": 69,
       "prompt": "What's a view of yours that you and your wife disagree on?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.35,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 24.14,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 43.23,
-      "total_e2e_latency_ms": 74.8
+      "stage2_latency_ms": 23.11,
+      "total_e2e_latency_ms": 47.4
     },
     {
       "repeat_index": 0,
       "query_index": 70,
       "prompt": "Do you have any resources on the French Revolution?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 32.37,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.76,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 35.82,
-      "total_e2e_latency_ms": 68.34
+      "stage2_latency_ms": 18.02,
+      "total_e2e_latency_ms": 34.9
     },
     {
       "repeat_index": 0,
       "query_index": 71,
       "prompt": "In this task, you are given an input list. A list contains several comma-separated items written within brackets. You need to collate all the alphabetical elements at the start of the list followed by all the numerical elements of the list. Maintain the order in which the alphabetical elements appear in the given input list, and do the same for the numerical elements.\n\nInput: ['s', 'r', 'O', '9335', 'S', '5817', 'J', 'm', 'l', 'e']",
-      "stage1_risk_score": 0.0002,
-      "stage1_latency_ms": 32.17,
+      "stage1_risk_score": 0.0006,
+      "stage1_latency_ms": 17.78,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 32.76,
-      "total_e2e_latency_ms": 65.07
+      "stage2_latency_ms": 16.8,
+      "total_e2e_latency_ms": 34.72
     },
     {
       "repeat_index": 0,
       "query_index": 72,
       "prompt": "What are some effective study techniques for visual learners?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.43,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 24.97,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 34.74,
-      "total_e2e_latency_ms": 66.4
+      "stage2_latency_ms": 19.0,
+      "total_e2e_latency_ms": 44.13
     },
     {
       "repeat_index": 0,
       "query_index": 73,
       "prompt": "How much sleep should an average adult aim for each night?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 32.51,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.37,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 35.63,
-      "total_e2e_latency_ms": 68.34
+      "stage2_latency_ms": 17.06,
+      "total_e2e_latency_ms": 36.55
     },
     {
       "repeat_index": 0,
       "query_index": 74,
       "prompt": "Who proved that the Earth was round?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 38.54,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.62,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.87,
-      "total_e2e_latency_ms": 70.59
+      "stage2_latency_ms": 23.52,
+      "total_e2e_latency_ms": 38.25
     },
     {
       "repeat_index": 0,
       "query_index": 75,
       "prompt": "I am looking for a good restaurant in Munich and would like to know where to get the best Bavarian cuisine.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 31.85,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 23.54,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 43.54,
-      "total_e2e_latency_ms": 75.54
+      "stage2_latency_ms": 19.62,
+      "total_e2e_latency_ms": 43.27
     },
     {
       "repeat_index": 0,
       "query_index": 76,
       "prompt": "How does the age structure of the population change and what effects does that have on society?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 34.17,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.76,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 29.55,
-      "total_e2e_latency_ms": 63.89
+      "stage2_latency_ms": 17.68,
+      "total_e2e_latency_ms": 37.59
     },
     {
       "repeat_index": 0,
       "query_index": 77,
       "prompt": "In the U.S., can the victim of a domestic violence case drop the charges?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 29.79,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.81,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 33.18,
-      "total_e2e_latency_ms": 63.12
+      "stage2_latency_ms": 18.8,
+      "total_e2e_latency_ms": 33.74
     },
     {
       "repeat_index": 0,
       "query_index": 78,
       "prompt": "Could you provide me with a list of cultural dos and don\u2019ts for a first-time visitor to Japan?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 31.13,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 23.54,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.74,
-      "total_e2e_latency_ms": 62.04
+      "stage2_latency_ms": 21.58,
+      "total_e2e_latency_ms": 45.23
     },
     {
       "repeat_index": 0,
       "query_index": 79,
       "prompt": "Question: \"To what church did Zahm belong?\"\n\nContext: \"Father Joseph Carrier, C.S.C. was Director of the Science Museum and the Library and Professor of Chemistry and Physics until 1874. Carrier taught that scientific research and its promise for progress were not antagonistic to the ideals of intellectual and moral culture endorsed by the Church. One of Carrier's students was Father John Augustine Zahm (1851\u20131921) who was made Professor and Co-Director of the Science Department at age 23 and by 1900 was a nationally prominent scientist and naturalist. Zahm was active in the Catholic Summer School movement, which introduced Catholic laity to contemporary intellectual issues. His book Evolution and Dogma (1896) defended certain aspects of evolutionary theory as true, and argued, moreover, that even the great Church teachers Thomas Aquinas and Augustine taught something like it. The intervention of Irish American Catholics in Rome prevented Zahm's censure by the Vatican. In 1913, Zahm and former President Theodore Roosevelt embarked on a major expedition through the Amazon.\"\n\nAnswer:",
-      "stage1_risk_score": 0.0007,
-      "stage1_latency_ms": 38.99,
+      "stage1_risk_score": 0.0028,
+      "stage1_latency_ms": 34.67,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 32.1,
-      "total_e2e_latency_ms": 71.31
+      "stage2_latency_ms": 16.2,
+      "total_e2e_latency_ms": 51.03
     },
     {
       "repeat_index": 0,
       "query_index": 80,
       "prompt": "Is it true that no birds have ever become fluent in English?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.18,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 21.53,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 35.99,
-      "total_e2e_latency_ms": 66.36
+      "stage2_latency_ms": 19.51,
+      "total_e2e_latency_ms": 41.26
     },
     {
       "repeat_index": 0,
       "query_index": 81,
       "prompt": "Question. Premise: \"3 little kids are playing football.\"\nHypothesis: \"The kids are on a team.\"\nDo we know that the hypothesis entailed by the premise?\nAnswer. it is not possible to tell\nWhat step-by-step reasoning justifies that answer?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 31.53,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.39,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 31.0,
-      "total_e2e_latency_ms": 62.67
+      "stage2_latency_ms": 15.13,
+      "total_e2e_latency_ms": 29.66
     },
     {
       "repeat_index": 0,
       "query_index": 82,
       "prompt": "What is not going well in Germany?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 34.7,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.45,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 31.49,
-      "total_e2e_latency_ms": 66.43
+      "stage2_latency_ms": 18.95,
+      "total_e2e_latency_ms": 33.52
     },
     {
       "repeat_index": 0,
       "query_index": 83,
       "prompt": "How can I track my expenses more effectively to save more money each month?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 34.41,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.65,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 32.55,
-      "total_e2e_latency_ms": 67.17
+      "stage2_latency_ms": 15.93,
+      "total_e2e_latency_ms": 32.69
     },
     {
       "repeat_index": 0,
       "query_index": 84,
       "prompt": "Wann war der erste Corona Lockdown?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 33.56,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.05,
       "stage2_decision": "HALLUCINATION_CONTRADICTION",
-      "stage2_latency_ms": 23.47,
-      "total_e2e_latency_ms": 57.18
+      "stage2_latency_ms": 22.73,
+      "total_e2e_latency_ms": 41.98
     },
     {
       "repeat_index": 0,
       "query_index": 85,
       "prompt": "I am looking for a new gym in my city and would like to know what offers there are.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 25.52,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.81,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 23.82,
-      "total_e2e_latency_ms": 49.49
+      "stage2_latency_ms": 24.25,
+      "total_e2e_latency_ms": 39.18
     },
     {
       "repeat_index": 0,
       "query_index": 86,
       "prompt": "Do you know who Ted Turner is?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.88,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 20.24,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 24.84,
-      "total_e2e_latency_ms": 54.9
+      "stage2_latency_ms": 24.48,
+      "total_e2e_latency_ms": 44.83
     },
     {
       "repeat_index": 0,
       "query_index": 87,
       "prompt": "Creatively image a question and justification for this answer: no",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 31.46,
+      "stage1_risk_score": 0.0005,
+      "stage1_latency_ms": 17.12,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 34.6,
-      "total_e2e_latency_ms": 66.23
+      "stage2_latency_ms": 22.49,
+      "total_e2e_latency_ms": 39.75
     },
     {
       "repeat_index": 0,
       "query_index": 88,
       "prompt": "Generate a report of how many calories are consumed by people who have joined the gym recently.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 32.31,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.58,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 33.52,
-      "total_e2e_latency_ms": 66.0
+      "stage2_latency_ms": 20.17,
+      "total_e2e_latency_ms": 39.9
     },
     {
       "repeat_index": 0,
       "query_index": 89,
       "prompt": "What does Darth Vader say to Luke in \"The Empire Strikes Back\"?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 33.4,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 19.2,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 24.37,
-      "total_e2e_latency_ms": 57.95
+      "stage2_latency_ms": 23.34,
+      "total_e2e_latency_ms": 42.68
     },
     {
       "repeat_index": 0,
       "query_index": 90,
       "prompt": "Why shouldn't you mention Macbeth in a theater?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 27.14,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 18.28,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 32.44,
-      "total_e2e_latency_ms": 59.7
+      "stage2_latency_ms": 16.78,
+      "total_e2e_latency_ms": 35.19
     },
     {
       "repeat_index": 0,
       "query_index": 91,
       "prompt": "What's a country where most people love playing golf?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 31.22,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 16.8,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 28.61,
-      "total_e2e_latency_ms": 59.96
+      "stage2_latency_ms": 24.2,
+      "total_e2e_latency_ms": 41.13
     },
     {
       "repeat_index": 0,
       "query_index": 92,
       "prompt": "The 31-year-old, who will have the support of newly-appointed head coach Keith Bertschin, succeeds Marcus Bignot, who left Solihull on 7 November to join League Two side Grimsby Town.\nMcDonald, who took over the Pitmen in May, leaves them fourth in the Northern Premier League Premier Division.\nHis first game will be Tuesday's FA Cup first-round replay at home to Yeovil.\nSolihull are 16th in the National League after being promoted last season.\nMcDonald will also be joined at the Moors by assistant manager Nick Green and coach David Bridgwater, his backroom team at Hednesford and his previous club Redditch.\n\"With my ambitions as a football manager, the opportunity to come to Solihull was just too good to turn down,\" McDonald told BBC WM.\n\"Part of the decision to come was to help with my development. Keith has a wealth of experience which will help that.\n\"But I'm in charge. I have my management team with me, I want to put my stamp on things and carry on the good work Marcus has done in transforming this club.\n\"It was a tough decision and Saturday was an emotional day for me, but the people at Hednesford understand why I've made it.\"\nLiam McDonald was talking to BBC WM's Rob Gurney.\nThis boils down to the simple idea that",
-      "stage1_risk_score": 0.0033,
-      "stage1_latency_ms": 41.52,
+      "stage1_risk_score": 0.0069,
+      "stage1_latency_ms": 37.37,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 30.88,
-      "total_e2e_latency_ms": 72.59
+      "stage2_latency_ms": 18.31,
+      "total_e2e_latency_ms": 55.83
     },
     {
       "repeat_index": 0,
       "query_index": 93,
       "prompt": "Is it true that stretching before a workout is crucial to prevent injury?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 30.69,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 17.28,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 32.44,
-      "total_e2e_latency_ms": 63.39
+      "stage2_latency_ms": 19.93,
+      "total_e2e_latency_ms": 37.34
     },
     {
       "repeat_index": 0,
       "query_index": 94,
       "prompt": "Ive been experiencing chest pain and shortness of breath. What should I do?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 29.83,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 14.96,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 26.88,
-      "total_e2e_latency_ms": 56.86
+      "stage2_latency_ms": 22.49,
+      "total_e2e_latency_ms": 37.69
     },
     {
       "repeat_index": 0,
       "query_index": 95,
       "prompt": "Ich bin auf der Suche nach einem guten Restaurant in M\u00fcnchen und w\u00fcrde gerne wissen, wo man die beste bayerische K\u00fcche bekommt.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 28.76,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 22.84,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 24.28,
-      "total_e2e_latency_ms": 53.17
+      "stage2_latency_ms": 18.05,
+      "total_e2e_latency_ms": 41.0
     },
     {
       "repeat_index": 0,
       "query_index": 96,
       "prompt": "Hat Russland die Ukraine \u00fcberfallen? Warum?",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 24.85,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 17.52,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 27.21,
-      "total_e2e_latency_ms": 52.21
+      "stage2_latency_ms": 19.32,
+      "total_e2e_latency_ms": 36.95
     },
     {
       "repeat_index": 0,
       "query_index": 97,
       "prompt": "Where does the word \"butterfly\" come from?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 25.26,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 15.34,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 27.91,
-      "total_e2e_latency_ms": 53.37
+      "stage2_latency_ms": 16.5,
+      "total_e2e_latency_ms": 31.97
     },
     {
       "repeat_index": 0,
       "query_index": 98,
       "prompt": "In this task, you will be given a debate topic, along with a sentence from the debate. You should classify the given sentence and choose the type of that sentence. Possible types are explained below.\nPolicy: This refers to a sentence proposing a specific course of action to be taken. It typically contains modal verbs like \"should\" and \"ought to\". It cannot be directly proved with objective evidence, and a proper type of support is a logical reason from which the proposition can be inferred.\nValue: This refers to a sentence containing value judgments without making specific claims about what should be done (If so, then it is a Policy sentence.). Because of the subjectivity of value judgments, it cannot be proved directly with objective evidence.\nFact: This refers to an objective proposition expressing or dealing with facts or conditions as perceived without distortion by personal feelings, prejudices, or interpretations. A Fact sentence has a truth value that can be verified with objective evidence that may be available at the time the claim is made; predictions about future are considered unverifiable.\nTestimony: This refers to an objective sentence about the author's personal state or experience. Evidence for Testimony is not publicly available in most cases.\n\nInput: topic: The Reason why Christianity is Looked Down Upon...\nsentence: Atheists won't buy into it because they are looking for a logical explanation as to why they all are here.",
-      "stage1_risk_score": 0.0001,
-      "stage1_latency_ms": 37.7,
+      "stage1_risk_score": 0.0003,
+      "stage1_latency_ms": 38.53,
       "stage2_decision": "UNVERIFIED_NEUTRAL",
-      "stage2_latency_ms": 57.7,
-      "total_e2e_latency_ms": 95.56
+      "stage2_latency_ms": 39.3,
+      "total_e2e_latency_ms": 77.95
     },
     {
       "repeat_index": 0,
       "query_index": 99,
       "prompt": "Who designed the first American flag?",
-      "stage1_risk_score": 0.0,
-      "stage1_latency_ms": 25.53,
+      "stage1_risk_score": 0.0002,
+      "stage1_latency_ms": 12.58,
       "stage2_decision": "FACTUAL_ENTAILMENT",
-      "stage2_latency_ms": 26.87,
-      "total_e2e_latency_ms": 52.52
+      "stage2_latency_ms": 18.77,
+      "total_e2e_latency_ms": 31.47
     }
   ]
 }

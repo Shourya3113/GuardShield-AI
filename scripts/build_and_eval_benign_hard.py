@@ -37,7 +37,7 @@ logger = logging.getLogger("BenignHardAudit")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR / "src"))
-from prescan_filter import PreScanSecurityFilter
+from prescan_filter import PreScanSecurityFilter, weights_sha256
 
 BENIGN_HARD_PROBES = [
     # 1. Plain English Baseline (10 samples)
@@ -238,6 +238,7 @@ def run_benign_hard_audit():
     with open(report_json_path, "w", encoding="utf-8") as f:
         json.dump({
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "weights_sha256": weights_sha256(filter_engine.model_dir),
             "total_probes": len(BENIGN_HARD_PROBES),
             "categories": category_summary,
             "sample_predictions": eval_records

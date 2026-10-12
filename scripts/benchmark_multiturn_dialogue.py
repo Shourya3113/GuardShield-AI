@@ -35,8 +35,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "src"))
 
-from prescan_filter import PreScanSecurityFilter
-from proxy_server import compute_assistant_signature, record_assistant_signature, verify_assistant_signature
+from prescan_filter import PreScanSecurityFilter, weights_sha256
+from proxy_server import compute_assistant_signature, scan_messages
 
 DATA_FILE = BASE_DIR / "data" / "multiturn_benchmark_eval.json"
 REPORTS_DIR = BASE_DIR / "docs" / "01 Reports"
@@ -47,7 +47,7 @@ PROTECTAI_MODEL_ID = "protectai/deberta-v3-base-prompt-injection-v2"
 
 def get_git_commit():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
+        return subprocess.check_output(["git", "describe", "--always", "--dirty", "--abbrev=40"], cwd=str(BASE_DIR), stderr=subprocess.DEVNULL).decode().strip()
     except Exception:
         return "unknown"
 
@@ -95,11 +95,15 @@ def evaluate_multiturn():
             return float(probs[1].item())
 
     # 3. Evaluate across conversations
+    # GuardShield is scored with the proxy's own multi-turn logic (proxy_server.scan_messages):
+    #   raw    -> no turn is signed, so assistant turns are scanned like any untrusted turn
+    #   signed -> every assistant turn carries a valid proxy signature (as when relayed by the proxy)
     print("\n[3/3] Evaluating conversations...")
 
     gs_all_preds = []
     gs_user_preds = []
     gs_asst_preds = []
+    gs_signed_user_preds = []
 
     gs_signed_conv_blocked = 0
     gs_raw_conv_blocked = 0
@@ -110,45 +114,46 @@ def evaluate_multiturn():
     pai_conv_blocked = 0
 
     detailed_conv_results = []
+    never_signed = lambda content, sig: False
 
     for c_idx, conv in enumerate(conversations):
         cid = conv["conversation_id"]
         turns = conv["turns"]
-        
-        c_gs_raw_blocked = False
-        c_gs_signed_blocked = False
-        c_pai_blocked = False
+
+        raw_scan = scan_messages(guardshield_engine, turns, verify_signature=never_signed, stop_on_block=False)
+        signed_turns = [
+            dict(t, proxy_signature=compute_assistant_signature(t["content"])) if t["role"] == "assistant" else t
+            for t in turns
+        ]
+        signed_scan = scan_messages(guardshield_engine, signed_turns, stop_on_block=False)
+        raw_by_idx = {r["index"]: r for r in raw_scan["turns"]}
+        signed_by_idx = {r["index"]: r for r in signed_scan["turns"]}
 
         conv_turns_log = []
-
+        c_pai_blocked = False
         for t_idx, turn in enumerate(turns):
             role = turn["role"]
             content = turn["content"]
 
-            # GuardShield raw turn scoring
-            gs_res = guardshield_engine.inspect_prompt(content)
-            gs_risk = gs_res["risk_score"]
-            gs_pred = 1 if gs_risk >= 0.50 else 0
+            gs_raw = raw_by_idx.get(t_idx)
+            gs_risk = gs_raw["risk_score"] if gs_raw else 0.0
+            gs_pred = 0 if (gs_raw is None or gs_raw["is_safe"]) else 1
+            gs_signed = signed_by_idx.get(t_idx)
+            gs_signed_pred = 0 if (gs_signed is None or gs_signed["is_safe"]) else 1
 
-            # ProtectAI turn scoring
+            # ProtectAI turn scoring (stateless)
             pai_risk = score_protectai(content)
             pai_pred = 1 if pai_risk >= 0.50 else 0
 
-            # Turn tracking
             gs_all_preds.append(gs_pred)
             pai_all_preds.append(pai_pred)
-
             if role == "user":
                 gs_user_preds.append(gs_pred)
+                gs_signed_user_preds.append(gs_signed_pred)
                 pai_user_preds.append(pai_pred)
-                if gs_pred == 1:
-                    c_gs_signed_blocked = True
             elif role == "assistant":
                 gs_asst_preds.append(gs_pred)
                 pai_asst_preds.append(pai_pred)
-
-            if gs_pred == 1:
-                c_gs_raw_blocked = True
             if pai_pred == 1:
                 c_pai_blocked = True
 
@@ -158,10 +163,13 @@ def evaluate_multiturn():
                 "content_preview": content[:60] + "..." if len(content) > 60 else content,
                 "guardshield_risk": round(gs_risk, 4),
                 "guardshield_pred": gs_pred,
+                "guardshield_signed_history_pred": gs_signed_pred,
                 "protectai_risk": round(pai_risk, 4),
                 "protectai_pred": pai_pred
             })
 
+        c_gs_raw_blocked = raw_scan["blocked"]
+        c_gs_signed_blocked = signed_scan["blocked"]
         if c_gs_raw_blocked: gs_raw_conv_blocked += 1
         if c_gs_signed_blocked: gs_signed_conv_blocked += 1
         if c_pai_blocked: pai_conv_blocked += 1
@@ -199,6 +207,7 @@ def evaluate_multiturn():
             "benchmark_name": "GuardShield Multi-Turn Dialogue Benign Benchmark",
             "dataset_sha256": compute_sha256(DATA_FILE),
             "git_commit": get_git_commit(),
+            "weights_sha256": weights_sha256(guardshield_engine.model_dir),
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "device": device.upper(),
             "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
@@ -208,7 +217,8 @@ def evaluate_multiturn():
             "sample_conversations": total_convs,
             "sample_turns": total_turns,
             "user_turns": total_users,
-            "assistant_turns": total_assts
+            "assistant_turns": total_assts,
+            "guardshield_scan_logic": "proxy_server.scan_messages (short-turn context, max-risk)"
         },
         "guardshield_eval": {
             "all_turns_fpr": round(float(gs_raw_turn_fpr), 4),
@@ -219,6 +229,8 @@ def evaluate_multiturn():
             "assistant_turns_false_positives": int(sum(gs_asst_preds)),
             "raw_conversation_fpr": round(float(gs_raw_conv_fpr), 4),
             "raw_conversations_blocked": int(gs_raw_conv_blocked),
+            "signed_history_user_turns_fpr": round(float(sum(gs_signed_user_preds) / total_users), 4),
+            "signed_history_user_turns_false_positives": int(sum(gs_signed_user_preds)),
             "signed_history_conversation_fpr": round(float(gs_signed_conv_fpr), 4),
             "signed_history_conversations_blocked": int(gs_signed_conv_blocked)
         },
