@@ -100,15 +100,22 @@ def sync_readme():
 
     # Replace Headline Table
     content = re.sub(
-        r"\| Defense Component \| Evaluation Dataset / Split \|[\s\S]*?\|\s*\*\*Dual-Stage Pipeline\*\*[\s\S]*?\|",
-        headline_table,
+        r"\| Defense Component \| Evaluation Dataset / Split \|[\s\S]*?\|\s*\*\*Dual-Stage Pipeline\*\*.*?(?=\n)",
+        lambda _: headline_table,
         content
     )
 
     # Replace Comparative Baselines Table
     content = re.sub(
-        r"\| Model Architecture \|[\s\S]*?\|\s*\*\*GuardShield DeBERTa-v3 \(Ours\)\*\*[\s\S]*?\|",
-        baselines_table,
+        r"\| Model Architecture \|[\s\S]*?\|\s*\*\*GuardShield DeBERTa-v3 \(Ours\)\*\*.*?(?=\n)",
+        lambda _: baselines_table,
+        content
+    )
+
+    # Update Weekly Project Progression W10 row
+    content = re.sub(
+        r"\|\s*\*\*W10\*\*.*?(?=\n)",
+        lambda _: f"| **W10** | Authentic Stage 2 Benchmarks (FEVER/HaluEval), Statistical Controls, & Measured E2E Latency | ✅ Completed | WPR 10, {s2_m['accuracy']*100:.2f}% Grounding Acc, {e2e_m['latency_p50_ms']:.2f}ms E2E p50 ({e2e_m['latency_mean_ms']:.2f}ms mean), 95% Wilson CIs |",
         content
     )
 
@@ -121,8 +128,9 @@ To maintain rigorous scientific integrity, we explicitly document the operationa
 
 1. **Multilingual & Hinglish Tokenization Anomaly Trigger**:
    - Because Stage 1 was fine-tuned on English adversarial benchmarks, romanized transliterated languages (e.g. Hinglish: *"bhai ye batao ki..."*) and non-English scripts undergo extreme Byte-Pair / SentencePiece subword fragmentation into rare tokens.
-   - This fragmentation elevates risk scores artificially on benign conversational text (yielding a **34%–44% False Positive Rate** on unfiltered multilingual inputs).
-   - *Mitigation*: The sidecar proxy (`src/proxy_server.py`) includes regex language-routing heuristics that detect Devanagari script and romanized South-Asian stopwords, safely passing benign conversational queries to upstream multilingual handlers while retaining security screening for explicit jailbreak terms.
+   - On the held-out benign-hard diagnostic suite (`benign_hard_eval.json`, N=65 benign, N=20 attacks), GuardShield achieves **100.00% attack recall (20/20)**, but incurs a **44.62% False Positive Rate (29/65)** on benign non-standard inputs (English 0.0%, Code 40.0%, Short turns 40.0%, Hindi 50.0%, Role-play 50.0%, Hinglish 90.0%).
+   - In comparison, ProtectAI DeBERTa-v3-base achieves an **18.46% FPR (12/65)** on benign inputs, but misses 15% of adversarial edge attacks (**85.00% attack recall, 17/20**).
+   - *Security Architectural Stance*: To guarantee that no adversarial prompt can bypass security controls via script-switching (e.g., prefixing Devanagari characters or romanized stopwords), GuardShield enforces **unconditional neural scanning** across all conversation turns (system, user, assistant, tool) without keyword exemptions or language-routing bypasses.
 
 2. **Character & Cipher Obfuscation Rejection (Blanket Rejection)**:
    - On 7 of the 11 evaluated evasion vectors (Zero-Width Spaces, Soft-Hyphens, Leetspeak, Cyrillic Homoglyphs, Base64, ROT13, and Hinglish Code-Mixing), benign queries transformed with the same perturbations trigger a **90.0% to 100.0% False Positive Rate**.
@@ -130,13 +138,19 @@ To maintain rigorous scientific integrity, we explicitly document the operationa
 
 3. **Short Conversational Turns & Context Dependency**:
    - Isolated short messages (e.g. *"ok thanks, that helps"*, *"continue"*, *"yes"*) lack syntactic structure and may trigger false positives if evaluated in zero-context isolation.
-   - *Mitigation*: The proxy maintains multi-turn conversation memory, appending prior turns for messages under 50 characters, and applies a conversational pleasantry filter to prevent false blocks on standard acknowledgements.
+   - *Mitigation*: The sidecar proxy preserves multi-turn conversation memory, evaluating messages under 50 characters or $\\le 6$ words within their dialogue discourse context (`Context: ...\\nTurn: ...`) while maintaining strict neural classification integrity without regex shortcuts.
 
 4. **Stage 2 Fact Verification Domain Sensitivity**:
    - While the cross-encoder NLI model achieves **86.50% accuracy and 0.9498 AUROC** on clean, single-sentence claims from FEVER, performance drops to **59.75% accuracy and 0.6127 AUROC** on complex open-domain QA pairs from HaluEval.
    - When evidence is partially missing from the retrieved premise, the verifier assigns an **`UNVERIFIED_NEUTRAL`** verdict. GuardShield reports these as separate ungrounded outcomes rather than conflating lack of retrieval context with active counter-factual hallucination."""
 
-    if "## ⚠️ Known Limitations & Operational Boundaries" not in content:
+    if "## ⚠️ Known Limitations & Operational Boundaries" in content:
+        content = re.sub(
+            r"---[\s\n]*## ⚠️ Known Limitations & Operational Boundaries[\s\S]*?(?=---[\s\n]*## 🚀 Live Interactive Colab Suite)",
+            lambda _: limitations_section + "\n\n",
+            content
+        )
+    else:
         content = content.replace("--- \n\n## 🚀 Live Interactive Colab Suite", limitations_section + "\n\n---\n\n## 🚀 Live Interactive Colab Suite")
         content = content.replace("---\n\n## 🚀 Live Interactive Colab Suite", limitations_section + "\n\n---\n\n## 🚀 Live Interactive Colab Suite")
 

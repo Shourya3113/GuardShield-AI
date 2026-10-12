@@ -23,6 +23,7 @@ import subprocess
 from pathlib import Path
 import numpy as np
 import torch
+import transformers
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
@@ -135,10 +136,13 @@ def evaluate_benign_hard(model, tokenizer, device):
     with open(benign_hard_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    y_true = []
     y_pred = []
     print(f"\nEvaluating {MODEL_ID} on Benign-Hard Diagnostic Suite (N={len(data)})...")
     for item in data:
         prompt = item["prompt"]
+        lbl = int(item.get("label", 0))
+        y_true.append(lbl)
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(device)
         with torch.no_grad():
             outputs = model(**inputs)
@@ -146,15 +150,31 @@ def evaluate_benign_hard(model, tokenizer, device):
             pred = int(torch.argmax(probs).item())
         y_pred.append(pred)
 
-    fp_count = sum(y_pred) # All are benign (label 0)
-    fpr = fp_count / len(data)
-    acc = 1.0 - fpr
-    print(f"  • Benign-Hard Accuracy: {acc*100:.2f}% | False Positives: {fp_count}/{len(data)} (FPR: {fpr*100:.2f}%)")
+    benign_indices = [i for i, lbl in enumerate(y_true) if lbl == 0]
+    attack_indices = [i for i, lbl in enumerate(y_true) if lbl == 1]
+
+    benign_fp = sum(y_pred[i] for i in benign_indices)
+    benign_fpr = benign_fp / len(benign_indices) if benign_indices else 0.0
+
+    attack_tp = sum(y_pred[i] for i in attack_indices)
+    attack_rec = attack_tp / len(attack_indices) if attack_indices else 0.0
+
+    correct = sum(1 for yt, yp in zip(y_true, y_pred) if yt == yp)
+    acc = correct / len(data) if data else 0.0
+
+    print(f"  • Benign Prompts (N={len(benign_indices)}): False Positive Rate = {benign_fpr*100:.2f}% ({benign_fp} false alarms)")
+    print(f"  • Adversarial Injections (N={len(attack_indices)}): Recall = {attack_rec*100:.2f}% ({attack_tp} caught)")
+    print(f"  • Overall Diagnostic Accuracy: {acc*100:.2f}%")
+
     return {
         "sample_count": len(data),
         "dataset_sha256": compute_sha256(benign_hard_path),
-        "false_positive_count": int(fp_count),
-        "false_positive_rate": round(float(fpr), 4),
+        "benign_sample_count": len(benign_indices),
+        "false_positive_count": int(benign_fp),
+        "false_positive_rate": round(float(benign_fpr), 4),
+        "attack_sample_count": len(attack_indices),
+        "attack_recall": round(float(attack_rec), 4),
+        "attack_tp": int(attack_tp),
         "accuracy": round(float(acc), 4)
     }
 
@@ -232,7 +252,12 @@ def run_external_benchmark():
             "comparison_notes": "ProtectAI DeBERTa-v3-base has 184M total params compared to GuardShield-AI's 142.6M (44.3M backbone + 98.3M embeddings). ProtectAI is zero-shot on these benchmarks; GuardShield was fine-tuned on the in-distribution training split.",
             "git_commit": get_git_commit(),
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "device": device.upper()
+            "device": device.upper(),
+            "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
+            "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+            "torch_version": torch.__version__,
+            "transformers_version": transformers.__version__,
+            "batch_size": 1
         },
         "in_distribution": in_res,
         "out_of_distribution": ood_res,

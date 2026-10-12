@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 import numpy as np
 import torch
+import transformers
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
@@ -115,6 +116,11 @@ def measure_real_pipeline_latency(num_samples: int = 100):
             "sample_count": num_samples,
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "device": device.upper(),
+            "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
+            "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+            "torch_version": torch.__version__,
+            "transformers_version": transformers.__version__,
+            "batch_size": 1,
             "pipeline": "Stage 1 (PreScan DeBERTa-v3 with sliding window) -> Stage 2 (Windowed NLI Cross-Encoder verify_claim)"
         },
         "metrics": {

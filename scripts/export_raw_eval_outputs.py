@@ -5,6 +5,7 @@ import time
 import hashlib
 import subprocess
 import torch
+import transformers
 import numpy as np
 from pathlib import Path
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
@@ -95,7 +96,13 @@ def export_stage1_eval(split_file, split_name, out_filename):
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "sample_count": len(records),
             "model_path": str(engine.model_dir),
-            "decision_rule": "risk_score >= 0.50 (Block as Attack) with sliding-window chunking"
+            "decision_rule": "risk_score >= 0.50 (Block as Attack) with sliding-window chunking",
+            "device": engine.device.upper(),
+            "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
+            "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+            "torch_version": torch.__version__,
+            "transformers_version": transformers.__version__,
+            "batch_size": 1
         },
         "metrics": {
             "accuracy": round(float(acc), 4),
@@ -233,7 +240,13 @@ def export_stage2_eval():
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "sample_count": len(records),
             "model_name": verifier.model_name,
-            "decision_rule": "Windowed verify_claim: Disaggregated Contradiction (p_contra >= 0.50 flags hallucination); Neutral treated as UNVERIFIED_NEUTRAL rather than conflated with hallucination."
+            "decision_rule": "Windowed verify_claim: Disaggregated Contradiction (p_contra >= 0.50 flags hallucination); Neutral treated as UNVERIFIED_NEUTRAL rather than conflated with hallucination.",
+            "device": verifier.device.upper(),
+            "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
+            "cuda_version": torch.version.cuda if torch.cuda.is_available() else None,
+            "torch_version": torch.__version__,
+            "transformers_version": transformers.__version__,
+            "batch_size": 1
         },
         "metrics": {
             "accuracy": round(float(acc), 4),

@@ -6,9 +6,14 @@
     "embedding_parameters": "98.0M",
     "total_parameters": "184.0M",
     "comparison_notes": "ProtectAI DeBERTa-v3-base has 184M total params compared to GuardShield-AI's 142.6M (44.3M backbone + 98.3M embeddings). ProtectAI is zero-shot on these benchmarks; GuardShield was fine-tuned on the in-distribution training split.",
-    "git_commit": "7cd714f901cc7ae495bae58e6102792c278deb3f",
-    "timestamp": "2026-10-12 00:47:19",
-    "device": "CUDA"
+    "git_commit": "7e4832851c345d7d549b084347a8a3725cb81040",
+    "timestamp": "2026-10-12 12:06:20",
+    "device": "CUDA",
+    "device_name": "NVIDIA GeForce RTX 3050 4GB Laptop GPU",
+    "cuda_version": "12.4",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "4.57.0",
+    "batch_size": 1
   },
   "in_distribution": {
     "split_name": "In-Distribution Test (698)",
@@ -25,8 +30,8 @@
       "fn": 40,
       "tp": 315
     },
-    "latency_p50_ms": 45.44,
-    "latency_mean_ms": 50.47
+    "latency_p50_ms": 65.26,
+    "latency_mean_ms": 69.73
   },
   "out_of_distribution": {
     "split_name": "Zero-Shot OOD Test (500)",
@@ -43,8 +48,8 @@
       "fn": 53,
       "tp": 197
     },
-    "latency_p50_ms": 54.6,
-    "latency_mean_ms": 58.02,
+    "latency_p50_ms": 63.41,
+    "latency_mean_ms": 66.29,
     "granular_breakdown": {
       "human_dan_jailbreak_recall": 0.8684,
       "human_dan_sample_count": 76,
@@ -57,9 +62,13 @@
   "benign_hard_control": {
     "sample_count": 85,
     "dataset_sha256": "ec95979647976fe244698435681c7eb43c9231433b2e6ee56e2af84e07a1f22c",
-    "false_positive_count": 29,
-    "false_positive_rate": 0.3412,
-    "accuracy": 0.6588
+    "benign_sample_count": 65,
+    "false_positive_count": 12,
+    "false_positive_rate": 0.1846,
+    "attack_sample_count": 20,
+    "attack_recall": 0.85,
+    "attack_tp": 17,
+    "accuracy": 0.8235
   },
   "xstest_control": {
     "sample_count": 450,

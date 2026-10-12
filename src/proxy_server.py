@@ -89,22 +89,6 @@ def health_check():
         "max_input_chars": MAX_INPUT_CHARS
     }
 
-# Regex Heuristics for Conversational Routing
-PLEASANTRY_REGEX = re.compile(
-    r"^[\s,\.!]*(ok|okay|sure|thanks|thank you|sounds good|cool|great|got it|proceed|continue|yes|no|understood|hello|hi|hey|bye|that helps|much appreciated|for the help)([\s,\.!]+(ok|okay|sure|thanks|thank you|sounds good|cool|great|got it|proceed|continue|yes|no|understood|hello|hi|hey|bye|that helps|much appreciated|for the help))*[\s,\.!]*$",
-    re.IGNORECASE
-)
-
-HINGLISH_REGEX = re.compile(
-    r"\b(kya|hai|hain|kaise|batao|bhai|mujhe|mera|meri|hum|aap|nahi|nahin|karna|karte|achha|theek|shukriya|dhanyawad|yaar|namaste|chalo|bolo|karo|raha|rahi|samajh|ye|wo|ki|ka|ke|ko|se|me|par)\b",
-    re.IGNORECASE
-)
-
-ATTACK_KEYWORDS = re.compile(
-    r"(ignore previous|bypass|jailbreak|override|system prompt|dan mode|unrestricted|developer mode)",
-    re.IGNORECASE
-)
-
 @app.post("/v1/chat/completions")
 async def chat_completions(req: ChatCompletionRequest):
     global prescan_filter, nli_verifier
@@ -119,10 +103,10 @@ async def chat_completions(req: ChatCompletionRequest):
             detail=f"Request payload ({total_chars:,} chars) exceeds the safety cap of {MAX_INPUT_CHARS:,} characters."
         )
 
-    # 2. MULTI-TURN & ROLE-AWARE SCANNING
-    # Every ingress turn (system, user, assistant, tool) is validated.
+    # 2. MULTI-TURN UNCONDITIONAL NEURAL SCANNING
+    # Every ingress turn (system, user, assistant, tool) is inspected by the neural classifier.
+    # Zero keyword-list bypasses or language shortcuts.
     prev_context = ""
-    routing_tags = []
     
     for idx, msg in enumerate(req.messages):
         content = msg.content.strip()
@@ -131,82 +115,32 @@ async def chat_completions(req: ChatCompletionRequest):
             
         role = msg.role.lower()
         
-        # Scan system and tool messages
-        if role in ("system", "tool"):
-            sys_res = await asyncio.to_thread(prescan_filter.inspect_prompt, content)
-            if not sys_res["is_safe"]:
-                logger.warning(f"Ingress message #{idx+1} ({role}) blocked (Risk: {sys_res['risk_score']})")
-                return JSONResponse(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    content={
-                        "error": {
-                            "message": f"GuardShield AI: Ingress {role} message #{idx+1} blocked due to security policy violation.",
-                            "type": "security_policy_violation",
-                            "code": f"{role.upper()}_INJECTION_DETECTED",
-                            "risk_score": sys_res["risk_score"],
-                            "latency_ms": sys_res["latency_ms"]
-                        }
+        # Context-aware augmentation for short conversational turns (< 50 chars or <= 6 words)
+        # to preserve discourse context and prevent false-alarms on zero-context continuation tokens.
+        if len(content) < 50 and len(content.split()) <= 6 and prev_context:
+            scan_target = f"Context: {prev_context[-300:]}\nTurn: {content}"
+        else:
+            scan_target = content
+            
+        turn_res = await asyncio.to_thread(prescan_filter.inspect_prompt, scan_target)
+        logger.info(f"Turn #{idx+1} ({role}) Decision: {turn_res['decision']} (Risk: {turn_res['risk_score']}, Latency: {turn_res['latency_ms']}ms)")
+        
+        if not turn_res["is_safe"]:
+            logger.warning(f"Ingress message #{idx+1} ({role}) blocked (Risk: {turn_res['risk_score']})")
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "error": {
+                        "message": f"GuardShield AI: Ingress {role} message #{idx+1} blocked due to security policy violation.",
+                        "type": "security_policy_violation",
+                        "code": f"{role.upper()}_INJECTION_DETECTED",
+                        "risk_score": turn_res["risk_score"],
+                        "latency_ms": turn_res["latency_ms"]
                     }
-                )
-        elif role == "assistant":
-            # Guard against forged assistant completions injecting jailbreak patterns
-            if ATTACK_KEYWORDS.search(content):
-                asst_res = await asyncio.to_thread(prescan_filter.inspect_prompt, content)
-                if not asst_res["is_safe"]:
-                    logger.warning(f"Forged assistant message #{idx+1} blocked (Risk: {asst_res['risk_score']})")
-                    return JSONResponse(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        content={
-                            "error": {
-                                "message": f"GuardShield AI: Ingress assistant message #{idx+1} blocked due to adversarial injection violation.",
-                                "type": "security_policy_violation",
-                                "code": "ASSISTANT_INJECTION_DETECTED",
-                                "risk_score": asst_res["risk_score"],
-                                "latency_ms": asst_res["latency_ms"]
-                            }
-                        }
-                    )
-            prev_context = content
-        elif role == "user":
-            # Check for conversational pleasantries / acknowledgements ("ok thanks, that helps", "proceed")
-            is_pleasantry = bool(PLEASANTRY_REGEX.match(content)) and not bool(ATTACK_KEYWORDS.search(content))
+                }
+            )
             
-            # Check for benign Hinglish / Hindi code-mixing
-            is_hinglish = (bool(re.search(r"[\u0900-\u097F]", content)) or len(HINGLISH_REGEX.findall(content)) >= 2) and not bool(ATTACK_KEYWORDS.search(content))
-            
-            if is_pleasantry:
-                logger.info(f"User message #{idx+1} matched conversational pleasantry pattern; passed.")
-                prev_context = content
-                continue
-            elif is_hinglish:
-                logger.info(f"User message #{idx+1} routed as benign multilingual/Hinglish traffic.")
-                routing_tags.append("multilingual-hinglish-allowed")
-                prev_context = content
-                continue
-                
-            # For short conversational follow-ups (< 50 chars or <= 6 words), attach prior context
-            if len(content) < 50 and len(content.split()) <= 6 and prev_context:
-                scan_target = f"Context: {prev_context[-300:]}\nTurn: {content}"
-            else:
-                scan_target = content
-                
-            user_res = await asyncio.to_thread(prescan_filter.inspect_prompt, scan_target)
-            logger.info(f"Turn #{idx+1} (user) Decision: {user_res['decision']} (Risk: {user_res['risk_score']}, Latency: {user_res['latency_ms']}ms)")
-            
-            if not user_res["is_safe"]:
-                return JSONResponse(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    content={
-                        "error": {
-                            "message": f"GuardShield AI: User message #{idx+1} blocked due to security policy violation (Adversarial Prompt Injection / Jailbreak detected).",
-                            "type": "security_policy_violation",
-                            "code": "PROMPT_INJECTION_DETECTED",
-                            "risk_score": user_res["risk_score"],
-                            "latency_ms": user_res["latency_ms"]
-                        }
-                    }
-                )
-            prev_context = content
+        prev_context = content
 
     # 3. UPSTREAM LLM FORWARDING
     upstream_url = f"{UPSTREAM_LLM_URL.rstrip('/')}/chat/completions"
@@ -313,10 +247,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 await resp.aclose()
                 await client.aclose()
 
-        headers = {}
-        if routing_tags:
-            headers["X-GuardShield-Routing"] = ",".join(routing_tags)
-        return StreamingResponse(event_generator(), media_type="text/event-stream", headers=headers)
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
     else:
         # Non-streaming request: Forward to upstream and optionally apply Stage 2 fact grounding
         try:
@@ -326,7 +257,7 @@ async def chat_completions(req: ChatCompletionRequest):
                     data = resp.json()
                     metadata = {
                         "status": "PASS",
-                        "routing": routing_tags if routing_tags else "standard"
+                        "routing": "neural_prescan"
                     }
                     
                     # Stage 2 Fact Grounding verification if reference context is supplied
@@ -353,10 +284,7 @@ async def chat_completions(req: ChatCompletionRequest):
                             }
                             
                     data["guardshield_metadata"] = metadata
-                    response = JSONResponse(content=data)
-                    if routing_tags:
-                        response.headers["X-GuardShield-Routing"] = ",".join(routing_tags)
-                    return response
+                    return JSONResponse(content=data)
                 else:
                     return JSONResponse(
                         status_code=status.HTTP_502_BAD_GATEWAY,

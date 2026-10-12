@@ -6,6 +6,11 @@
     "sample_count": 100,
     "timestamp": "2026-10-12 00:44:32",
     "device": "CUDA",
+    "device_name": "NVIDIA GeForce RTX 3050 4GB Laptop GPU",
+    "cuda_version": "12.4",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "4.57.0",
+    "batch_size": 1,
     "pipeline": "Stage 1 (PreScan DeBERTa-v3 with sliding window) -> Stage 2 (Windowed NLI Cross-Encoder verify_claim)"
   },
   "metrics": {
