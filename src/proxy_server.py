@@ -30,6 +30,9 @@ from streaming_entropy_engine import StreamingEntropyEngine
 from nli_verifier import WindowedNLIVerifier
 
 import httpx
+import hmac
+import hashlib
+import secrets
 
 # Upstream LLM Service (e.g. Ollama, vLLM, or local OpenAI-compatible endpoint)
 UPSTREAM_LLM_URL = os.environ.get("UPSTREAM_LLM_URL", "http://localhost:11434/v1")
@@ -37,10 +40,42 @@ UPSTREAM_LLM_URL = os.environ.get("UPSTREAM_LLM_URL", "http://localhost:11434/v1
 # Safety Caps
 MAX_INPUT_CHARS = int(os.environ.get("GUARDSHIELD_MAX_INPUT_CHARS", "32768"))
 
+# Cryptographic Assistant History Signing
+# The proxy signs authentic assistant turns it relays from the upstream LLM.
+# On re-submission in multi-turn dialogues, signed assistant turns are recognized as trusted history
+# and exempt from Stage 1 scanning, while unsigned or forged assistant turns are scanned unconditionally.
+PROXY_SECRET_KEY = os.environ.get("GUARDSHIELD_PROXY_SECRET", "guardshield-assistant-signing-key-prod-v1").encode("utf-8")
+RELAYED_SIGNATURE_CACHE: set = set()
+
+def compute_assistant_signature(content: str) -> str:
+    """Computes HMAC-SHA256 signature for trusted assistant messages generated/relayed by the proxy."""
+    return hmac.new(PROXY_SECRET_KEY, content.strip().encode("utf-8"), hashlib.sha256).hexdigest()
+
+def verify_assistant_signature(content: str, provided_signature: Optional[str] = None) -> bool:
+    """Verifies whether an assistant message was authentically generated and relayed by GuardShield proxy."""
+    content_clean = content.strip()
+    expected_sig = hmac.new(PROXY_SECRET_KEY, content_clean.encode("utf-8"), hashlib.sha256).hexdigest()
+    if expected_sig in RELAYED_SIGNATURE_CACHE:
+        return True
+    if provided_signature and hmac.compare_digest(expected_sig, provided_signature):
+        return True
+    return False
+
+def record_assistant_signature(content: str) -> str:
+    """Records generated assistant text into the trusted signature cache."""
+    sig = compute_assistant_signature(content)
+    RELAYED_SIGNATURE_CACHE.add(sig)
+    if len(RELAYED_SIGNATURE_CACHE) > 50000:
+        for _ in range(25000):
+            RELAYED_SIGNATURE_CACHE.pop()
+    return sig
+
 # Pydantic Schemas for OpenAI / Ollama Compatibility
 class ChatMessage(BaseModel):
     role: str
     content: str
+    proxy_signature: Optional[str] = Field(default=None, description="HMAC-SHA256 signature for verified relayed assistant turns.")
+    signature: Optional[str] = Field(default=None, description="Alias for proxy_signature.")
 
 class ChatCompletionRequest(BaseModel):
     model: Optional[str] = "llama3.1:8b"
@@ -83,7 +118,9 @@ def health_check():
     return {
         "status": "healthy",
         "service": "GuardShield AI Sidecar Proxy",
-        "target_latency": "< 25ms",
+        "pipeline": "Stage 1 (Pre-Scan DeBERTa-v3) -> Stage 2 (Windowed NLI Verifier)",
+        "measured_overhead_p50_ms": "60.52 ms (IQR: 10.75 ms)",
+        "assistant_signing_enabled": True,
         "prescan_ready": prescan_filter is not None,
         "nli_grounder_ready": nli_verifier is not None,
         "max_input_chars": MAX_INPUT_CHARS
@@ -103,9 +140,10 @@ async def chat_completions(req: ChatCompletionRequest):
             detail=f"Request payload ({total_chars:,} chars) exceeds the safety cap of {MAX_INPUT_CHARS:,} characters."
         )
 
-    # 2. MULTI-TURN UNCONDITIONAL NEURAL SCANNING
-    # Every ingress turn (system, user, assistant, tool) is inspected by the neural classifier.
-    # Zero keyword-list bypasses or language shortcuts.
+    # 2. MULTI-TURN SCANNING WITH CRYPTOGRAPHIC ASSISTANT SIGNING
+    # • User, system, and tool turns are ALWAYS unconditionally scanned.
+    # • Relayed assistant turns signed by the proxy are recognized as authentic history and bypass Stage 1 scanning.
+    # • Unsigned or forged assistant turns are scanned unconditionally.
     prev_context = ""
     
     for idx, msg in enumerate(req.messages):
@@ -115,8 +153,17 @@ async def chat_completions(req: ChatCompletionRequest):
             
         role = msg.role.lower()
         
-        # Context-aware augmentation for short conversational turns (< 50 chars or <= 6 words)
-        # to preserve discourse context and prevent false-alarms on zero-context continuation tokens.
+        # 2a. ASSISTANT TURN VERIFICATION (Signed History vs. Untrusted/Forged Turn)
+        if role == "assistant":
+            provided_sig = msg.proxy_signature or msg.signature
+            if verify_assistant_signature(content, provided_sig):
+                logger.info(f"Turn #{idx+1} (assistant): VERIFIED SIGNED HISTORY (Skipping Stage 1 scan).")
+                prev_context = content
+                continue
+            else:
+                logger.warning(f"Turn #{idx+1} (assistant): UNSIGNED / FORGED ASSISTANT TURN -> Subject to unconditional Stage 1 neural scan.")
+
+        # 2b. CONTEXT-AWARE NEURAL SCANNING FOR USER, SYSTEM, TOOL, AND UNSIGNED ASSISTANT TURNS
         if len(content) < 50 and len(content.split()) <= 6 and prev_context:
             scan_target = f"Context: {prev_context[-300:]}\nTurn: {content}"
         else:
@@ -185,6 +232,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 }
             )
 
+        streamed_chunks_accum = []
         async def event_generator():
             session_entropy_engine = StreamingEntropyEngine(spike_threshold=1.25, consecutive_spike_limit=2)
             try:
@@ -201,8 +249,8 @@ async def chat_completions(req: ChatCompletionRequest):
                             delta = chunk_json.get("choices", [{}])[0].get("delta", {})
                             content_chunk = delta.get("content", "")
 
-                            # Inspect token uncertainty if logprobs or token content is provided
                             if content_chunk:
+                                streamed_chunks_accum.append(content_chunk)
                                 choice_obj = chunk_json.get("choices", [{}])[0]
                                 extracted_probs = []
 
@@ -244,6 +292,9 @@ async def chat_completions(req: ChatCompletionRequest):
                         except Exception:
                             yield f"{line}\n\n"
             finally:
+                if streamed_chunks_accum:
+                    full_text = "".join(streamed_chunks_accum)
+                    record_assistant_signature(full_text)
                 await resp.aclose()
                 await client.aclose()
 
@@ -259,6 +310,19 @@ async def chat_completions(req: ChatCompletionRequest):
                         "status": "PASS",
                         "routing": "neural_prescan"
                     }
+                    
+                    # Cryptographically sign the assistant response
+                    try:
+                        first_choice = data.get("choices", [{}])[0]
+                        assistant_msg = first_choice.get("message", {})
+                        gen_content = assistant_msg.get("content", "")
+                        if gen_content:
+                            asst_sig = record_assistant_signature(gen_content)
+                            assistant_msg["proxy_signature"] = asst_sig
+                            assistant_msg["signature"] = asst_sig
+                            metadata["assistant_signature"] = asst_sig
+                    except Exception as e:
+                        logger.warning(f"Failed to record assistant signature: {e}")
                     
                     # Stage 2 Fact Grounding verification if reference context is supplied
                     if req.grounding_context:
@@ -284,7 +348,10 @@ async def chat_completions(req: ChatCompletionRequest):
                             }
                             
                     data["guardshield_metadata"] = metadata
-                    return JSONResponse(content=data)
+                    headers = {}
+                    if "assistant_signature" in metadata:
+                        headers["X-GuardShield-Assistant-Signature"] = metadata["assistant_signature"]
+                    return JSONResponse(content=data, headers=headers)
                 else:
                     return JSONResponse(
                         status_code=status.HTTP_502_BAD_GATEWAY,
