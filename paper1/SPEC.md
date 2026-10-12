@@ -47,7 +47,7 @@ Note: the earlier `scripts/benchmark_adaptive_attacks.py` used *different* wrapp
 
 **Study B: Hindi / Hinglish registers.** A natively written, human-validated benchmark (section 4). The `condition` is the register (`en`, `hi_deva`, `hi_roman`, `hinglish`), and the reference condition is `en`. Pairs link an injection seed to a length-matched benign seed within each register.
 
-**Study C: mitigation.** Compared on the same guard backbone (GuardShield DeBERTa-v3-small, plus Prompt Guard 2 22M if fine-tuning is permitted by its licence):
+**Study C: mitigation.** Compared on two guard backbones: GuardShield DeBERTa-v3-small and ProtectAI v2 (Apache-2.0, so fine-tuning is unambiguously permitted):
 
 1. **None:** current checkpoint.
 2. **Canonicalize (inference-time, no retraining):** NFKC; remove U+200B, U+00AD, U+2060 and U+FEFF, but keep ZWJ/ZWNJ (U+200D/U+200C) inside Devanagari words; map Cyrillic/Greek confusables to Latin only within words that are mostly Latin; collapse letter spacing; decode-and-rescan Base64/ROT13 spans (score = max of raw and decoded).
@@ -138,11 +138,13 @@ python -m guard_audit.run_audit report --run runs/paper1/obf_main
 
 Copy the run directory between machines; scoring resumes and refuses scores made against a different dataset version.
 
-## 10. Open decisions and change log
+## 10. Decisions and change log
 
-| Date | Item | Status |
+The guide left these decisions to the team (2026-10-12). Revisit them here, with a dated entry, if anything changes.
+
+| Date | Item | Decision |
 |---|---|---|
-| 2026-10-12 | Primary attack source Gandalf, benign source Dolly | proposed, confirm with guide |
-| 2026-10-12 | Headline threshold policy: 5% FPR on held-out calibration pool | proposed |
-| 2026-10-12 | Whether to include commercial APIs (Azure Prompt Shields, Lakera); depends on budget and terms of service | open |
-| 2026-10-12 | Study C on Prompt Guard 2 22M: check whether its licence permits fine-tuning | open |
+| 2026-10-12 | Primary data | Gandalf attacks × Dolly benign twins (500 pairs, seed 13, 1,000 calibration prompts). NotInject and deepset_test are secondary runs, reported separately with contamination flags. |
+| 2026-10-12 | Headline threshold policy | 5% FPR on the held-out calibration pool. The default threshold and 1% FPR are also reported for every guard. |
+| 2026-10-12 | Commercial APIs (Azure Prompt Shields, Lakera) | Excluded from the main study (cost, terms of service, not reproducible). Optional appendix only. |
+| 2026-10-12 | Study C backbones | GuardShield DeBERTa-v3-small and ProtectAI v2 (Apache-2.0). Prompt Guard 2 is not fine-tuned, which avoids the licence question. |
