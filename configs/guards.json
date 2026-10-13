@@ -182,7 +182,10 @@
       "dtype": "bfloat16",
       "gated": true,
       "approx_gb": 24,
-      "verify": "Multimodal Llama 4 architecture. 2026-10-13 Kaggle check failed inside transformers' cache handling; fixed by scoring without a KV cache (use_cache=False). Must pass check_guard on its next run."
+      "verify": "Config marks every layer chunked_attention but leaves attention_chunk_size unset, which transformers 4.57 rejects. 8192 (Llama 4 Scout's value) exceeds every prompt here, so chunked attention equals full attention (verified on a reduced random copy: max diff 0.0). Must pass check_guard on Kaggle.",
+      "config_overrides": {
+        "text_config.attention_chunk_size": 8192
+      }
     },
     "qwen3guard_gen_0_6b": {
       "type": "generative",

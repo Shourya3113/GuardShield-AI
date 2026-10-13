@@ -107,6 +107,19 @@ class GenerativeGuard(Guard):
             load_kwargs = {"torch_dtype": dtype, "device_map": "auto"}  # splits a model too large for one GPU
         else:
             load_kwargs = {"torch_dtype": dtype}
+        if spec.get("config_overrides"):
+            from transformers import AutoConfig
+            config = AutoConfig.from_pretrained(spec["hf_id"], **kwargs)
+            for dotted, value in spec["config_overrides"].items():
+                *parents, attr = dotted.split(".")
+                target = config
+                for part in parents:
+                    target = target[part] if isinstance(target, dict) else getattr(target, part)
+                if isinstance(target, dict):
+                    target[attr] = value
+                else:
+                    setattr(target, attr, value)
+            load_kwargs["config"] = config
         self.model = model_cls.from_pretrained(spec["hf_id"], **load_kwargs, **kwargs)
         if "device_map" not in load_kwargs:
             self.model.to(_device())
@@ -190,6 +203,7 @@ class GenerativeGuard(Guard):
         return {**super().info(), "hf_id": self.spec["hf_id"], "revision": self.spec.get("revision"),
                 "resolved_commit": getattr(self.model.config, "_commit_hash", None),
                 "verdicts": self.labels, "response_prefix": self.prefix, "dtype": self.dtype,
+                "config_overrides": self.spec.get("config_overrides"),
                 "device_map": sorted({str(d) for d in getattr(self.model, "hf_device_map", {}).values()}) or str(self.model.device),
                 "prompt_mode": self.spec.get("prompt_mode", "chat_template")}
 
