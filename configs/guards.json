@@ -126,12 +126,12 @@
       "family": "low-FP classifier",
       "hf_id": "rogue-security/prompt-injection-jailbreak-sentinel-v2",
       "revision": "05ff9bfd1f28c5228e53121d5ee4427bb5205212",
-      "attack_label_ids": [
-        1
-      ],
       "max_length": 4096,
       "gated": true,
-      "verify": "Qwen3-0.6B sequence classifier, Elastic licence, gated. Confirm id2label after licence acceptance (label 1 assumed to be jailbreak/injection)."
+      "attack_labels": [
+        "jailbreak"
+      ],
+      "notes": "Validated 2026-10-13: id2label {0: benign, 1: jailbreak}; no pad token in config (harness falls back to EOS)."
     },
     "llama_guard_3_1b": {
       "type": "generative",
@@ -182,7 +182,7 @@
       "dtype": "bfloat16",
       "gated": true,
       "approx_gb": 24,
-      "verify": "Multimodal Llama 4 architecture; untested loader path. Use the tokenizer's chat template or processor per the model card. 20 GB GPU: set load_in_8bit."
+      "verify": "Multimodal Llama 4 architecture. 2026-10-13 Kaggle check failed inside transformers' cache handling; fixed by scoring without a KV cache (use_cache=False). Must pass check_guard on its next run."
     },
     "qwen3guard_gen_0_6b": {
       "type": "generative",

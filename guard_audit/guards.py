@@ -58,6 +58,10 @@ class HFClassifierGuard(Guard):
         ).to(_device()).eval()
         self.max_length = spec.get("max_length", 512)
         self.batch_size = spec.get("batch_size", 16)
+        if self.tokenizer.pad_token is None:  # decoder-based classifiers (e.g. Qwen3) ship without one
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        if self.model.config.pad_token_id is None:
+            self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
         id2label = {int(k): str(v) for k, v in self.model.config.id2label.items()}
         if "attack_label_ids" in spec:
@@ -141,8 +145,9 @@ class GenerativeGuard(Guard):
             attention[row, width - len(ids):] = 1
         position_ids = (attention.cumsum(-1) - 1).clamp(min=0)
         device = self.model.device
+        # no KV cache: it is never reused here, and Llama 4's cache breaks this plain forward pass
         logits = self.model(input_ids=input_ids.to(device), attention_mask=attention.to(device),
-                            position_ids=position_ids.to(device), logits_to_keep=keep).logits[:, -keep:]
+                            position_ids=position_ids.to(device), logits_to_keep=keep, use_cache=False).logits[:, -keep:]
         return torch.log_softmax(logits.float(), dim=-1).cpu()
 
     @torch.no_grad()
