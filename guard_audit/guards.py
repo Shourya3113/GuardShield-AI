@@ -93,14 +93,21 @@ class GenerativeGuard(Guard):
         model_cls = getattr(transformers, spec.get("model_class", "AutoModelForCausalLM"))
         kwargs = {"revision": spec.get("revision"), "trust_remote_code": spec.get("trust_remote_code", False)}
         self.tokenizer = AutoTokenizer.from_pretrained(spec["hf_id"], **kwargs)
-        load_kwargs = {"torch_dtype": DTYPES[spec.get("dtype", "bfloat16")]}
+        dtype = DTYPES[spec.get("dtype", "bfloat16")]
+        if torch.cuda.is_available() and dtype == torch.bfloat16 and torch.cuda.get_device_capability(0)[0] < 8:
+            dtype = torch.float16  # pre-Ampere GPUs (e.g. T4) have no native bfloat16
         if spec.get("load_in_8bit"):
             from transformers import BitsAndBytesConfig
             load_kwargs = {"quantization_config": BitsAndBytesConfig(load_in_8bit=True), "device_map": "auto"}
+        elif torch.cuda.is_available():
+            load_kwargs = {"torch_dtype": dtype, "device_map": "auto"}  # splits a model too large for one GPU
+        else:
+            load_kwargs = {"torch_dtype": dtype}
         self.model = model_cls.from_pretrained(spec["hf_id"], **load_kwargs, **kwargs)
-        if not spec.get("load_in_8bit"):
+        if "device_map" not in load_kwargs:
             self.model.to(_device())
         self.model.eval()
+        self.dtype = str(dtype).replace("torch.", "") if not spec.get("load_in_8bit") else "int8"
         self.labels: Dict[str, int] = spec["labels"]          # verdict string -> 1 if attack
         self.prefix = spec.get("response_prefix", "")
         self.batch_size = spec.get("batch_size", 4)
@@ -124,33 +131,52 @@ class GenerativeGuard(Guard):
                              "adjust response_prefix / verdict strings in configs/guards.json")
         return full_ids, len(prompt_ids)
 
+    def _tail_logprobs(self, sequences: List[List[int]], keep: int) -> torch.Tensor:
+        """Log-probabilities at the last `keep` positions of each (left-padded) sequence: (batch, keep, vocab)."""
+        width = max(len(ids) for ids in sequences)
+        input_ids = torch.full((len(sequences), width), self.pad_id, dtype=torch.long)
+        attention = torch.zeros((len(sequences), width), dtype=torch.long)
+        for row, ids in enumerate(sequences):
+            input_ids[row, width - len(ids):] = torch.tensor(ids)
+            attention[row, width - len(ids):] = 1
+        position_ids = (attention.cumsum(-1) - 1).clamp(min=0)
+        device = self.model.device
+        logits = self.model(input_ids=input_ids.to(device), attention_mask=attention.to(device),
+                            position_ids=position_ids.to(device), logits_to_keep=keep).logits[:, -keep:]
+        return torch.log_softmax(logits.float(), dim=-1).cpu()
+
     @torch.no_grad()
     def score(self, texts: List[str]) -> List[float]:
+        """
+        Exact verdict log-likelihoods with minimal passes: every single-token verdict is read from one
+        forward pass over the prompt; only multi-token verdicts need their own pass over prompt + verdict.
+        The prompt always ends with the same template tail, so verdict tokens are identical for every text.
+        """
         verdicts = list(self.labels)
-        jobs = [(t, v) for t in range(len(texts)) for v in verdicts]
         rendered = [self.render(t) for t in texts]
+        prompts = [self.tokenizer(r, add_special_tokens=False)["input_ids"] for r in rendered]
+        verdict_ids = {}
+        for v in verdicts:
+            full_ids, p_len = self._encode_pair(rendered[0], v)
+            verdict_ids[v] = full_ids[p_len:]
+        single = [j for j, v in enumerate(verdicts) if len(verdict_ids[v]) == 1]
+        multi = [j for j, v in enumerate(verdicts) if len(verdict_ids[v]) > 1]
+
         loglik = torch.empty(len(texts), len(verdicts))
-        for i in range(0, len(jobs), self.batch_size):
-            batch = jobs[i:i + self.batch_size]
-            encoded = [self._encode_pair(rendered[t], v) for t, v in batch]
-            # Left-pad so every verdict ends at the last position; only the last `keep` logits are needed.
-            width = max(len(ids) for ids, _ in encoded)
-            keep = max(len(ids) - p_len for ids, p_len in encoded) + 1
-            input_ids = torch.full((len(batch), width), self.pad_id, dtype=torch.long)
-            attention = torch.zeros((len(batch), width), dtype=torch.long)
-            for row, (ids, _) in enumerate(encoded):
-                input_ids[row, width - len(ids):] = torch.tensor(ids)
-                attention[row, width - len(ids):] = 1
-            position_ids = (attention.cumsum(-1) - 1).clamp(min=0)
-            device = self.model.device
-            logits = self.model(input_ids=input_ids.to(device), attention_mask=attention.to(device),
-                                position_ids=position_ids.to(device), logits_to_keep=keep).logits[:, -keep:]
-            logprobs = torch.log_softmax(logits.float(), dim=-1).cpu()
-            for row, ((t, v), (ids, p_len)) in enumerate(zip(batch, encoded)):
-                n_verdict = len(ids) - p_len
-                targets = torch.tensor(ids[p_len:])
-                positions = torch.arange(keep - n_verdict - 1, keep - 1)
-                loglik[t, verdicts.index(v)] = logprobs[row, positions, targets].sum()
+        for i in range(0, len(texts), self.batch_size):
+            rows = list(range(i, min(i + self.batch_size, len(texts))))
+            if single:
+                lp = self._tail_logprobs([prompts[t] for t in rows], keep=1)[:, 0]
+                for j in single:
+                    loglik[rows, j] = lp[:, verdict_ids[verdicts[j]][0]]
+            for j in multi:
+                vid = verdict_ids[verdicts[j]]
+                lp = self._tail_logprobs([prompts[t] + vid for t in rows], keep=len(vid) + 1)
+                # kept position k predicts verdict token k
+                loglik[rows, j] = lp[:, torch.arange(len(vid)), torch.tensor(vid)].sum(dim=-1)
+        if not torch.isfinite(loglik).all():
+            raise RuntimeError(f"{self.name}: non-finite verdict log-likelihoods (dtype {self.dtype}); "
+                               "try \"dtype\": \"float32\" or \"load_in_8bit\": true in configs/guards.json")
         probs = torch.softmax(loglik, dim=-1)
         attack_cols = [j for j, v in enumerate(verdicts) if self.labels[v]]
         return probs[:, attack_cols].sum(dim=-1).tolist()
@@ -158,7 +184,8 @@ class GenerativeGuard(Guard):
     def info(self) -> Dict[str, Any]:
         return {**super().info(), "hf_id": self.spec["hf_id"], "revision": self.spec.get("revision"),
                 "resolved_commit": getattr(self.model.config, "_commit_hash", None),
-                "verdicts": self.labels, "response_prefix": self.prefix,
+                "verdicts": self.labels, "response_prefix": self.prefix, "dtype": self.dtype,
+                "device_map": sorted({str(d) for d in getattr(self.model, "hf_device_map", {}).values()}) or str(self.model.device),
                 "prompt_mode": self.spec.get("prompt_mode", "chat_template")}
 
 

@@ -119,6 +119,7 @@ For each guard tokenizer and condition: tokens per whitespace word (fertility), 
 - 95% CIs on all rates (Wilson) and AUROCs (paired bootstrap). Differences between guards or conditions use paired bootstrap CIs. With about 15 guards × 11 conditions, results are read as effect sizes with CIs, not as many significance tests.
 - Trained models (Study C): ≥ 5 seeds, mean ± std.
 - Latency is not a claim of this paper.
+- Generative judges run in 16-bit (bfloat16 on Ampere and newer GPUs, float16 on T4). Against float32, 16-bit scoring shifts individual scores by up to about 0.08 (mean about 0.006) and flips roughly 0.5–1.5% of decisions near the threshold (measured 2026-10-13 on 200 pilot items). Each run records its dtype and device in `meta.json`, and the paper reports it.
 
 ## 9. Compute plan
 
