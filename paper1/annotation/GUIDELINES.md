@@ -15,6 +15,8 @@ The paper asks whether prompt-injection guards wrongly block harmless text just 
 
 Each row of the spreadsheet is one **seed**: one request, written four times. The target is about **400 seeds**: 200 benign and 200 injection.
 
+**Already done:** `seeds.csv` contains all 400 seeds with the label, category, trigger-word flag and **English version filled in**. The English versions were drafted by Claude and checked for overlap with every training and test set. **Your job is the three Hindi registers**, written natively, plus validating each other's rows. You may edit the English wording if it reads unnaturally; record that in `notes`. The paper will disclose that the English seeds were AI-drafted and edited by the authors, and that every Hindi-register text was written by a native speaker.
+
 Our advantage over the only existing Hindi/Hinglish injection dataset (machine-translated) is that ours is **written by native speakers**. So: **never use Google Translate, ChatGPT, or any other tool to produce or "fix" a register.** If a tool was used for a row, say so in `notes`; that row is excluded.
 
 ## 2. Labels
@@ -67,13 +69,15 @@ Every seed is checked by a team member who did not write it. Fill in `validator`
 
 ## 5. Workflow
 
-1. Copy `seeds_template.csv` to `seeds.csv` and give each author a block of seed ids (Shourya S001–S135, Rachit S136–S270, Dhruv S271–S400). Keep roughly 50/50 benign and injection inside each block.
+1. Work in `seeds.csv`. Blocks: Shourya S001–S135, Rachit S136–S270, Dhruv S271–S400. Each block already has about 50/50 benign and injection seeds and about 20 trigger-word seeds. Put your name in `author` on every row you write.
 2. Write in Google Sheets or Excel, then export as **CSV UTF-8**. Plain "CSV" in Excel can corrupt Devanagari.
-3. Run the validator and fix every error it reports:
+3. Check your progress at any time. `--draft` tolerates rows not written yet:
 
    ```bash
-   python paper1/annotation/validate_seeds.py paper1/annotation/seeds.csv
+   python paper1/annotation/validate_seeds.py paper1/annotation/seeds.csv --draft
    ```
+
+   Fix every `ERROR` it reports. Once all rows are written, run it without `--draft`.
 
 4. Swap blocks for validation, fix, and re-run the validator.
 5. When it passes, write the cleaned file for the harness:
@@ -82,4 +86,4 @@ Every seed is checked by a team member who did not write it. Fill in `validator`
    python paper1/annotation/validate_seeds.py paper1/annotation/seeds.csv --out paper1/annotation/seeds.jsonl
    ```
 
-**Effort estimate:** about 3–4 minutes per seed to write (≈ 8 hours each) and about 2 minutes per seed to validate (≈ 4–5 hours each).
+**Effort estimate:** with the English already written, about 2–3 minutes per seed for the three Hindi registers (≈ 5–6 hours each) and about 2 minutes per seed to validate (≈ 4–5 hours each). Spelling-variant rows (about 20% of seeds) take about a minute each.

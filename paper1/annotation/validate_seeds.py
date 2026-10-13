@@ -48,8 +48,10 @@ def read_rows(path):
         return [{k: (v or "").strip() for k, v in row.items()} for row in reader]
 
 
-def validate(rows):
+def validate(rows, draft=False):
+    """draft=True tolerates rows whose Hindi registers are not written yet (counted, not errors)."""
     errors, warnings = [], []
+    unwritten = 0
     ids = Counter(r["seed_id"] for r in rows)
     texts = Counter((reg, r[reg]) for r in rows for reg in REGISTERS if not r["spelling_variant_of"])
     by_id = {r["seed_id"]: r for r in rows}
@@ -76,6 +78,9 @@ def validate(rows):
             errors.append(f"{where}: trigger_word=yes is only for benign rows")
 
         empty = [reg for reg in REGISTERS if not r[reg]]
+        if empty and draft and "en" not in empty:
+            unwritten += 1
+            continue
         if empty:
             errors.append(f"{where}: empty register(s) {empty}")
             continue
@@ -94,7 +99,7 @@ def validate(rows):
                 warnings.append(f"{where}: {reg} is {ratio:.1f}x the English length")
         if not r["spelling_variant_of"]:
             for reg in REGISTERS:
-                if texts[(reg, r[reg])] > 1:
+                if r[reg] and texts[(reg, r[reg])] > 1:
                     errors.append(f"{where}: {reg} text duplicates another seed")
         else:
             base = by_id.get(r["spelling_variant_of"])
@@ -104,6 +109,8 @@ def validate(rows):
                 errors.append(f"{where}: a spelling variant must keep en, hi_deva and label identical to its base seed")
             elif (r["hi_roman"], r["hinglish"]) == (base["hi_roman"], base["hinglish"]):
                 errors.append(f"{where}: spelling variant changes nothing")
+    if unwritten:
+        warnings.append(f"{unwritten} seed(s) still need their Hindi registers written")
     return errors, warnings
 
 
@@ -170,10 +177,13 @@ def main():
     p.add_argument("--out", help="write harness JSONL (only if there are no errors)")
     p.add_argument("--make-blind", help="write a 20%% blind-labelling sample to this CSV")
     p.add_argument("--kappa", help="compute Cohen's kappa from a filled blind-labelling CSV")
+    p.add_argument("--draft", action="store_true", help="work in progress: allow seeds whose Hindi registers are still empty")
     args = p.parse_args()
 
     rows = read_rows(Path(args.csv))
-    errors, warnings = validate(rows)
+    errors, warnings = validate(rows, draft=args.draft)
+    if args.draft and args.out:
+        sys.exit("ERROR: --out needs a complete sheet; run without --draft")
     for w in warnings:
         print("WARN ", w)
     for e in errors:
