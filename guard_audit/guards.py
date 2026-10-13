@@ -23,6 +23,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DTYPES = {"float32": torch.float32, "float16": torch.float16, "bfloat16": torch.bfloat16}
 
 
+TRANSIENT_HUB_ERRORS = ("500 Server Error", "502 Server Error", "503 Server Error", "504 Server Error",
+                        "Connection", "Read timed out", "Temporary failure")
+
+
+def _hub(load, *args, attempts: int = 4, **kwargs):
+    """Calls a from_pretrained loader, retrying transient Hugging Face Hub errors (e.g. HTTP 500) with backoff."""
+    import time
+    for attempt in range(attempts):
+        try:
+            return load(*args, **kwargs)
+        except OSError as exc:
+            if attempt == attempts - 1 or not any(marker in str(exc) for marker in TRANSIENT_HUB_ERRORS):
+                raise
+            wait = 15 * 2 ** attempt
+            print(f"Hugging Face Hub error ({str(exc).splitlines()[-1][:120]}); retrying in {wait}s", flush=True)
+            time.sleep(wait)
+
+
 def _device() -> str:
     if torch.cuda.is_available():
         return "cuda"
@@ -52,8 +70,8 @@ class HFClassifierGuard(Guard):
         super().__init__(name, spec)
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
         kwargs = {"revision": spec.get("revision"), "trust_remote_code": spec.get("trust_remote_code", False)}
-        self.tokenizer = AutoTokenizer.from_pretrained(spec["hf_id"], **kwargs)
-        self.model = AutoModelForSequenceClassification.from_pretrained(
+        self.tokenizer = _hub(AutoTokenizer.from_pretrained, spec["hf_id"], **kwargs)
+        self.model = _hub(AutoModelForSequenceClassification.from_pretrained, 
             spec["hf_id"], torch_dtype=DTYPES[spec.get("dtype", "float32")], **kwargs
         ).to(_device()).eval()
         self.max_length = spec.get("max_length", 512)
@@ -96,7 +114,7 @@ class GenerativeGuard(Guard):
         from transformers import AutoTokenizer
         model_cls = getattr(transformers, spec.get("model_class", "AutoModelForCausalLM"))
         kwargs = {"revision": spec.get("revision"), "trust_remote_code": spec.get("trust_remote_code", False)}
-        self.tokenizer = AutoTokenizer.from_pretrained(spec["hf_id"], **kwargs)
+        self.tokenizer = _hub(AutoTokenizer.from_pretrained, spec["hf_id"], **kwargs)
         dtype = DTYPES[spec.get("dtype", "bfloat16")]
         if torch.cuda.is_available() and dtype == torch.bfloat16 and torch.cuda.get_device_capability(0)[0] < 8:
             dtype = torch.float16  # pre-Ampere GPUs (e.g. T4) have no native bfloat16
@@ -109,7 +127,7 @@ class GenerativeGuard(Guard):
             load_kwargs = {"torch_dtype": dtype}
         if spec.get("config_overrides"):
             from transformers import AutoConfig
-            config = AutoConfig.from_pretrained(spec["hf_id"], **kwargs)
+            config = _hub(AutoConfig.from_pretrained, spec["hf_id"], **kwargs)
             for dotted, value in spec["config_overrides"].items():
                 *parents, attr = dotted.split(".")
                 target = config
@@ -120,7 +138,7 @@ class GenerativeGuard(Guard):
                 else:
                     setattr(target, attr, value)
             load_kwargs["config"] = config
-        self.model = model_cls.from_pretrained(spec["hf_id"], **load_kwargs, **kwargs)
+        self.model = _hub(model_cls.from_pretrained, spec["hf_id"], **load_kwargs, **kwargs)
         if "device_map" not in load_kwargs:
             self.model.to(_device())
         self.model.eval()
@@ -232,8 +250,8 @@ class PerplexityGuard(Guard):
     def __init__(self, name: str, spec: Dict[str, Any]):
         super().__init__(name, spec)
         from transformers import AutoModelForCausalLM, AutoTokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(spec["hf_id"], revision=spec.get("revision"))
-        self.model = AutoModelForCausalLM.from_pretrained(spec["hf_id"], revision=spec.get("revision")).to(_device()).eval()
+        self.tokenizer = _hub(AutoTokenizer.from_pretrained, spec["hf_id"], revision=spec.get("revision"))
+        self.model = _hub(AutoModelForCausalLM.from_pretrained, spec["hf_id"], revision=spec.get("revision")).to(_device()).eval()
         self.max_length = spec.get("max_length", 512)
 
     @torch.no_grad()

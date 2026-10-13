@@ -259,6 +259,11 @@ def cmd_report(args):
     run = Path(args.run)
     m = json.loads((run / "metrics.json").read_text(encoding="utf-8"))
     guards = m["guards"]
+    if not guards:
+        (run / "report.md").write_text(f"# Paired audit report: `{run.name}`\n\nNo guard has complete scores yet.\n",
+                                       encoding="utf-8")
+        print(f"No scored guards; wrote an empty {run / 'report.md'}")
+        return
     conditions = [c for c in FAMILIES if any(c in g["conditions"] for g in guards.values())]
     extra = sorted({c for g in guards.values() for c in g["conditions"]} - set(conditions))
     conditions += extra

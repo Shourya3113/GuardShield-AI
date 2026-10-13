@@ -225,3 +225,29 @@ def test_end_to_end_run(tmp_path, monkeypatch):
         f.write("\n")
     with pytest.raises(SystemExit):
         run_audit.main(["metrics", "--run", str(run)])
+
+
+def test_hub_retries_transient_errors_only(monkeypatch):
+    import time
+    from guard_audit.guards import _hub
+    monkeypatch.setattr(time, "sleep", lambda s: None)
+    calls = []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) < 3:
+            raise OSError("500 Server Error: Internal Server Error for url: https://huggingface.co/x/config.json")
+        return "loaded"
+
+    assert _hub(flaky) == "loaded" and len(calls) == 3
+    with pytest.raises(OSError):
+        _hub(lambda: (_ for _ in ()).throw(OSError("401 Client Error: gated repo")))
+
+
+def test_report_with_no_scored_guards(tmp_path):
+    from guard_audit import run_audit
+    run = tmp_path / "run"
+    run.mkdir()
+    (run / "metrics.json").write_text(json.dumps({"dataset_sha256": "x", "environment": {}, "guards": {}}))
+    run_audit.main(["report", "--run", str(run)])
+    assert "No guard has complete scores" in (run / "report.md").read_text(encoding="utf-8")
