@@ -99,6 +99,40 @@
       "gated": true,
       "notes": "Validated 2026-10-13: id2label LABEL_0/LABEL_1, label 1 = malicious."
     },
+    "mezzo_v2_base": {
+      "type": "hf_classifier",
+      "family": "multilingual classifier",
+      "hf_id": "RyanStudio/Mezzo-Prompt-Guard-v2-Base",
+      "revision": "73f2ac8f23377dbfae0b762625674fe33cf1a749",
+      "attack_labels": [
+        "unsafe"
+      ],
+      "max_length": 512,
+      "notes": "XLM-RoBERTa, MIT licence; model card lists Hindi."
+    },
+    "horizon_guard_base": {
+      "type": "hf_classifier",
+      "family": "low-FP classifier",
+      "hf_id": "Horizon-Labs/prompt-injection-guard-base",
+      "revision": "e4fbfc6f603e24c675cdf310c3b8d7abaa825666",
+      "attack_labels": [
+        "INJECTION"
+      ],
+      "max_length": 8192,
+      "notes": "ModernBERT, Apache-2.0; card lists Hindi among 18 languages. Low FPR in Liu 2026 (arXiv 2610.03448)."
+    },
+    "sentinel_v2": {
+      "type": "hf_classifier",
+      "family": "low-FP classifier",
+      "hf_id": "rogue-security/prompt-injection-jailbreak-sentinel-v2",
+      "revision": "05ff9bfd1f28c5228e53121d5ee4427bb5205212",
+      "attack_label_ids": [
+        1
+      ],
+      "max_length": 4096,
+      "gated": true,
+      "verify": "Qwen3-0.6B sequence classifier, Elastic licence, gated. Confirm id2label after licence acceptance (label 1 assumed to be jailbreak/injection)."
+    },
     "llama_guard_3_1b": {
       "type": "generative",
       "family": "content guard",

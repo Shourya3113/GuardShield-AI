@@ -6,7 +6,7 @@ Notebook: `notebooks/paper1_guard_audit.ipynb`. It runs on either platform witho
 
 The guards are split into two sessions:
 - **A:** all small guards, plus Llama Guard 3 8B and WildGuard
-- **B:** Qwen3Guard 8B and Llama Guard 4 12B
+- **B:** Qwen3Guard 8B, Llama Guard 4 12B, and three newer classifiers (Mezzo Prompt Guard v2, Horizon-Labs guard, Sentinel v2). Before running B, accept the Sentinel v2 licence at https://huggingface.co/rogue-security/prompt-injection-jailbreak-sentinel-v2
 
 Each session takes roughly 3–5 hours. This is a rough guess; T4 speed for these exact models has not been measured yet.
 

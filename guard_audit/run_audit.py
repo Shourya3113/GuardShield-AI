@@ -200,6 +200,13 @@ def cmd_metrics(args):
     run = Path(args.run)
     dataset_sha = sha256_file(run / "dataset.jsonl")
     items = read_items(run)
+    exclude = set()
+    if args.exclude_over_limit:
+        over = run / "tokens" / "over_limit_pairs.json"
+        if not over.exists():
+            raise SystemExit("Run the tokens command first: python -m guard_audit.run_audit tokens --run ...")
+        exclude = set(json.loads(over.read_text(encoding="utf-8"))["pairs"])
+        print(f"Excluding {len(exclude)} pairs over a classifier's input limit")
     results = {}
     for meta_path in sorted((run / "scores").glob("*.meta.json")):
         name = meta_path.name[:-len(".meta.json")]
@@ -212,9 +219,33 @@ def cmd_metrics(args):
                   map(json.loads, (run / "scores" / f"{name}.jsonl").read_text(encoding="utf-8").splitlines())}
         results[name] = {"guard": meta["guard"],
                          **guard_metrics(items, scores, meta["guard"].get("default_threshold"),
-                                         reference_condition=args.reference, n_boot=args.n_boot, seed=args.seed)}
+                                         reference_condition=args.reference, n_boot=args.n_boot, seed=args.seed,
+                                         exclude_pairs=exclude)}
         print(f"[{name}] metrics computed")
-    write_json(run / "metrics.json", {"dataset_sha256": dataset_sha, "environment": environment(), "guards": results})
+    out_name = "metrics_under_limit.json" if args.exclude_over_limit else "metrics.json"
+    write_json(run / out_name, {"dataset_sha256": dataset_sha, "environment": environment(),
+                                "excluded_pairs": sorted(exclude), "guards": results})
+
+
+# --------------------------------------------------------------------------- tokens
+def cmd_tokens(args):
+    from .tokens import input_limit, token_stats, tokenizer_counter
+    run = Path(args.run)
+    items = read_items(run)
+    specs = json.loads(Path(args.guards_config).read_text(encoding="utf-8"))["guards"]
+    over_all = set()
+    for name in args.guards:
+        try:
+            counter = tokenizer_counter(name, specs[name], BASE_DIR)
+        except Exception as exc:
+            print(f"[{name}] skipped: {exc}")
+            continue
+        stats = token_stats(items, counter, input_limit(specs[name]))
+        over_all.update(stats["over_limit_pairs"])
+        write_json(run / "tokens" / f"{name}.json", stats)
+        print(f"[{name}] limit={stats['limit']} pairs over limit={len(stats['over_limit_pairs'])}")
+    write_json(run / "tokens" / "over_limit_pairs.json", {"guards": args.guards, "pairs": sorted(over_all)})
+    print(f"{len(over_all)} pairs exceed at least one classifier's input limit")
 
 
 # --------------------------------------------------------------------------- report
@@ -244,6 +275,14 @@ def cmd_report(args):
             lines.append(f"| {name} | " + " | ".join(row) + " |")
         lines.append("")
 
+    def labels(title, getter, names):
+        lines.extend([f"## {title}", "", "| Guard | " + " | ".join(conditions) + " |",
+                      "| :--- | " + " | ".join([":---:"] * len(conditions)) + " |"])
+        for name, g in guards.items():
+            row = [names.get(getter(g["conditions"][c]), "—") if c in g["conditions"] else "—" for c in conditions]
+            lines.append(f"| {name} | " + " | ".join(row) + " |")
+        lines.append("")
+
     pol = lambda c: c["policies"].get(policy, {})
     matrix("Within-condition AUROC (attack vs. benign twin)", lambda c: c["auroc"], pct=False)
     matrix(f"Paired joint accuracy (%) at {policy}", lambda c: pol(c).get("pja", {}).get("value"))
@@ -251,6 +290,15 @@ def cmd_report(args):
     matrix(f"Benign twin FPR (%) at {policy}", lambda c: pol(c).get("fpr", {}).get("value"))
     matrix(f"FPR (%) after re-thresholding each condition to the {m['guards'][next(iter(guards))]['reference_condition']} TPR",
            lambda c: pol(c).get("fpr_at_ref_tpr", {}).get("fpr"))
+    matrix("FPR (%) at the threshold catching 90% of the condition's attacks (threshold-free)", lambda c: c.get("fpr_at_tpr90"))
+    labels(f"Intent signal (pre-registered; SPEC section 5)", lambda c: c.get("signal"),
+           {"intact": "intact", "degraded": "degraded", "destroyed": "**destroyed**"})
+    labels(f"Failure mode at {policy} (pre-registered; SPEC section 5)", lambda c: pol(c).get("failure_mode"),
+           {"stable": "·", "fail_closed": "**closed**", "fail_open": "**open**", "both": "**both**"})
+    first = next(iter(guards.values()))["conditions"]
+    lines.extend(["## Length confound (AUROC of character length, attack vs twin; 0.5 = none)", "",
+                  "| " + " | ".join(conditions) + " |", "| " + " | ".join([":---:"] * len(conditions)) + " |",
+                  "| " + " | ".join(_fmt(first[c].get("length_auroc"), pct=False) if c in first else "—" for c in conditions) + " |", ""])
     (run / "report.md").write_text("\n".join(lines), encoding="utf-8")
     print(f"Wrote {run / 'report.md'}")
 
@@ -284,7 +332,15 @@ def main(argv=None):
     mt.add_argument("--reference", default="clean")
     mt.add_argument("--n-boot", type=int, default=1000)
     mt.add_argument("--seed", type=int, default=0)
+    mt.add_argument("--exclude-over-limit", action="store_true",
+                    help="drop pairs over any classifier's input limit (needs the tokens command); writes metrics_under_limit.json")
     mt.set_defaults(func=cmd_metrics)
+
+    t = sub.add_parser("tokens", help="token counts, truncation and length confound per guard tokenizer")
+    t.add_argument("--run", required=True)
+    t.add_argument("--guards", nargs="+", required=True)
+    t.add_argument("--guards-config", default=str(DEFAULT_GUARDS))
+    t.set_defaults(func=cmd_tokens)
 
     r = sub.add_parser("report", help="render markdown tables from metrics.json")
     r.add_argument("--run", required=True)

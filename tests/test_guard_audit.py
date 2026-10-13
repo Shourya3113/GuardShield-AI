@@ -109,6 +109,9 @@ def test_blanket_rejection_scores_as_failure_not_robustness():
     assert zw["policies"]["default"]["fpr"]["value"] == 1.0
     assert zw["policies"]["default"]["pja"]["value"] == 0.0          # paired metric exposes it
     assert zw["auroc"] == 0.5 and zw["pairwise_win"] == 0.5
+    assert zw["signal"] == "destroyed" and clean["signal"] == "intact"
+    assert zw["policies"]["default"]["failure_mode"] == "fail_closed"
+    assert clean["policies"]["default"]["failure_mode"] == "stable"
     assert "fpr@0.01" in m["thresholds"] and m["n_calibration"] == 100
 
 
@@ -124,6 +127,34 @@ def test_shifted_scores_are_recoverable_by_rethresholding():
     assert leet["policies"]["default"]["fpr"]["value"] > 0.9          # default threshold: massive FPR
     assert leet["auroc"] > 0.95                                      # but ranking intact
     assert leet["policies"]["default"]["fpr_at_ref_tpr"]["fpr"] < 0.1
+    assert leet["signal"] == "intact" and leet["fpr_at_tpr90"] < 0.1
+    assert leet["policies"]["default"]["failure_mode"] == "fail_closed"
+
+
+def test_fail_open_and_pair_exclusion():
+    items, scores = _items_and_scores({
+        "clean": [(0.9, 0.1)] * 30,
+        "base64_wrap": [(0.1, 0.1)] * 30,    # attacks no longer detected, benign untouched
+    })
+    m = guard_metrics(items, scores, default_threshold=0.5, n_boot=20)
+    assert m["conditions"]["base64_wrap"]["policies"]["default"]["failure_mode"] == "fail_open"
+    m2 = guard_metrics(items, scores, default_threshold=0.5, n_boot=0, exclude_pairs={"p0", "p1"})
+    assert m2["conditions"]["clean"]["n_pairs"] == 28 and m2["n_excluded_pairs"] == 2
+
+
+def test_token_stats_flags_pairs_over_limit():
+    from guard_audit.tokens import token_stats
+    items = [
+        {"split": "eval", "condition": "clean", "pair_id": "p0", "label": 1, "text": "a b c"},
+        {"split": "eval", "condition": "clean", "pair_id": "p0", "label": 0, "text": "a b"},
+        {"split": "eval", "condition": "zero_width", "pair_id": "p1", "label": 1, "text": "a b c d e f"},
+        {"split": "eval", "condition": "zero_width", "pair_id": "p1", "label": 0, "text": "a"},
+        {"split": "calibration", "condition": "clean", "pair_id": None, "label": 0, "text": "x " * 100},
+    ]
+    stats = token_stats(items, lambda texts: [len(t.split()) for t in texts], limit=4)
+    assert stats["over_limit_pairs"] == ["p1"]
+    assert stats["conditions"]["zero_width"]["share_over_limit"] == 0.5
+    assert stats["conditions"]["clean"]["token_length_auroc"] == 1.0
 
 
 def test_missing_scores_are_an_error():
