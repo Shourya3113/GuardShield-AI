@@ -4,7 +4,7 @@
 
 Files: `manifest.json` (dataset provenance), `metrics.json` (all metrics with CIs), `report_fpr5.md` (thresholds at 5% FPR on the calibration pool), `report_default.md` (each guard's default threshold).
 
-Guards scored: GuardShield, ProtectAI v2, deepset, fmops, GPT-2 perplexity, Qwen3Guard-Gen-0.6B. The Meta guards are gated and still need licence acceptance.
+Guards scored: GuardShield, ProtectAI v2, deepset, fmops, GPT-2 perplexity, Qwen3Guard-Gen-0.6B; added 2026-10-13: Prompt Guard v1 (both modes), Prompt Guard 2 86M/22M, Llama Guard 3 1B.
 
 ## What the pilot suggests (to be confirmed at full scale)
 
@@ -26,6 +26,14 @@ Guards scored: GuardShield, ProtectAI v2, deepset, fmops, GPT-2 perplexity, Qwen
    - It has 0% recall on Base64/ROT13-wrapped attacks at its default threshold: it cannot see the payload.
    - It over-flags leetspeak (95% benign FPR at default) and diacritics.
 6. **Perplexity filtering is a weak baseline** (clean AUROC 0.63). It mostly fails to flag obfuscated attacks at all, so it does not show the format-rejection pattern.
+
+7. **Prompt Guard 2 fails in the opposite direction ("fail-open").**
+   - At its default threshold its benign FPR stays at 0% under every perturbation.
+   - Its attack recall collapses instead: about 99% clean, but 0% under soft hyphens, leetspeak, Base64 and ROT13.
+   - So the paired metric has to catch both failure modes. ProtectAI/GuardShield reject the unfamiliar (high FPR); Prompt Guard 2 lets it through (low TPR).
+   - Prompt Guard 2 is unaffected by zero-width characters and letter spacing (its tokenizer drops or normalizes them).
+8. **Prompt Guard v1 in INJECTION+JAILBREAK mode flags every prompt** (100% FPR even on clean benign text), so its paired accuracy is 0 everywhere. In JAILBREAK-only mode (Meta's advice for user input) it behaves like Prompt Guard 2.
+9. **Llama Guard 3 1B** catches only 57% of clean injections (it judges harm, not injection). It flags 72% of benign leetspeak and 100% of benign Base64 at its default threshold.
 
 ## Harness checks done
 

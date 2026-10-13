@@ -50,7 +50,8 @@ def environment() -> Dict[str, Any]:
         import torch
         import transformers
         env.update(torch=torch.__version__, transformers=transformers.__version__,
-                   device=torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu")
+                   device=torch.cuda.get_device_name(0) if torch.cuda.is_available()
+                   else f"mps ({platform.processor() or 'Apple Silicon'})" if torch.backends.mps.is_available() else "cpu")
     except ImportError:
         pass
     return env
@@ -104,7 +105,6 @@ def cmd_build(args):
 
 # --------------------------------------------------------------------------- score
 def cmd_score(args):
-    from .guards import build_guard
     run = Path(args.run)
     manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
     dataset_sha = sha256_file(run / "dataset.jsonl")
@@ -112,7 +112,39 @@ def cmd_score(args):
         raise SystemExit("dataset.jsonl no longer matches manifest.json; rebuild the run.")
     items = read_items(run)
     guard_specs = json.loads(Path(args.guards_config).read_text(encoding="utf-8"))["guards"]
+    unknown = [g for g in args.guards if g not in guard_specs]
+    if unknown:
+        raise SystemExit(f"Unknown guards {unknown}; see {args.guards_config}")
 
+    lock = run / "scores" / ".lock"
+    _acquire_lock(lock)
+    try:
+        _score_guards(args, run, items, guard_specs, dataset_sha)
+    finally:
+        lock.unlink(missing_ok=True)
+
+
+def _acquire_lock(lock: Path):
+    """One scorer per run directory: concurrent scorers would fight over the GPU and append to the same files."""
+    import os
+    import psutil
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    me = f"{platform.node()}:{os.getpid()}"
+    if lock.exists():
+        host, _, pid = lock.read_text().strip().rpartition(":")
+        if host == platform.node() and pid.isdigit() and psutil.pid_exists(int(pid)):
+            raise SystemExit(f"Another scorer (pid {pid}) is already running on {lock.parent.parent}; wait for it or stop it.")
+        lock.unlink()  # stale: crashed run, or written on another machine (e.g. a disconnected Colab session)
+    try:
+        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        raise SystemExit(f"Another scorer just started on {lock.parent.parent}.")
+    os.write(fd, me.encode())
+    os.close(fd)
+
+
+def _score_guards(args, run, items, guard_specs, dataset_sha):
+    from .guards import build_guard
     for name in args.guards:
         out = run / "scores" / f"{name}.jsonl"
         meta_path = run / "scores" / f"{name}.meta.json"
@@ -129,7 +161,11 @@ def cmd_score(args):
         if not todo:
             print(f"[{name}] already complete ({len(done)} items)")
             continue
-        guard = build_guard(name, guard_specs[name])
+        resumed_from = len(done)
+        spec = dict(guard_specs[name])
+        if args.batch_size:
+            spec["batch_size"] = args.batch_size
+        guard = build_guard(name, spec)
         unique_texts = list(dict.fromkeys(it["text"] for it in todo))
         print(f"[{name}] scoring {len(todo)} items ({len(unique_texts)} unique texts)")
         write_json(meta_path, {"guard": guard.info(), "dataset_sha256": dataset_sha, "status": "in_progress"})
@@ -146,12 +182,14 @@ def cmd_score(args):
             print(f"  {min(i + args.chunk, len(unique_texts))}/{len(unique_texts)}", flush=True)
         elapsed = time.perf_counter() - start
         write_json(meta_path, {"guard": guard.info(), "dataset_sha256": dataset_sha, "status": "complete",
-                               "environment": environment(),
+                               "environment": environment(), "resumed_from_items": resumed_from,
                                "scoring_seconds": round(elapsed, 2), "texts_per_second": round(len(unique_texts) / elapsed, 2)})
         del guard
         try:
             import torch
             torch.cuda.empty_cache()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
         except ImportError:
             pass
 
@@ -238,6 +276,7 @@ def main(argv=None):
     s.add_argument("--guards-config", default=str(DEFAULT_GUARDS))
     s.add_argument("--chunk", type=int, default=256)
     s.add_argument("--overwrite", action="store_true")
+    s.add_argument("--batch-size", type=int, help="override every guard's batch size (e.g. 64 on a large GPU)")
     s.set_defaults(func=cmd_score)
 
     mt = sub.add_parser("metrics", help="compute metrics for every scored guard")

@@ -71,7 +71,7 @@ Report on seen families and held-out families separately, at matched clean TPR, 
 
 Training-data overlap is unknowable for most vendor guards. Every table states, per guard and source, whether contamination is known, likely or unknown.
 
-## 4. Hindi / Hinglish benchmark (Study B), to be finalized in the annotation guidelines (Week 2)
+## 4. Hindi / Hinglish benchmark (Study B): see [`annotation/GUIDELINES.md`](annotation/GUIDELINES.md)
 
 - About 400 seeds, roughly half benign and half injection. Each seed is written by a native speaker in all four registers: English, Devanagari Hindi, romanized Hindi, Hindi-English code-mixed.
 - A **trigger-word split** of benign seeds that use injection vocabulary harmlessly (for example "pichhle instructions bhool jao, naya recipe batao"), mirroring NotInject.
@@ -99,12 +99,13 @@ For guard *g*, condition *c*, threshold *τ*; *A* = attack scores, *B* = benign-
 | Group | Guards | Runs on |
 |---|---|---|
 | Ours | GuardShield DeBERTa-v3-small | laptop |
-| Encoder classifiers | ProtectAI v2, deepset, fmops, PIGuard*, Prompt Guard v1†, Prompt Guard 2 86M† / 22M† | laptop |
+| Encoder classifiers | ProtectAI v2, deepset, fmops, PIGuard*, Prompt Guard v1†‡, Prompt Guard 2 86M† / 22M† | laptop |
 | Content-safety judges | Llama Guard 3 1B† / 8B†, Llama Guard 4 12B†, Qwen3Guard-Gen 0.6B / 8B, WildGuard† | 47 GB GPU (1B and 0.6B also run on the laptop) |
 | Baseline | GPT-2 perplexity filter | laptop |
 
 \* PIGuard executes code from its model repository: review `modeling_piguard.py` at the pinned revision before enabling it.
 † Gated: each team member who runs it must accept the licence on Hugging Face.
+‡ Reported in both of Meta's modes: INJECTION+JAILBREAK (`prompt_guard_v1`, intended for untrusted third-party data, which flags almost any instruction-like text) and JAILBREAK only (`prompt_guard_v1_jailbreak`, intended for direct user input).
 
 Content-safety judges classify *harmfulness*, not injection, so low recall on injections is expected. They are included because deployments use them as the only guard, and because their over-defense on unfamiliar text is still informative. Generative judges are scored by the probability mass of their "unsafe" verdict among their verdict strings, using teacher-forced log-likelihood (no sampling). Every judge's `verify` note must be checked against one rendered prompt before its full run.
 

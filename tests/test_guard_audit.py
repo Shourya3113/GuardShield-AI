@@ -176,6 +176,19 @@ def test_end_to_end_run(tmp_path, monkeypatch):
     assert m["base64_scaffold"]["policies"]["default"]["pja"]["value"] == 1.0  # template alone is harmless
     assert "Paired joint accuracy" in (run / "report.md").read_text(encoding="utf-8")
 
+    # only one scorer per run directory; a lock left by a dead process is taken over
+    import os
+    lock = run / "scores" / ".lock"
+    import platform
+    lock.write_text(f"{platform.node()}:{os.getpid()}")
+    with pytest.raises(SystemExit):
+        run_audit.main(["score", "--run", str(run), "--guards", "stub", "--guards-config", str(tmp_path / "guards.json")])
+    lock.write_text(f"other-machine:{os.getpid()}")  # same pid, different host: stale
+    run_audit.main(["score", "--run", str(run), "--guards", "stub", "--guards-config", str(tmp_path / "guards.json")])
+    lock.write_text(f"{platform.node()}:999999999")
+    run_audit.main(["score", "--run", str(run), "--guards", "stub", "--guards-config", str(tmp_path / "guards.json")])
+    assert not lock.exists()
+
     # tampering with the dataset invalidates existing scores
     with open(run / "dataset.jsonl", "a", encoding="utf-8") as f:
         f.write("\n")

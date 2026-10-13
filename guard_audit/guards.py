@@ -24,7 +24,11 @@ DTYPES = {"float32": torch.float32, "float16": torch.float16, "bfloat16": torch.
 
 
 def _device() -> str:
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        return "cuda"
+    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        return "mps"  # Apple Silicon GPU
+    return "cpu"
 
 
 class Guard:
