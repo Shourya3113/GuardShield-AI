@@ -5,8 +5,8 @@ Notebook: `notebooks/paper1_guard_audit.ipynb`. It runs on either platform witho
 **Why Kaggle:** it gives free **2× T4 GPUs** (32 GB together, enough for every guard), **30 GPU-hours a week**, and committed runs that continue for **up to 12 hours with the browser closed**.
 
 The guards are split into two sessions:
-- **A:** all small guards, plus Llama Guard 3 8B and WildGuard
-- **B:** Qwen3Guard 8B, Llama Guard 4 12B, and three newer classifiers (Mezzo Prompt Guard v2, Horizon-Labs guard, Sentinel v2). Before running B, accept the Sentinel v2 licence at https://huggingface.co/rogue-security/prompt-injection-jailbreak-sentinel-v2
+- **A:** all small guards, plus Llama Guard 3 8B (completed 2026-10-13)
+- **B:** WildGuard (moved from A after a check bug, fixed 2026-10-13), Qwen3Guard 8B, Llama Guard 4 12B, and three newer classifiers (Mezzo Prompt Guard v2, Horizon-Labs guard, Sentinel v2). Before running B, accept the Sentinel v2 licence at https://huggingface.co/rogue-security/prompt-injection-jailbreak-sentinel-v2
 
 Each session takes roughly 3–5 hours. This is a rough guess; T4 speed for these exact models has not been measured yet.
 

@@ -35,7 +35,8 @@ def check_generative(g: GenerativeGuard, scores) -> bool:
         enc = g.tokenizer(g.render(text), return_tensors="pt", add_special_tokens=False).to(g.model.device)
         out = g.model.generate(**enc, max_new_tokens=12, do_sample=False, pad_token_id=g.pad_id)
         generated = g.tokenizer.decode(out[0, enc["input_ids"].shape[1]:], skip_special_tokens=True)
-        matches = [v for v in g.labels if generated.startswith(v)]
+        # decoding drops a leading space ("no" for " no"), so compare without surrounding whitespace
+        matches = [v for v in g.labels if generated.lstrip().startswith(v.strip())]
         verdict = max(matches, key=len) if matches else None
         agrees = verdict is not None and bool(g.labels[verdict]) == (score >= 0.5)
         ok &= agrees
