@@ -1,0 +1,38 @@
+{
+  "guard": {
+    "name": "llama_guard_4_12b",
+    "type": "generative",
+    "default_threshold": 0.5,
+    "hf_id": "meta-llama/Llama-Guard-4-12B",
+    "revision": "87acb4b94e930c3d679e6e7ee9d57e2feab9ea71",
+    "resolved_commit": "87acb4b94e930c3d679e6e7ee9d57e2feab9ea71",
+    "verdicts": {
+      "safe": 0,
+      "unsafe": 1
+    },
+    "response_prefix": "\n\n",
+    "dtype": "float16",
+    "config_overrides": {
+      "text_config.attention_chunk_size": 8192
+    },
+    "device_map": [
+      "0",
+      "1"
+    ],
+    "prompt_mode": "chat_template"
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "46369666fa7334dce97f4cc40012e6f689378d87",
+    "timestamp": "2026-10-13T22:55:25Z",
+    "python": "3.13.15",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.6",
+    "device": "Tesla T4"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 4045.38,
+  "texts_per_second": 3.21
+}

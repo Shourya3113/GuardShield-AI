@@ -1,0 +1,90 @@
+{
+  "limit": null,
+  "conditions": {
+    "clean": {
+      "mean_tokens": 16.531,
+      "max_tokens": 97,
+      "chars_per_token": 4.473958018268707,
+      "share_over_limit": null,
+      "token_length_auroc": 0.400626
+    },
+    "zero_width": {
+      "mean_tokens": 98.089,
+      "max_tokens": 448,
+      "chars_per_token": 1.207056856528255,
+      "share_over_limit": null,
+      "token_length_auroc": 0.521084
+    },
+    "soft_hyphen": {
+      "mean_tokens": 77.247,
+      "max_tokens": 355,
+      "chars_per_token": 1.5327326627571298,
+      "share_over_limit": null,
+      "token_length_auroc": 0.519246
+    },
+    "leetspeak": {
+      "mean_tokens": 51.059,
+      "max_tokens": 254,
+      "chars_per_token": 1.448500754029652,
+      "share_over_limit": null,
+      "token_length_auroc": 0.48480399999999996
+    },
+    "homoglyph": {
+      "mean_tokens": 44.631,
+      "max_tokens": 209,
+      "chars_per_token": 1.657121731531895,
+      "share_over_limit": null,
+      "token_length_auroc": 0.47646999999999995
+    },
+    "base64_wrap": {
+      "mean_tokens": 77.626,
+      "max_tokens": 317,
+      "chars_per_token": 1.957282353850514,
+      "share_over_limit": null,
+      "token_length_auroc": 0.492096
+    },
+    "base64_scaffold": {
+      "mean_tokens": 27.531,
+      "max_tokens": 108,
+      "chars_per_token": 4.575169808579419,
+      "share_over_limit": null,
+      "token_length_auroc": 0.398754
+    },
+    "rot13_wrap": {
+      "mean_tokens": 46.274,
+      "max_tokens": 196,
+      "chars_per_token": 2.7004149198253877,
+      "share_over_limit": null,
+      "token_length_auroc": 0.48375599999999996
+    },
+    "rot13_scaffold": {
+      "mean_tokens": 27.531,
+      "max_tokens": 108,
+      "chars_per_token": 4.538847117794486,
+      "share_over_limit": null,
+      "token_length_auroc": 0.398754
+    },
+    "fullwidth": {
+      "mean_tokens": 105.286,
+      "max_tokens": 487,
+      "chars_per_token": 0.7024580665995479,
+      "share_over_limit": null,
+      "token_length_auroc": 0.523628
+    },
+    "diacritics": {
+      "mean_tokens": 91.996,
+      "max_tokens": 425,
+      "chars_per_token": 1.3462433149267359,
+      "share_over_limit": null,
+      "token_length_auroc": 0.509734
+    },
+    "spaced_letters": {
+      "mean_tokens": 58.003,
+      "max_tokens": 278,
+      "chars_per_token": 2.041256486733445,
+      "share_over_limit": null,
+      "token_length_auroc": 0.51296
+    }
+  },
+  "over_limit_pairs": []
+}

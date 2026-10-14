@@ -1,0 +1,32 @@
+{
+  "guard": {
+    "name": "prompt_guard_2_22m",
+    "type": "hf_classifier",
+    "default_threshold": 0.5,
+    "hf_id": "meta-llama/Llama-Prompt-Guard-2-22M",
+    "revision": "11614a155199674a0a95e6602d6ab0417b790ed0",
+    "resolved_commit": "11614a155199674a0a95e6602d6ab0417b790ed0",
+    "id2label": {
+      "0": "LABEL_0",
+      "1": "LABEL_1"
+    },
+    "attack_label_ids": [
+      1
+    ],
+    "max_length": 512
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "c31ba67427840be709af166c7666235bbcea2792",
+    "timestamp": "2026-10-13T11:48:38Z",
+    "python": "3.13.15",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.6",
+    "device": "Tesla T4"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 43.6,
+  "texts_per_second": 298.05
+}

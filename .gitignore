@@ -66,5 +66,8 @@ scripts/copy_signatures.py
 Thumbs.db
 Desktop.ini
 
-# Guard audit run outputs (export final results to docs/ explicitly)
-runs/
+# Guard audit run outputs: scratch runs at the repo root stay local; paper runs under
+# paper1/runs/ are committed except their datasets, which rebuild from pinned sources
+/runs/
+paper1/runs/*/dataset.jsonl
+paper1/runs/*/report.md

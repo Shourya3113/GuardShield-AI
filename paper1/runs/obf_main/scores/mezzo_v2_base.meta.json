@@ -1,0 +1,32 @@
+{
+  "guard": {
+    "name": "mezzo_v2_base",
+    "type": "hf_classifier",
+    "default_threshold": 0.5,
+    "hf_id": "RyanStudio/Mezzo-Prompt-Guard-v2-Base",
+    "revision": "73f2ac8f23377dbfae0b762625674fe33cf1a749",
+    "resolved_commit": "73f2ac8f23377dbfae0b762625674fe33cf1a749",
+    "id2label": {
+      "0": "safe",
+      "1": "unsafe"
+    },
+    "attack_label_ids": [
+      1
+    ],
+    "max_length": 512
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "1030e207615a32d42f900f0ca0f07c251fdcf8ab",
+    "timestamp": "2026-10-13T17:03:30Z",
+    "python": "3.13.15",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.6",
+    "device": "Tesla T4"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 92.93,
+  "texts_per_second": 139.84
+}
