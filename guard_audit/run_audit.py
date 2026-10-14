@@ -19,6 +19,8 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from collections import Counter
+from statistics import median
 from typing import Any, Dict, List
 
 from .pairs import expand, length_matched_pairs
@@ -70,6 +72,8 @@ def write_json(path: Path, obj: Any):
 
 # --------------------------------------------------------------------------- build
 def cmd_build(args):
+    import numpy as np
+    from .metrics import _auroc
     sources = load_sources_config(Path(args.sources))
     attacks, benigns = [], []
     for name in args.attack_sources:
@@ -79,13 +83,14 @@ def cmd_build(args):
     attack_texts = {a["text"] for a in attacks}
     benigns = [b for b in benigns if b["text"] not in attack_texts]
 
-    pairs, calibration = length_matched_pairs(attacks, benigns, args.n_pairs, args.calibration_size, args.seed)
+    pairs, calibration = length_matched_pairs(attacks, benigns, args.n_pairs, args.calibration_size, args.seed,
+                                              pair_first=args.pair_first)
     families = resolve_families(args.families)
     items = expand(pairs, calibration, families)
 
     run = Path(args.out)
     run.mkdir(parents=True, exist_ok=True)
-    with open(run / "dataset.jsonl", "w", encoding="utf-8") as f:
+    with open(run / "dataset.jsonl", "w", encoding="utf-8", newline="\n") as f:  # same SHA-256 on every OS
         for it in items:
             f.write(json.dumps(it, ensure_ascii=False) + "\n")
     length_gap = [abs(len(p["attack"]["text"]) - len(p["benign"]["text"])) for p in pairs]
@@ -97,6 +102,13 @@ def cmd_build(args):
         "n_pairs": len(pairs), "n_calibration": len(calibration),
         "families": [f.name for f in families],
         "median_pair_length_gap_chars": sorted(length_gap)[len(length_gap) // 2],
+        "pair_length_auroc": _auroc(np.array([len(p["attack"]["text"]) for p in pairs], dtype=float),
+                                    np.array([len(p["benign"]["text"]) for p in pairs], dtype=float)),
+        "median_length_chars": {"attacks": median([len(p["attack"]["text"]) for p in pairs]),
+                                "twins": median([len(p["benign"]["text"]) for p in pairs]),
+                                "calibration": median([len(c["text"]) for c in calibration]) if calibration else None},
+        "pair_origins": {role: dict(Counter(p[role].get("origin", p[role]["source"]) for p in pairs))
+                         for role in ("attack", "benign")},
         "n_items": len(items),
         "environment": environment(),
     })
@@ -320,6 +332,8 @@ def main(argv=None):
     b.add_argument("--n-pairs", type=int, default=500)
     b.add_argument("--calibration-size", type=int, default=1000)
     b.add_argument("--seed", type=int, default=13)
+    b.add_argument("--pair-first", action="store_true",
+                   help="match twins against the whole benign pool, then draw calibration from the rest")
     b.add_argument("--out", required=True)
     b.set_defaults(func=cmd_build)
 

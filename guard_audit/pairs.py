@@ -20,7 +20,13 @@ def length_matched_pairs(
     n_pairs: int,
     calibration_size: int,
     seed: int,
+    pair_first: bool = False,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Default: calibration is a random draw from the benign pool and twins come from the rest.
+    pair_first: twins are matched against the whole benign pool and calibration is a random draw
+    from what is left. Use it when benign prompts are much shorter than attacks, where a reduced
+    twin pool would leave a length confound; the calibration pool is then biased towards lengths
+    the attacks did not need, which the manifest records."""
     if any(a["label"] != 1 for a in attacks) or any(b["label"] != 0 for b in benigns):
         raise ValueError("attack pool must be label 1 and benign pool label 0")
     rng = random.Random(seed)
@@ -28,7 +34,10 @@ def length_matched_pairs(
     rng.shuffle(attacks)
     rng.shuffle(benigns)
 
-    calibration, twin_pool = benigns[:calibration_size], benigns[calibration_size:]
+    if pair_first:
+        calibration, twin_pool = [], benigns
+    else:
+        calibration, twin_pool = benigns[:calibration_size], benigns[calibration_size:]
     n_pairs = min(n_pairs, len(attacks), len(twin_pool))
     if n_pairs == 0:
         raise ValueError("no pairs can be formed: empty attack pool or twin pool")
@@ -44,6 +53,9 @@ def length_matched_pairs(
         twin = twin_pool.pop(best)
         lengths.pop(best)
         pairs.append({"pair_id": f"p{idx:05d}", "attack": attack, "benign": twin})
+    if pair_first:
+        rng.shuffle(twin_pool)
+        calibration = twin_pool[:calibration_size]
     return pairs, calibration
 
 

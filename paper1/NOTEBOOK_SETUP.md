@@ -4,11 +4,11 @@ Notebook: `notebooks/paper1_guard_audit.ipynb`. It runs on either platform witho
 
 **Why Kaggle:** it gives free **2× T4 GPUs** (32 GB together, enough for every guard), **30 GPU-hours a week**, and committed runs that continue for **up to 12 hours with the browser closed**.
 
-The guards are split into two sessions:
-- **A:** all small guards, plus Llama Guard 3 8B (completed 2026-10-13)
-- **B:** WildGuard (moved from A after a check bug, fixed 2026-10-13), Qwen3Guard 8B, Llama Guard 4 12B, and three newer classifiers (Mezzo Prompt Guard v2, Horizon-Labs guard, Sentinel v2). Before running B, accept the Sentinel v2 licence at https://huggingface.co/rogue-security/prompt-injection-jailbreak-sentinel-v2
+Two settings in the first code cell choose what runs:
+- `RUN_NAME`: `obf_main` (Study A on Gandalf × Dolly, **complete** for 18 guards on 2026-10-14) or `pids_main` (Study A on PIDS-Bench, the second primary source)
+- `GUARD_SET`: `ALL` scores every guard in one session; `A`, `B` and `C` are the split sessions used for `obf_main`
 
-Each session takes roughly 3–5 hours. This is a rough guess; T4 speed for these exact models has not been measured yet.
+`pids_main` has 5,296 items (40% of `obf_main`), so all 18 guards fit in one committed session of about 4–5 hours.
 
 ---
 
@@ -41,19 +41,16 @@ Each session takes roughly 3–5 hours. This is a rough guess; T4 speed for thes
 
 ## Kaggle: each run
 
-1. In the first code cell, set `GUARD_SET = "A"`.
+1. In the first code cell, set `RUN_NAME` and `GUARD_SET` (currently `"pids_main"` and `"ALL"`).
 2. Click **Save Version** (top right), choose **Save & Run All (Commit)**, and click **Save**. The run continues on Kaggle's servers, so you can close the browser.
-3. About 20 minutes later, check that it started properly. Open the notebook from **Your Work**, then **Versions** › the running version › **Logs**. Section 8 should print three `PASS` lines per large judge. If a judge prints `FAIL`, it is skipped automatically; copy its lines to Claude.
-4. When the version finishes, open it, go to the **Output** tab, and download `obf_main_A.zip`.
-5. Go back to the editor, set `GUARD_SET = "B"`, and **Save Version** again. Do this after A has finished: Kaggle limits how many GPU sessions run at once. Then download `obf_main_B.zip`.
+3. About 20 minutes later, check that it started properly. Open the notebook from **Your Work**, then **Versions** › the running version › **Logs**. Section 7 must print the dataset SHA-256 without an assertion error, and section 8 should print three `PASS` lines per large judge. If a judge prints `FAIL`, it is skipped automatically; copy its lines to Claude.
+4. When the version finishes, open it, go to the **Output** tab, and download `<RUN_NAME>_<GUARD_SET>.zip` (for example `pids_main_ALL.zip`) and the log.
 
 Your remaining GPU quota is shown at https://www.kaggle.com/settings under *Quotas*.
 
 ## Bring the results back
 
-1. Unzip `obf_main_A.zip` into `D:\projects\GuardShield_AI\runs\`.
-2. Unzip `obf_main_B.zip` into the same `runs\` folder. When asked about overwriting, choose **Yes to all**: the shared files (`dataset.jsonl`, `manifest.json`) are identical between sessions, and the per-guard score files differ.
-3. Tell Claude. The combined metrics are recomputed from `runs\obf_main`; the harness refuses to combine score files from datasets that don't match.
+Give Claude the zip and the log from your Downloads folder. Score files are merged into `paper1/runs/<RUN_NAME>`; the harness refuses to combine score files built from different datasets.
 
 ---
 
@@ -67,7 +64,7 @@ Free Colab works, but GPU availability is not guaranteed and sessions are short 
 4. Click the **🔑 Secrets** icon, add `HF_TOKEN` and `GITHUB_TOKEN`, and switch on **Notebook access** for both.
 5. **Runtime › Change runtime type › T4 GPU**. Not TPU: the harness needs an NVIDIA GPU.
 6. Set `GUARD_SET` (start with `"A"`), then **Runtime › Run all**, and allow Drive access when asked.
-7. Results are saved to `My Drive/GuardShield_Paper1/`. Download `obf_main_A.zip` / `obf_main_B.zip` from there.
+7. Results are saved to `My Drive/GuardShield_Paper1/`. Download `<RUN_NAME>_<GUARD_SET>.zip` from there.
 
 With a single 16 GB T4, Llama Guard 4 12B does not fit in 16-bit. Run set B on Kaggle, or ask Claude to switch that judge to 8-bit loading.
 
@@ -83,6 +80,6 @@ With a single 16 GB T4, Llama Guard 4 12B does not fit in 16-bit. Run set B on K
 | `git failed: … 403` / `Repository not found` | The GitHub token is missing, expired, not attached, or lacks *Contents: Read-only* on this repository. |
 | `401` / `GatedRepoError` | `HF_TOKEN` is missing or not attached, or your Hugging Face account was not approved for that model. |
 | Download errors or `Temporary failure in name resolution` (Kaggle) | Internet is off, or the phone number is not verified. |
-| `No space left on device` | Keep `DELETE_MODEL_AFTER = True` and run sets A and B in separate sessions. |
+| `No space left on device` | Keep `DELETE_MODEL_AFTER = True` and run sets A and B in separate sessions instead of `ALL`. |
 | `non-finite verdict log-likelihoods` | 16-bit overflow on this GPU; send the log to Claude. The fix is a per-guard setting in `configs/guards.json`. |
 | `Another scorer … is already running` | Two sessions are writing the same results folder; stop one. |

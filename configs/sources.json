@@ -40,6 +40,26 @@
       "role": "benign",
       "contamination": "Generic instruction data; may appear as benign training data for some guards."
     },
+    "pids_test": {
+      "type": "url_csv",
+      "files": [{
+        "url": "https://raw.githubusercontent.com/ShirePyDev/Prompt-Injection-Detection-System/87dc835566b930ee921240874a4939b2c266c2fe/data/pids_bench_v3/test.csv",
+        "sha256": "149092dc6a7a83d3da73e8c7b413ea5e215e3f96c5565767b6db56b3b7835d96"
+      }],
+      "text_field": "text",
+      "label_field": "label",
+      "attack_values": [1],
+      "filter": {"obfuscation": "none"},
+      "exclude": {"attack_type": ["encoded_attack"], "source": ["deepset_injection", "stackexchange"]},
+      "origin_field": "source",
+      "one_per": "parent_seed_id",
+      "one_per_order": ["paraphrase_round"],
+      "max_chars": 200,
+      "role": "mixed",
+      "licence": "Research / non-commercial use (inherits upstream licences: CC BY-NC 4.0 for Alpaca-seeded and qualifire rows; see DATA_LICENSES.md at the pinned commit). Code MIT.",
+      "provenance": "PIDS-Bench v3 test split (arXiv 2609.15017), tag v1.0-pids-bench (commit 87dc835); SHA-256 equals FREEZE_MANIFEST.txt. Unobfuscated rows only (we apply our own perturbations); encoded_attack rows dropped (already encoded); deepset_injection dropped (training data of deepset, fmops, GuardShield); stackexchange dropped (Dolly instructions, the Study A benign source); one row per parent seed (paraphrases share seeds); <= 200 characters so that length-matched twins exist.",
+      "contamination": "Seeds disjoint from PIDS-Bench train by construction. SPML and qualifire rows: training data of other guards unknown; see the contamination audit."
+    },
     "notinject": {
       "type": "hf_parquet",
       "repo": "leolee99/NotInject",

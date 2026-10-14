@@ -72,12 +72,20 @@ Report on seen and held-out families separately, at matched clean TPR, over ≥ 
 |---|---|---|---|
 | Lakera `gandalf_ignore_instructions` (all splits) | attacks (primary 1) | 1,000 | not in GuardShield training; unknown for vendor guards |
 | `databricks-dolly-15k`, instructions without context | benign twins + calibration (primary 1) | 10,362 available | generic; possibly benign training data for some guards |
-| PIDS-Bench injection test + external hard-benign split, or BIPIA test half | attacks + benign (primary 2) | to be fixed | **To add (owner: Rachit):** verify the public release and licence, and pin its SHA-256 manifest |
+| PIDS-Bench v3 `test.csv` (`pids_test`; tag v1.0-pids-bench, SHA-256 matches its `FREEZE_MANIFEST.txt`) | attacks + benign (primary 2) | 264 attacks, 696 benign after selection; 200 pairs + 496 calibration | seeds disjoint from PIDS-Bench train by construction; `deepset_injection` rows dropped (training data of deepset, fmops, GuardShield) |
 | `leolee99/NotInject` (3 subsets) | benign hard negatives (secondary) | 339 | PIGuard designed against it |
 | `deepset/prompt-injections` test | mixed (secondary) | ~116 | in-distribution for deepset, fmops, GuardShield |
 | GuardShield `test_in_distribution` | mixed (GuardShield-only analysis) | 698 | in-distribution for GuardShield |
 
 **Primary run 1:** 500 Gandalf attacks × 500 Dolly twins (seed 13), with 1,000 further Dolly prompts as the calibration pool. A second primary source is required: PIDS-Bench showed over-defense is provenance-sensitive, and the pilot's Prompt Guard 2 clean recall on Gandalf (~99%) differs sharply from PIDS-Bench's 0.369.
+
+**Primary run 2 (`pids_main`, decided 2026-10-14):** 200 PIDS-Bench attack/benign pairs (seed 13), with the 496 remaining benign prompts as the calibration pool. The data are for research / non-commercial use and inherit upstream licences (CC BY-NC 4.0 for Alpaca-seeded and qualifire rows; `DATA_LICENSES.md` at the pinned commit). Row selection (`configs/sources.json`):
+- unobfuscated rows only, because we apply our own perturbations; `encoded_attack` rows dropped (already encoded)
+- `stackexchange` rows dropped (Dolly instructions, the Study A benign source)
+- one row per `parent_seed_id`, the lowest paraphrase round, since paraphrases of one seed are near-duplicates
+- texts ≤ 200 characters: PIDS benign prompts are short (median ≈ 75 characters) while SPML and qualifire attacks are long (median 531 and 982), so longer attacks have no length-matched twin
+
+Twins are matched against the whole benign pool before the calibration pool is drawn from the remainder (`build --pair-first`), which gives a length AUROC of 0.53 (0.83 if the calibration pool is held out first). The calibration pool is shorter than the twins (median 66 vs 102 characters); this affects only the calibrated policies, not the default-threshold headline. The pairs' attacks are 188 PIDS template injections and 12 SPML injections; their twins are 95 Alpaca paraphrases, 71 chatbot instructions, 20 OASST1 paraphrases and 14 PIDS template benign prompts. Every PIDS text was paraphrased by gpt-4o-mini, so this source is less diverse than Gandalf and complements it rather than replacing it. BIPIA was rejected as primary 2: its injections are embedded in long emails, tables and code, which the length-matched twin protocol cannot pair, and PIGuard is trained on it (Liu 2610.03448).
 
 **Contamination audit (before reporting):** verbatim and near-duplicate overlap (word 8-gram and MinHash, threshold 0.8) of every evaluation source against every auditable guard's training sources: ProtectAI v2's listed datasets, PIGuard, Horizon-Labs, GuardShield. Each table cell is marked known, likely or unknown. This follows Liu ([arXiv 2610.03448](https://arxiv.org/abs/2610.03448)), who found PIGuard trained on most of BIPIA's and InjecAgent's attacks.
 
@@ -177,6 +185,7 @@ Content-safety judges classify *harmfulness*, not injection, so low injection re
 python -m guard_audit.run_audit build --attack-sources gandalf --benign-sources dolly --n-pairs 500 --calibration-size 1000 --out runs/obf_main
 python -m guard_audit.run_audit score --run runs/obf_main --guards guardshield protectai_v2 deepset fmops perplexity_gpt2
 python -m guard_audit.run_audit tokens --run runs/obf_main --guards guardshield protectai_v2 deepset fmops prompt_guard_v1 prompt_guard_2_86m prompt_guard_2_22m mezzo_v2_base horizon_guard_base
+python -m guard_audit.run_audit build --attack-sources pids_test --benign-sources pids_test --n-pairs 200 --calibration-size 1000 --seed 13 --pair-first --out paper1/runs/pids_main
 python -m guard_audit.run_audit metrics --run runs/obf_main
 python -m guard_audit.run_audit metrics --run runs/obf_main --exclude-over-limit
 python -m guard_audit.run_audit report --run runs/obf_main --policy default
@@ -199,6 +208,7 @@ The guide left these decisions to the team (2026-10-12). Revisit them here, with
 | 2026-10-13 | Truncation and length | Primary analysis on pairs under every classifier's input limit; length-confound AUROC reported per condition. |
 | 2026-10-13 | Roster | Added Mezzo Prompt Guard v2 Base, Horizon-Labs guard-base and Sentinel v2; HiveTraceGuard-Pro and PolyGuard-Qwen-Smol to be configured. |
 | 2026-10-13 | Study C | Added the naive canonicalizer and decode-and-rescan-only arms, and per-round recall/FPR plots for augmentation. |
+| 2026-10-14 | Data | Second primary source fixed: PIDS-Bench v3 test split, 200 pairs (`pids_main`, section 3); BIPIA rejected. Study A on Gandalf × Dolly complete for 18 guards. |
 
 ## 11. Claims and wording
 
