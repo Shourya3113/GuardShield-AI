@@ -24,4 +24,4 @@ There is no LaTeX on the laptop, so build on Overleaf:
 | Mechanism (H4, tokenizer fragmentation) | not started |
 | Study B, Study C | waiting for data / experiments |
 | Related work | Study A clusters drafted; Indic and canonicalization paragraphs are `\todo` |
-| References | entries marked `TODO verify` need authors and titles checked on arXiv |
+| References | verified 2026-10-14 against the arXiv API, the ACL Anthology and Crossref |
