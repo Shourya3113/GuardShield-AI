@@ -242,6 +242,18 @@
       "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
       "max_length": 512,
       "notes": "Classic perplexity filter; no default threshold, evaluated at matched FPR only."
-    }
+    },
+    "guardshield_canon_naive": {"type": "canonicalized", "family": "study_c", "base": "guardshield", "canonicalizer": "naive",
+      "notes": "Study C arm 2: NFKC + strip all Cf (LLM Guard InvisibleText style)."},
+    "guardshield_canon_script": {"type": "canonicalized", "family": "study_c", "base": "guardshield", "canonicalizer": "script_aware", "rescan": true,
+      "notes": "Study C arm 3: script-aware canonicalizer with decode-and-rescan."},
+    "guardshield_rescan_only": {"type": "canonicalized", "family": "study_c", "base": "guardshield", "canonicalizer": "none", "rescan": true,
+      "notes": "Study C arm 4: decode-and-rescan only."},
+    "protectai_v2_canon_naive": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "naive",
+      "notes": "Study C arm 2 on the ProtectAI v2 backbone."},
+    "protectai_v2_canon_script": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "script_aware", "rescan": true,
+      "notes": "Study C arm 3 on the ProtectAI v2 backbone."},
+    "protectai_v2_rescan_only": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "none", "rescan": true,
+      "notes": "Study C arm 4 on the ProtectAI v2 backbone."}
   }
 }

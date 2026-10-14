@@ -13,6 +13,7 @@ Guard types (configs/guards.json):
   perplexity     - mean token negative log-likelihood under a small LM (classic perplexity filter)
 """
 
+import json
 import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -270,11 +271,45 @@ class PerplexityGuard(Guard):
                 "resolved_commit": getattr(self.model.config, "_commit_hash", None), "score": "mean token NLL"}
 
 
+class CanonicalizedGuard(Guard):
+    """Study C, inference-time arms: an unchanged base guard behind a canonicalizer, optionally with
+    decode-and-rescan. The score is the base guard's maximum over the views of each input."""
+
+    def __init__(self, name: str, spec: Dict[str, Any], base: Optional[Guard] = None):
+        super().__init__(name, spec)
+        from .canonicalize import CANONICALIZERS
+        if spec["canonicalizer"] not in CANONICALIZERS:
+            raise ValueError(f"{name}: unknown canonicalizer {spec['canonicalizer']!r}")
+        if base is None and "base_spec" in spec:  # e.g. a Study C retrained checkpoint
+            base = build_guard(spec["base"], spec["base_spec"])
+        elif base is None:
+            specs = json.loads((BASE_DIR / "configs" / "guards.json").read_text(encoding="utf-8"))["guards"]
+            base = build_guard(spec["base"], specs[spec["base"]])
+        self.base = base
+        if "default_threshold" not in spec:
+            self.default_threshold = base.default_threshold
+
+    def score(self, texts: List[str]) -> List[float]:
+        from .canonicalize import views
+        per_item = [views(t, self.spec["canonicalizer"], self.spec.get("rescan", False)) for t in texts]
+        flat = [v for vs in per_item for v in vs]
+        scores, out, k = self.base.score(flat), [], 0
+        for vs in per_item:
+            out.append(max(scores[k:k + len(vs)]))
+            k += len(vs)
+        return out
+
+    def info(self) -> Dict[str, Any]:
+        return {**super().info(), "base": self.base.info(), "canonicalizer": self.spec["canonicalizer"],
+                "rescan": self.spec.get("rescan", False)}
+
+
 GUARD_TYPES = {
     "hf_classifier": HFClassifierGuard,
     "generative": GenerativeGuard,
     "guardshield": GuardShieldGuard,
     "perplexity": PerplexityGuard,
+    "canonicalized": CanonicalizedGuard,
 }
 
 
