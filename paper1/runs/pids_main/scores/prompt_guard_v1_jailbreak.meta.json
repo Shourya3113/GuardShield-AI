@@ -1,0 +1,33 @@
+{
+  "guard": {
+    "name": "prompt_guard_v1_jailbreak",
+    "type": "hf_classifier",
+    "default_threshold": 0.5,
+    "hf_id": "meta-llama/Prompt-Guard-86M",
+    "revision": "1209add6ca7d9c1d815171b8e5571587fe3e7b03",
+    "resolved_commit": "1209add6ca7d9c1d815171b8e5571587fe3e7b03",
+    "id2label": {
+      "0": "BENIGN",
+      "1": "INJECTION",
+      "2": "JAILBREAK"
+    },
+    "attack_label_ids": [
+      2
+    ],
+    "max_length": 512
+  },
+  "dataset_sha256": "3d8a8714b2a898dc40964f16de882935c0a1c2f9f7c5b4adbc44e26e0cb7b06a",
+  "status": "complete",
+  "environment": {
+    "git_commit": "1063c48225758b4d1a6568b0f87b06d20499bbc6",
+    "timestamp": "2026-10-14T08:14:36Z",
+    "python": "3.13.15",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.6",
+    "device": "Tesla T4"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 65.11,
+  "texts_per_second": 81.33
+}

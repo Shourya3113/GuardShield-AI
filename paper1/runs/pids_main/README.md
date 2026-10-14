@@ -19,4 +19,4 @@ python -m guard_audit.run_audit build --attack-sources pids_test --benign-source
 
 The dataset SHA-256 must be `3d8a8714b2a898dc40964f16de882935c0a1c2f9f7c5b4adbc44e26e0cb7b06a`.
 
-Scores: not yet scored (Kaggle, `RUN_NAME = "pids_main"`, `GUARD_SET = "ALL"`).
+Scored 2026-10-14 for all 18 guards in one Kaggle session (2x T4, about 3.3 hours, code at 1063c48); every `scores/*.meta.json` records the dataset SHA-256 above. Token audit: no pair exceeds any classifier's input limit. `metrics.json`, `report_default.md` and `report_fpr5.md` were recomputed locally. The paper's replication numbers come from `paper1/paper/make_assets.py` (`generated/numbers_pids.tex`).

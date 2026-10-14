@@ -1,0 +1,21 @@
+{
+  "guards": [
+    "deepset",
+    "fmops",
+    "guardshield",
+    "horizon_guard_base",
+    "llama_guard_3_1b",
+    "llama_guard_3_8b",
+    "llama_guard_4_12b",
+    "mezzo_v2_base",
+    "prompt_guard_2_22m",
+    "prompt_guard_2_86m",
+    "prompt_guard_v1",
+    "protectai_v2",
+    "qwen3guard_gen_0_6b",
+    "qwen3guard_gen_8b",
+    "sentinel_v2",
+    "wildguard"
+  ],
+  "pairs": []
+}
