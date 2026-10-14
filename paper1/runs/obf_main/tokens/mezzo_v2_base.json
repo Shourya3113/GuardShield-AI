@@ -6,84 +6,120 @@
       "max_tokens": 89,
       "chars_per_token": 3.798613251155624,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.424968
+      "token_length_auroc": 0.424968,
+      "fragmentation": 1.0,
+      "identical_to_clean": 1.0,
+      "unk_share": 0.0
     },
     "zero_width": {
       "mean_tokens": 60.058,
       "max_tokens": 264,
       "chars_per_token": 1.9714109693962503,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.514358
+      "token_length_auroc": 0.514358,
+      "fragmentation": 3.084643040575244,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "soft_hyphen": {
       "mean_tokens": 103.229,
       "max_tokens": 457,
       "chars_per_token": 1.1469548285849906,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.5269940000000001
+      "token_length_auroc": 0.5269940000000001,
+      "fragmentation": 5.301951720595788,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "leetspeak": {
       "mean_tokens": 52.087,
       "max_tokens": 235,
       "chars_per_token": 1.4199128381361952,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.49741599999999997
+      "token_length_auroc": 0.49741599999999997,
+      "fragmentation": 2.6752439650744737,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "homoglyph": {
       "mean_tokens": 47.045,
       "max_tokens": 217,
       "chars_per_token": 1.5720905515995323,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.495198
+      "token_length_auroc": 0.495198,
+      "fragmentation": 2.41628145865434,
+      "identical_to_clean": 0.004,
+      "unk_share": 0.0
     },
     "base64_wrap": {
       "mean_tokens": 89.496,
       "max_tokens": 357,
       "chars_per_token": 1.6976848127290605,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.487724
+      "token_length_auroc": 0.487724,
+      "fragmentation": 4.596610169491526,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "base64_scaffold": {
       "mean_tokens": 31.47,
       "max_tokens": 101,
       "chars_per_token": 4.0025103272958376,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.424968
+      "token_length_auroc": 0.424968,
+      "fragmentation": 1.6163328197226503,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "rot13_wrap": {
       "mean_tokens": 53.532,
       "max_tokens": 206,
       "chars_per_token": 2.3342860345214076,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.489134
+      "token_length_auroc": 0.489134,
+      "fragmentation": 2.7494607087827427,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "rot13_scaffold": {
       "mean_tokens": 32.47,
       "max_tokens": 102,
       "chars_per_token": 3.8484447182014168,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.424968
+      "token_length_auroc": 0.424968,
+      "fragmentation": 1.667693888032871,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     },
     "fullwidth": {
       "mean_tokens": 19.47,
       "max_tokens": 89,
       "chars_per_token": 3.798613251155624,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.424968
+      "token_length_auroc": 0.424968,
+      "fragmentation": 1.0,
+      "identical_to_clean": 1.0,
+      "unk_share": 0.0
     },
     "diacritics": {
       "mean_tokens": 68.353,
       "max_tokens": 311,
       "chars_per_token": 1.8119029157461999,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.506584
+      "token_length_auroc": 0.506584,
+      "fragmentation": 3.510683102208526,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.05070735739470104
     },
     "spaced_letters": {
       "mean_tokens": 60.058,
       "max_tokens": 264,
       "chars_per_token": 1.9714109693962503,
       "share_over_limit": 0.0,
-      "token_length_auroc": 0.514358
+      "token_length_auroc": 0.514358,
+      "fragmentation": 3.084643040575244,
+      "identical_to_clean": 0.0,
+      "unk_share": 0.0
     }
   },
   "over_limit_pairs": []

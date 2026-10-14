@@ -22,7 +22,7 @@ There is no LaTeX on the laptop, so build on Overleaf:
 | Study 1 results (Gandalf × Dolly, 18 guards) | drafted from generated numbers |
 | Study 1 second source (`pids_main`) | done: replication section and appendix figure |
 | Contamination audit | done (`guard_audit/contamination.py`, `configs/training_sources.json`): table and sensitivity analysis generated from both runs' `contamination.json` and `obf_main/metrics_decontaminated.json` |
-| Mechanism (H4, tokenizer fragmentation) | not started |
+| Mechanism (H4, tokenizer fragmentation) | done: section "Mechanism: the tokenizer decides" and its table, from `tokens/*.json` (fragmentation, identical_to_clean, unk_share) of both runs |
 | Study 2 (canonicalization vs augmentation) | not started |
 | Related work | drafted; the canonicalization paragraph is `\todo` (Indic related work moves to Paper 2) |
 | References | verified 2026-10-14 against the arXiv API, the ACL Anthology and Crossref |

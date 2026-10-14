@@ -263,18 +263,18 @@ def load_pair_exclusions(path: Path) -> Dict[str, set]:
 
 # --------------------------------------------------------------------------- tokens
 def cmd_tokens(args):
-    from .tokens import input_limit, token_stats, tokenizer_counter
+    from .tokens import input_limit, token_stats, tokenizer_encoder
     run = Path(args.run)
     items = read_items(run)
     specs = json.loads(Path(args.guards_config).read_text(encoding="utf-8"))["guards"]
     over_all = set()
     for name in args.guards:
         try:
-            counter = tokenizer_counter(name, specs[name], BASE_DIR)
+            encode, unk_id = tokenizer_encoder(name, specs[name], BASE_DIR)
         except Exception as exc:
             print(f"[{name}] skipped: {exc}")
             continue
-        stats = token_stats(items, counter, input_limit(specs[name]))
+        stats = token_stats(items, None, input_limit(specs[name]), encode=encode, unk_id=unk_id)
         over_all.update(stats["over_limit_pairs"])
         write_json(run / "tokens" / f"{name}.json", stats)
         print(f"[{name}] limit={stats['limit']} pairs over limit={len(stats['over_limit_pairs'])}")

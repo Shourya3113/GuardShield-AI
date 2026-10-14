@@ -6,6 +6,7 @@
     "horizon_guard_base",
     "llama_guard_3_1b",
     "llama_guard_3_8b",
+    "llama_guard_4_12b",
     "mezzo_v2_base",
     "prompt_guard_2_22m",
     "prompt_guard_2_86m",
@@ -15,7 +16,7 @@
     "qwen3guard_gen_8b",
     "sentinel_v2",
     "wildguard",
-    "llama_guard_4_12b"
+    "prompt_guard_v1_jailbreak"
   ],
   "pairs": []
 }

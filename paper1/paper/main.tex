@@ -17,6 +17,7 @@
 \input{generated/numbers.tex}
 \input{generated/numbers_contamination.tex}
 \input{generated/numbers_pids.tex}
+\input{generated/numbers_mechanism.tex}
 \makeatletter  % pages holding only floats start at the top (single- and double-column floats)
 \setlength{\@fptop}{0pt}\setlength{\@dblfptop}{0pt}
 \makeatother
@@ -165,7 +166,36 @@ At the default threshold, \nModeClosed{} of \nModeCells{} cells fail closed, \nM
 \paragraph{The same guard fails in both directions (H1b).} Failure direction belongs to a guard--family cell rather than to a guard. \nMixedGuards{} guards (\mixedGuards) have at least one fail-closed and at least one fail-open cell. Qwen3Guard-Gen 0.6B flags \qwenSmallCleanTPR\% of clean attacks but \qwenSmallBsfTPR\% of Base64 attacks and \qwenSmallBsfFPR\% of their twins, yet under leetspeak it flags \qwenSmallLeetFPR\% of the benign twins. Model families also disagree across versions: Llama Guard 3 8B fails open under Base64 (recall \lgThreeEightBsfTPR\%, FPR \lgThreeEightBsfFPR\%), while Llama Guard 4 12B fails closed, flagging \lgFourBsfFPR\% of Base64 benign twins and \lgFourRotFPR\% of ROT13 twins.
 
 
-\paragraph{Encoder classifiers trained for injection fail closed; Prompt Guard fails open.} Across families, the injection classifiers fine-tuned from general encoders (ProtectAI v2, deepset, fmops, Mezzo, GuardShield) produce almost only fail-closed cells, whereas the Prompt Guard models produce only fail-open cells. Our own GuardShield is no exception: it flags \guardshieldCleanFPR\% of clean twins but \guardshieldShyFPR\% under soft hyphens (AUROC \guardshieldShyAUC). \todo{mechanism: tokenizer fragmentation (H4, \S7 of SPEC); Prompt Guard 2's tokenizer-level normalization explains its immunity to zero-width characters \citep{meta2025promptguard2,xpn_tokenization}.}
+\paragraph{Encoder classifiers trained for injection fail closed; Prompt Guard fails open.} Across families, the injection classifiers fine-tuned from general encoders (ProtectAI v2, deepset, fmops, Mezzo, GuardShield) produce almost only fail-closed cells, whereas the Prompt Guard models produce only fail-open cells. Our own GuardShield is no exception: it flags \guardshieldCleanFPR\% of clean twins but \guardshieldShyFPR\% under soft hyphens (AUROC \guardshieldShyAUC). Section~\ref{sec:mechanism} explains both patterns.
+
+\subsection{Mechanism: the tokenizer decides (H4)}
+\label{sec:mechanism}
+
+For each detector's tokenizer and each of the \mechCharFamilies{} character families, we tokenized every perturbed text and its unperturbed base text and recorded whether the token sequences are identical, the share of unknown tokens, and the ratio of token counts (fragmentation). Each tokenizer treats a family the same way for every text, so each of the \mechObfCells{} guard--family cells of the \mechGuards{} detectors\footnote{Prompt Guard v1 in injection mode is excluded because it flags almost all clean text; the perplexity baseline has no tokenizer-level decision.} falls into one of three outcomes (Table~\ref{tab:mechanism}).
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{3}{c}{Gandalf $\times$ Dolly} & \multicolumn{3}{c}{PIDS-Bench} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-7}
+Tokenizer & int. & deg. & destr. & int. & deg. & destr. \\
+\midrule
+\input{generated/tab_mechanism.tex}
+\bottomrule
+\end{tabular}
+\caption{Intent-signal status of character-family cells by how the detector's tokenizer treats the perturbation: normalized away (perturbed and clean token ids identical), collapsed into unknown tokens ($\geq 25\%$ of tokens), or fragmented.}
+\label{tab:mechanism}
+\end{table}
+
+\paragraph{Normalized away: the signal survives.} When the tokenizer maps the perturbed text back to the clean token sequence, the detector sees the clean prompt, and the signal is intact in all \mechObfNormalized{} such cells on both sources. This explains the immune cells in Figure~\ref{fig:map}: Prompt Guard 2's tokenizer removes zero-width characters, full-width forms and letter spacing, consistent with Meta's tokenization fix and an independent analysis \citep{meta2025promptguard2,xpn_tokenization}; Horizon guard-base's removes zero-width characters, soft hyphens and full-width forms; fmops's lowercasing, accent-stripping tokenizer removes zero-width characters, soft hyphens and diacritics; and those of ProtectAI, deepset, Mezzo, GuardShield and Prompt Guard v1 normalize full-width forms.
+
+\paragraph{Unknown tokens: the signal is destroyed.} fmops maps full-width words, and ProtectAI, deepset and Prompt Guard 2 22M map many soft-hyphenated words, to their unknown token. All \mechObfUnknown{} such cells lose the signal, although their token count barely changes, so token counts alone hide this failure.
+
+\paragraph{Fragmented: encoders lose the signal, larger judges sometimes read through.} The remaining \mechObfFragmented{} cells fragment the text into more tokens. Encoder classifiers keep an intact signal in only \mechObfFragEncIntact{} of their \mechObfFragEnc{} fragmented cells (\mechPidsFragEncIntact{} on PIDS-Bench), while the generative judges keep it in \mechObfFragJudgeIntact{} of \mechObfFragJudge{}, mostly Qwen3Guard-Gen 8B and WildGuard. How much the text fragments does not matter once it does: within fragmented cells, the fragmentation ratio is unrelated to the AUROC drop (Spearman $\rho = \mechObfFragRho$, $p = \mechObfFragP$; PIDS-Bench $\rho = \mechPidsFragRho$). We therefore read H4 as partly supported: the tokenizer's treatment of a perturbation, not the amount of fragmentation, predicts signal loss.
+
+\paragraph{Direction is the guard's default for unreadable text.} Once a detector cannot read its input, it returns a fixed verdict for both members of the pair. Across all perturbed families, \mechObfDirMajority{} of the \mechObfDirCells{} destroyed cells with a pure failure direction (\mechObfDirPct\%; PIDS-Bench \mechPidsDirPct\%) follow their guard's majority direction: the fine-tuned injection classifiers treat unreadable input as an attack, and Prompt Guard treats it as benign. Opposite directions within one guard arise mainly where the mechanisms differ, for instance Llama Guard 3 8B fails closed on fragmented leetspeak and full-width text but open on encoded wrappers.
 
 \subsection{Threshold shift or destroyed signal}
 

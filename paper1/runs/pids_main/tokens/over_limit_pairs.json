@@ -15,7 +15,8 @@
     "qwen3guard_gen_0_6b",
     "qwen3guard_gen_8b",
     "sentinel_v2",
-    "wildguard"
+    "wildguard",
+    "prompt_guard_v1_jailbreak"
   ],
   "pairs": []
 }
