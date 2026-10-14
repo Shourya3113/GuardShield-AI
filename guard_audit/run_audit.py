@@ -5,6 +5,8 @@ Paired-perturbation guard audit.
   python -m guard_audit.run_audit score   --run runs/paper1/obf --guards guardshield protectai_v2 deepset
   python -m guard_audit.run_audit metrics --run runs/paper1/obf
   python -m guard_audit.run_audit report  --run runs/paper1/obf
+  python -m guard_audit.run_audit contamination --run runs/paper1/obf   (guard_audit/contamination.py)
+  python -m guard_audit.run_audit metrics --run runs/paper1/obf --exclude-pairs runs/paper1/obf/contamination.json       --only-excluded --out metrics_decontaminated.json
 
 A run directory holds dataset.jsonl + manifest.json (build), scores/<guard>.jsonl + .meta.json
 (score), metrics.json (metrics) and report.md (report). Scoring is resumable; scores produced
@@ -219,6 +221,7 @@ def cmd_metrics(args):
             raise SystemExit("Run the tokens command first: python -m guard_audit.run_audit tokens --run ...")
         exclude = set(json.loads(over.read_text(encoding="utf-8"))["pairs"])
         print(f"Excluding {len(exclude)} pairs over a classifier's input limit")
+    exclude_by_guard = load_pair_exclusions(Path(args.exclude_pairs)) if args.exclude_pairs else None
     results = {}
     for meta_path in sorted((run / "scores").glob("*.meta.json")):
         name = meta_path.name[:-len(".meta.json")]
@@ -227,16 +230,35 @@ def cmd_metrics(args):
             raise SystemExit(f"Scores for {name} were produced on a different dataset; rescore with --overwrite.")
         if meta.get("status") != "complete":
             raise SystemExit(f"Scoring for {name} is incomplete; re-run the score command to resume it.")
+        guard_exclude = exclude
+        if exclude_by_guard is not None:
+            guard_exclude = exclude | exclude_by_guard.get(name, exclude_by_guard.get("*", set()))
+            if args.only_excluded and not guard_exclude - exclude:
+                continue
         scores = {r["item_id"]: r["score"] for r in
                   map(json.loads, (run / "scores" / f"{name}.jsonl").read_text(encoding="utf-8").splitlines())}
         results[name] = {"guard": meta["guard"],
                          **guard_metrics(items, scores, meta["guard"].get("default_threshold"),
                                          reference_condition=args.reference, n_boot=args.n_boot, seed=args.seed,
-                                         exclude_pairs=exclude)}
-        print(f"[{name}] metrics computed")
-    out_name = "metrics_under_limit.json" if args.exclude_over_limit else "metrics.json"
+                                         exclude_pairs=guard_exclude)}
+        if guard_exclude is not exclude:
+            results[name]["excluded_pairs"] = sorted(guard_exclude)
+        print(f"[{name}] metrics computed" + (f" without {len(guard_exclude)} pairs" if guard_exclude else ""))
+    out_name = args.out or ("metrics_under_limit.json" if args.exclude_over_limit else "metrics.json")
     write_json(run / out_name, {"dataset_sha256": dataset_sha, "environment": environment(),
-                                "excluded_pairs": sorted(exclude), "guards": results})
+                                "excluded_pairs": sorted(exclude),
+                                "exclude_pairs_file": args.exclude_pairs, "guards": results})
+
+
+def load_pair_exclusions(path: Path) -> Dict[str, set]:
+    """Pairs to drop per guard: a contamination.json (each guard's contaminated_pairs), {"guards": {name: [pair_ids]}},
+    or {"pairs": [pair_ids]} / a plain list for every guard (key "*")."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, list):
+        return {"*": set(data)}
+    if "pairs" in data:
+        return {"*": set(data["pairs"])}
+    return {name: set(g["contaminated_pairs"] if isinstance(g, dict) else g) for name, g in data["guards"].items()}
 
 
 # --------------------------------------------------------------------------- tokens
@@ -320,6 +342,17 @@ def cmd_report(args):
     print(f"Wrote {run / 'report.md'}")
 
 
+# --------------------------------------------------------------------------- contamination
+def cmd_contamination(args):
+    from .contamination import main as contamination_main
+    argv = ["--run", *args.run]
+    if args.training_sources:
+        argv += ["--training-sources", args.training_sources]
+    if args.corpora:
+        argv += ["--corpora", *args.corpora]
+    contamination_main(argv)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(required=True)
@@ -353,6 +386,11 @@ def main(argv=None):
     mt.add_argument("--seed", type=int, default=0)
     mt.add_argument("--exclude-over-limit", action="store_true",
                     help="drop pairs over any classifier's input limit (needs the tokens command); writes metrics_under_limit.json")
+    mt.add_argument("--exclude-pairs",
+                    help="JSON of pairs to drop per guard, e.g. <run>/contamination.json (each guard's contaminated pairs)")
+    mt.add_argument("--only-excluded", action="store_true",
+                    help="with --exclude-pairs: compute only the guards that have pairs to drop")
+    mt.add_argument("--out", help="output file name in the run directory (default metrics.json / metrics_under_limit.json)")
     mt.set_defaults(func=cmd_metrics)
 
     t = sub.add_parser("tokens", help="token counts, truncation and length confound per guard tokenizer")
@@ -365,6 +403,12 @@ def main(argv=None):
     r.add_argument("--run", required=True)
     r.add_argument("--policy", default="fpr@0.05")
     r.set_defaults(func=cmd_report)
+
+    c = sub.add_parser("contamination", help="overlap of the run's texts with guards' training data (contamination.py)")
+    c.add_argument("--run", nargs="+", required=True)
+    c.add_argument("--training-sources")
+    c.add_argument("--corpora", nargs="+")
+    c.set_defaults(func=cmd_contamination)
 
     args = p.parse_args(argv)
     args.func(args)

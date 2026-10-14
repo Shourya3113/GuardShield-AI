@@ -70,9 +70,9 @@ Report on seen and held-out families separately, at matched clean TPR, over ≥ 
 
 | Source | Role | Size used | Contamination risk |
 |---|---|---|---|
-| Lakera `gandalf_ignore_instructions` (all splits) | attacks (primary 1) | 1,000 | no verbatim copy in GuardShield training, but 94 of the 500 paired attacks share ≥ 50% of their word 8-grams with GuardShield's SPML training rows (SPML embeds Gandalf-style prompts; found 2026-10-14); unknown for vendor guards, and ProtectAI v2 may also list SPML (contamination audit) |
-| `databricks-dolly-15k`, instructions without context | benign twins + calibration (primary 1) | 10,362 available | generic; possibly benign training data for some guards |
-| PIDS-Bench v3 `test.csv` (`pids_test`; tag v1.0-pids-bench, SHA-256 matches its `FREEZE_MANIFEST.txt`) | attacks + benign (primary 2) | 264 attacks, 696 benign after selection; 200 pairs + 496 calibration | seeds disjoint from PIDS-Bench train by construction; `deepset_injection` rows dropped (training data of deepset, fmops, GuardShield) |
+| Lakera `gandalf_ignore_instructions` (all splits) | attacks (primary 1) | 1,000 | **known** for Horizon-Labs (trained on the train split: 388 of the 500 paired attacks) and GuardShield (157 of 500 inside its SPML training rows, which open with copied Gandalf prompts); see the audit table below |
+| `databricks-dolly-15k`, instructions without context | benign twins + calibration (primary 1) | 10,362 available | **likely** for ProtectAI v2 (its card lists VMware/open-instruct, which contains 487 of the 500 twins and 994 of the 1,000 calibration prompts); known for PIGuard (173 of 1,500), and a handful for GuardShield and Horizon-Labs |
+| PIDS-Bench v3 `test.csv` (`pids_test`; tag v1.0-pids-bench, SHA-256 matches its `FREEZE_MANIFEST.txt`) | attacks + benign (primary 2) | 264 attacks, 696 benign after selection; 200 pairs + 496 calibration | seeds disjoint from PIDS-Bench train by construction; `deepset_injection` rows dropped (training data of deepset, fmops, GuardShield); no overlap with any audited training corpus |
 | `leolee99/NotInject` (3 subsets) | benign hard negatives (secondary) | 339 | PIGuard designed against it |
 | `deepset/prompt-injections` test | mixed (secondary) | ~116 | in-distribution for deepset, fmops, GuardShield |
 | GuardShield `test_in_distribution` | mixed (GuardShield-only analysis) | 698 | in-distribution for GuardShield |
@@ -87,7 +87,39 @@ Report on seen and held-out families separately, at matched clean TPR, over ≥ 
 
 Twins are matched against the whole benign pool before the calibration pool is drawn from the remainder (`build --pair-first`), which gives a length AUROC of 0.53 (0.83 if the calibration pool is held out first). The calibration pool is shorter than the twins (median 66 vs 102 characters); this affects only the calibrated policies, not the default-threshold headline. The pairs' attacks are 188 PIDS template injections and 12 SPML injections; their twins are 95 Alpaca paraphrases, 71 chatbot instructions, 20 OASST1 paraphrases and 14 PIDS template benign prompts. Every PIDS text was paraphrased by gpt-4o-mini, so this source is less diverse than Gandalf and complements it rather than replacing it. BIPIA was rejected as primary 2: its injections are embedded in long emails, tables and code, which the length-matched twin protocol cannot pair, and PIGuard is trained on it (Liu 2610.03448).
 
-**Contamination audit (before reporting):** verbatim and near-duplicate overlap (word 8-gram and MinHash, threshold 0.8) of every evaluation source against every auditable guard's training sources: ProtectAI v2's listed datasets, PIGuard, Horizon-Labs, GuardShield. Each table cell is marked known, likely or unknown. This follows Liu ([arXiv 2610.03448](https://arxiv.org/abs/2610.03448)), who found PIGuard trained on most of BIPIA's and InjecAgent's attacks.
+**Contamination audit (before reporting; done 2026-10-14):** verbatim and near-duplicate overlap of every evaluation pool against every auditable guard's training sources. This follows Liu ([arXiv 2610.03448](https://arxiv.org/abs/2610.03448)), who found PIGuard trained on most of BIPIA's and InjecAgent's attacks.
+- Code and data: `guard_audit/contamination.py` (`run_audit contamination --run <dirs>`); training corpora with pinned revisions and each guard's usage in `configs/training_sources.json`; results in `<run>/contamination.json`.
+- Pools: the unperturbed attack and twin of each pair, and the calibration prompts.
+- Matching, after normalization (lowercase, punctuation removed, whitespace collapsed):
+  - *verbatim:* equal to a training text, or to one full line of one (SPML prepends copied Gandalf prompts as the first line of a user turn)
+  - *near-duplicate:* ≥ 80% of the text's word 8-grams in one training text (containment)
+  - texts under 8 words: verbatim only, since a short stock phrase inside a different attack is not a copy
+  - exact word 8-gram Jaccard is recorded with the 0.8 threshold. It replaces MinHash, which only estimates it; the corpora are small enough for the exact value.
+  - containment ≥ 0.5 is reported but not flagged: at that level, ~10-word texts match on stock phrases.
+- Status per guard × pool:
+
+  | Status | Rule |
+  |---|---|
+  | known | overlap with a corpus the guard trained on in full (its released training set, or a split its code loads) |
+  | likely | overlap only with corpora its model card lists without saying which rows it used |
+  | none | the audited corpora are its whole training set, and no overlap |
+  | unknown | no overlap, but part of the training data is undisclosed, gated or not audited |
+
+Results (28 corpora; contaminated / audited texts; "benign" = twins + calibration):
+
+| Guard | Gandalf attacks | Dolly benign | PIDS attacks | PIDS benign | Training data audited |
+|---|---|---|---|---|---|
+| GuardShield | known (157/500) | known (5/1,500) | none (0/200) | none (0/696) | splits_v3 train + validation, hard-negative script lists |
+| ProtectAI v2 | unknown (0/500) | likely (1,481/1,500) | unknown | unknown | the 7 of 22 datasets its card names. Harelix's set has been deleted from the Hub (PIGuard's copy of 1,174 rows is used); the other 15 are undisclosed |
+| deepset | none | none | none | none | deepset/prompt-injections train |
+| fmops | none | none | none | none | deepset/prompt-injections train (only dataset on its card) |
+| Horizon-Labs guard-base | known (388/500) | known (8/1,500) | unknown | unknown | the card's public sets at the splits loaded by `data/build_v0.py` (agent-io-guards@45fbbf8). Not audited: ~80k unreleased synthetic examples, LLMail-Inject, the NVIDIA Nemotron sets, Aya, UltraChat, glaive and FineWeb |
+| PIGuard (not scored) | none | known (173/1,500) | none | none | released `datasets/train.json` (PIGuard@1b5751e) |
+| Mezzo v2, Sentinel v2†, Prompt Guard v1/2, Llama Guard 3/4, Qwen3Guard, WildGuard† | unknown | unknown | unknown | unknown | training data undisclosed (†gated: no licence accepted for the audit) |
+
+- **Sources of the overlaps.** Horizon-Labs' Gandalf overlap is the dataset's train split itself. GuardShield's overlap comes from "Stanford SPML (16K Benchmark)" rows labelled injection: 155 of the 157 attacks are verbatim lines, and 2 are ≥ 80% contained. ProtectAI v2's and PIGuard's Dolly overlap comes from open-instruct. GuardShield's 5 Dolly matches (1 twin, 4 calibration prompts) are verbatim rows of its Jayavibhav and TruthfulQA data. Horizon-Labs' 8 Dolly matches are short stock questions ("Who are you?") in OASST2 and other sets.
+- **Sensitivity** (`obf_main/metrics_decontaminated.json`, from `metrics --exclude-pairs contamination.json`): each contaminated guard is recomputed without its own contaminated pairs. GuardShield keeps 342 pairs and Horizon-Labs 112. Across their 22 perturbed cells, no failure mode changes (default or 5%-FPR threshold). 4 intent-signal statuses change, all from destroyed to degraded: AUROC moves ≤ 0.02, but the CI widens across 0.75 with fewer pairs. ProtectAI v2 keeps only 13 pairs, too few to read, so its clean-condition FPR on Dolly is reported as possibly favoured by benign training data.
+- Calibration prompts are not removed: thresholds still use the full calibration pool, and the headline uses default thresholds.
 
 **External anchors:** clean-condition results are compared with published numbers, and differences are explained:
 
@@ -189,6 +221,8 @@ python -m guard_audit.run_audit build --attack-sources pids_test --benign-source
 python -m guard_audit.run_audit metrics --run runs/obf_main
 python -m guard_audit.run_audit metrics --run runs/obf_main --exclude-over-limit
 python -m guard_audit.run_audit report --run runs/obf_main --policy default
+python -m guard_audit.run_audit contamination --run paper1/runs/obf_main paper1/runs/pids_main
+python -m guard_audit.run_audit metrics --run paper1/runs/obf_main --exclude-pairs paper1/runs/obf_main/contamination.json --only-excluded --out metrics_decontaminated.json
 ```
 
 Score files from different machines merge into one run directory; scoring resumes and refuses scores made against a different dataset version.
@@ -209,6 +243,7 @@ The guide left these decisions to the team (2026-10-12). Revisit them here, with
 | 2026-10-13 | Roster | Added Mezzo Prompt Guard v2 Base, Horizon-Labs guard-base and Sentinel v2; HiveTraceGuard-Pro and PolyGuard-Qwen-Smol to be configured. |
 | 2026-10-13 | Study C | Added the naive canonicalizer and decode-and-rescan-only arms, and per-round recall/FPR plots for augmentation. |
 | 2026-10-14 | Data | Second primary source fixed: PIDS-Bench v3 test split, 200 pairs (`pids_main`, section 3); BIPIA rejected. Study A on Gandalf × Dolly complete for 18 guards. |
+| 2026-10-14 | Contamination audit | Done for both primary runs (section 3). Exact 8-gram Jaccard replaces MinHash. A text is contaminated if it is a verbatim copy (whole text or one line) or ≥ 80% contained; under 8 words, verbatim only. Status "none" added for guards whose whole training set was audited without overlap. Known: Horizon-Labs and GuardShield on Gandalf; likely: ProtectAI v2 on Dolly. Sensitivity without contaminated pairs changes no failure mode. |
 
 ## 11. Claims and wording
 

@@ -14,7 +14,7 @@
       "constant_label": 1,
       "max_chars": 1500,
       "role": "attack",
-      "contamination": "Unknown for vendor guards. No verbatim copy in GuardShield training, but 94 of obf_main's 500 attacks share >= 50% of their word 8-grams with GuardShield's SPML training rows (likely contamination)."
+      "contamination": "Audited 2026-10-14 (paper1/runs/obf_main/contamination.json): KNOWN for Horizon-Labs guard-base (trained on the train split; 388 of the 500 paired attacks) and GuardShield (157 of 500 inside its SPML training rows, 155 as verbatim lines). None for deepset, fmops, PIGuard; unknown for ProtectAI v2 (15 of 22 training sets undisclosed) and the undisclosed guards. Sensitivity without these pairs: metrics_decontaminated.json."
     },
     "deepset_test": {
       "type": "hf_parquet",
@@ -38,7 +38,7 @@
       "constant_label": 0,
       "max_chars": 1500,
       "role": "benign",
-      "contamination": "Generic instruction data; may appear as benign training data for some guards."
+      "contamination": "Audited 2026-10-14: LIKELY for ProtectAI v2 (its card lists VMware/open-instruct, which contains 487 of 500 twins and 994 of 1,000 calibration prompts); known for PIGuard (173 of 1,500 in its released training set, via open-instruct), GuardShield (5 verbatim) and Horizon-Labs (8, short stock questions). None for deepset and fmops."
     },
     "pids_test": {
       "type": "url_csv",
@@ -58,7 +58,7 @@
       "role": "mixed",
       "licence": "Research / non-commercial use (inherits upstream licences: CC BY-NC 4.0 for Alpaca-seeded and qualifire rows; see DATA_LICENSES.md at the pinned commit). Code MIT.",
       "provenance": "PIDS-Bench v3 test split (arXiv 2609.15017), tag v1.0-pids-bench (commit 87dc835); SHA-256 equals FREEZE_MANIFEST.txt. Unobfuscated rows only (we apply our own perturbations); encoded_attack rows dropped (already encoded); deepset_injection dropped (training data of deepset, fmops, GuardShield); stackexchange dropped (Dolly instructions, the Study A benign source); one row per parent seed (paraphrases share seeds); <= 200 characters so that length-matched twins exist.",
-      "contamination": "Seeds disjoint from PIDS-Bench train by construction. SPML and qualifire rows: training data of other guards unknown; see the contamination audit."
+      "contamination": "Seeds disjoint from PIDS-Bench train by construction. Audited 2026-10-14 (paper1/runs/pids_main/contamination.json): no overlap with any audited training corpus (GuardShield, PIGuard, deepset, fmops: none; ProtectAI v2 and Horizon-Labs: unknown, training data partly undisclosed)."
     },
     "notinject": {
       "type": "hf_parquet",

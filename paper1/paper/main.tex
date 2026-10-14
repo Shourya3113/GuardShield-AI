@@ -15,6 +15,7 @@
 \usepackage{xcolor}
 
 \input{generated/numbers.tex}
+\input{generated/numbers_contamination.tex}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\dg}{$^\circ$}       % degraded intent signal
 \newcommand{\ds}{$^\dagger$}     % destroyed intent signal
@@ -117,7 +118,7 @@ Let $A_c$ and $B_c$ be the detector's scores for the attacks and their twins und
 
 \paragraph{Data.} The primary run pairs \nPairs{} attacks from Lakera's \textit{gandalf\_ignore\_instructions} \citep{lakera2023gandalf} with benign instructions from \textit{databricks-dolly-15k} that have no context field \citep{conover2023dolly}; \nCalibration{} further Dolly instructions form the calibration pool. The dataset (SHA-256 \texttt{\datasetSha\ldots}) rebuilds deterministically from pinned dataset revisions. A second primary source pairs 200 attacks and benign prompts from the PIDS-Bench v3 test split \citep{pidsbench2026}. \todo{report pids\_main results once scored (\S\ref{sec:second}).}
 
-\paragraph{Detectors.} Table~\ref{tab:clean} lists the \nGuards{} detectors. Encoder classifiers are scored by the softmax probability of their attack label(s). Prompt Guard v1 is reported in both of Meta's modes: injection-or-jailbreak, intended for third-party data, and jailbreak only, intended for direct user input. Generative judges (Llama Guard \citep{inan2023llamaguard}, Qwen3Guard \citep{qwen3guard2025}, WildGuard \citep{han2024wildguard}) are scored without sampling, by the probability mass of their unsafe verdict among their verdict strings under teacher forcing; each judge was checked to agree with its own greedy output on probe prompts before scoring. Content-safety judges classify harmfulness rather than injection, so low clean recall is expected; they are included because deployments use them as the only guard. GuardShield is our own DeBERTa-v3-small classifier \citep{he2023debertav3}. Its training data contain no Gandalf or PIDS-Bench text verbatim, but include the SPML corpus, whose system-prompt injections reuse Gandalf-style password-extraction prompts: about one in five Study A attacks shares at least half of its word 8-grams with GuardShield training text. \todo{replace with the contamination-audit macro and report GuardShield with and without these pairs.} A GPT-2 perplexity filter is a non-learned baseline. Model revisions are pinned to commit hashes.
+\paragraph{Detectors.} Table~\ref{tab:clean} lists the \nGuards{} detectors. Encoder classifiers are scored by the softmax probability of their attack label(s). Prompt Guard v1 is reported in both of Meta's modes: injection-or-jailbreak, intended for third-party data, and jailbreak only, intended for direct user input. Generative judges (Llama Guard \citep{inan2023llamaguard}, Qwen3Guard \citep{qwen3guard2025}, WildGuard \citep{han2024wildguard}) are scored without sampling, by the probability mass of their unsafe verdict among their verdict strings under teacher forcing; each judge was checked to agree with its own greedy output on probe prompts before scoring. Content-safety judges classify harmfulness rather than injection, so low clean recall is expected; they are included because deployments use them as the only guard. GuardShield is our own DeBERTa-v3-small classifier \citep{he2023debertav3}. Its training data include the SPML corpus, whose injected user turns open with copied Gandalf prompts: \gsContamAttacks{} of the \nPairs{} Study A attacks (\gsContamAttacksPct\%) occur in GuardShield's training text, and Horizon guard-base trained on Gandalf's train split, which holds \horizonContamAttacks{} of them. Both detectors are also reported without these pairs (\S\ref{sec:contamination}). A GPT-2 perplexity filter is a non-learned baseline. Model revisions are pinned to commit hashes.
 
 \paragraph{Compute and precision.} Generative judges run in float16 on two NVIDIA T4 GPUs. Against float32, 16-bit scoring shifted individual scores by at most about 0.08 and flipped 0.5--1.5\% of decisions near the threshold on 200 pilot items. No pair exceeds any classifier's input limit under any family, so no input is truncated.
 
@@ -167,7 +168,26 @@ Ranking the \hTwoN{} detectors with a default threshold by mean perturbed-attack
 \label{sec:second}
 \todo{pids\_main: 200 PIDS-Bench pairs (188 template, 12 SPML attacks; Alpaca, chatbot-instruction, OASST1 and template twins); length AUROC 0.53. Report whether the failure map replicates, and compare clean results with PIDS-Bench Table 7: ProtectAI hard-benign FPR 0.216 and obfuscated recall 0.906; Prompt Guard 2 IID recall 0.369 and obfuscated recall 0.3235; Llama Guard 3 1B obfuscated recall 0.484.}
 
-\paragraph{Contamination.} \todo{contamination audit: verbatim and near-duplicate overlap of Gandalf, Dolly and PIDS-Bench against the training sources of ProtectAI v2, PIGuard, Horizon-Labs and GuardShield; mark each cell known / likely / unknown.}
+\paragraph{Contamination.}\label{sec:contamination} Following \citet{liu2026passing}, we checked every evaluated text (the unperturbed attack and twin of each pair, and the calibration prompts) against the published training data of the \nAuditGuards{} detectors that disclose it: \nAuditCorpora{} corpora at pinned revisions. After lowercasing and removing punctuation, a text counts as contaminated if it equals a training text or one full line of one, or if at least 80\% of its word 8-grams occur in a single training text; texts under eight words count only as verbatim copies. Exact 8-gram Jaccard is recorded alongside. Table~\ref{tab:contamination} marks each cell \emph{known} (overlap with data the detector trained on in full), \emph{likely} (overlap with a corpus its model card lists without saying which rows were used), \emph{none} (complete training data audited, no overlap) or \emph{unknown}.
+
+Three overlaps matter. Horizon guard-base trained on Gandalf's train split, which holds \horizonContamAttacks{} of our \nPairs{} attacks (\horizonContamAttacksPct\%). GuardShield's SPML training data contain \gsContamAttacks{} of them (\gsContamAttacksPct\%), \gsContamAttacksVerbatim{} as verbatim lines. On the benign side, ProtectAI v2's model card lists VMware's open-instruct collection, which includes Dolly: \protectaiContamTwins{} of the \nPairs{} twins and \protectaiContamCal{} of the \nCalibration{} calibration prompts occur in it, so ProtectAI's clean-condition FPR may partly reflect benign prompts seen in training. PIGuard's released training set contains \piguardContamTwins{} twins and \piguardContamCal{} calibration prompts; PIGuard is not in the scored roster. No audited corpus contains any of the \pidsAuditTexts{} PIDS-Bench texts.
+
+Recomputing each detector without its own contaminated pairs leaves GuardShield with \gsDeconPairs{} pairs and Horizon guard-base with \horizonDeconPairs{}. Across their \deconCells{} perturbed cells, \deconModeChanged{} failure modes change at the default threshold and \deconModeFprChanged{} at the 5\%-FPR threshold. \deconSigChanged{} intent-signal statuses change, \deconSigUp{} of them from destroyed to degraded: the AUROC moves by at most \deconAucShiftMax{}, while the smaller sample widens its confidence interval across the 0.75 bound. ProtectAI v2 keeps only \protectaiDeconPairs{} uncontaminated pairs, too few for this check. Training-data overlap would favour clean-condition results; it does not explain the failure map.
+
+\begin{table*}[t]
+\centering\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+& \multicolumn{2}{c}{Study A (Gandalf $\times$ Dolly)} & \multicolumn{2}{c}{PIDS-Bench} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Detector & attacks & benign & attacks & benign \\
+\midrule
+\input{generated/tab_contamination.tex}
+\bottomrule
+\end{tabular}
+\caption{Contamination audit: status, with contaminated / audited texts per evaluation pool. Benign pools include the twins and the calibration prompts. Known: overlap with data the detector trained on in full; likely: overlap with a corpus its model card lists; none: complete training data audited without overlap; unknown: training data partly or wholly undisclosed. $^\dagger$ audited but not scored.}
+\label{tab:contamination}
+\end{table*}
 
 % =====================================================================
 \section{Study B: Hindi, Romanized Hindi and Hinglish}

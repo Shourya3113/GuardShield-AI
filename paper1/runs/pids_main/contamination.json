@@ -1,0 +1,1171 @@
+{
+  "dataset_sha256": "3d8a8714b2a898dc40964f16de882935c0a1c2f9f7c5b4adbc44e26e0cb7b06a",
+  "environment": {
+    "git_commit": "1063c48225758b4d1a6568b0f87b06d20499bbc6-dirty",
+    "timestamp": "2026-10-14T08:04:15Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  },
+  "method": {
+    "normalization": "lowercase; punctuation removed; whitespace collapsed",
+    "ngram_words": 8,
+    "contaminated": "verbatim (whole text or one full line) or containment >= 0.8",
+    "reported_not_flagged": "containment >= 0.5",
+    "jaccard_threshold": 0.8,
+    "jaccard": "exact word n-gram Jaccard (MinHash estimates it)"
+  },
+  "corpora": {
+    "chatbot_instruction_prompts": {
+      "files": [
+        {
+          "repo": "alespalla/chatbot_instruction_prompts",
+          "revision": "6ea5ce09647e5451860801a46db6a46b28e259bf",
+          "file": "data/train-00000-of-00001-d3450385c0ae3f98.parquet",
+          "sha256": "d2b26dc88cef5844ec60fd54e5e9ffdc7c5cc76d0708d8b0ba1dbad451532cc0"
+        },
+        {
+          "repo": "alespalla/chatbot_instruction_prompts",
+          "revision": "6ea5ce09647e5451860801a46db6a46b28e259bf",
+          "file": "data/test-00000-of-00001-8d5da67d5c6856ed.parquet",
+          "sha256": "0b6e57d49470b63b3f195fbc15db7ebffb88a8bc5f4eafc290179a918a6f02fe"
+        }
+      ],
+      "n_docs": 322553
+    },
+    "deepset_train": {
+      "files": [
+        {
+          "repo": "deepset/prompt-injections",
+          "revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+          "file": "data/train-00000-of-00001-9564e8b05b4757ab.parquet",
+          "sha256": "2e10bc7ab30f542c97e4e83e2a5683000b5057d25ec10908784c631d44124c04"
+        }
+      ],
+      "n_docs": 546
+    },
+    "gandalf_train": {
+      "files": [
+        {
+          "repo": "Lakera/gandalf_ignore_instructions",
+          "revision": "04737b65e90a6794ec227012e4a255a7def6344b",
+          "file": "data/train-00000-of-00001-ded53be747ff55cd.parquet",
+          "sha256": "5b6acf3e5a5998d21f8e1222bb45bbdec25a14408747b1cd63bebef4a75fa439"
+        }
+      ],
+      "n_docs": 777
+    },
+    "grok_harmless": {
+      "files": [
+        {
+          "repo": "HuggingFaceH4/grok-conversation-harmless",
+          "revision": "01185ad52860775c65cbd6d0c9254ac8e9089fe0",
+          "file": "data/train_sft-00000-of-00001-71f7b2a54cfc90b9.parquet",
+          "sha256": "816145a51c8d5baeec39d312b2325924391b71547f4e36e00d2e7036b7706b92"
+        },
+        {
+          "repo": "HuggingFaceH4/grok-conversation-harmless",
+          "revision": "01185ad52860775c65cbd6d0c9254ac8e9089fe0",
+          "file": "data/test_sft-00000-of-00001-8e8f87780d2fd798.parquet",
+          "sha256": "3766c8d98d76f27fceb962007ae833201faf328002db1add7963a4c88320d6dc"
+        }
+      ],
+      "n_docs": 22424
+    },
+    "guardshield_hard_examples": {
+      "files": [
+        {
+          "path": "scripts/train_stage1_hard_negatives.py",
+          "sha256": "816de4b8bf5acc191d449e6f62f3be0eff15bed1691ce538f52640c1fff5668c"
+        }
+      ],
+      "n_docs": 139
+    },
+    "guardshield_splits_v3": {
+      "files": [
+        {
+          "path": "data/processed/splits_v3/train.json",
+          "sha256": "433f0ed264d976f39d858f5ed25287d50b76d3c7ee863826d9b649e3e05129ff"
+        },
+        {
+          "path": "data/processed/splits_v3/validation.json",
+          "sha256": "69cef843fa55584bdef68a9da66ea7496d8816d00dbdc335539c84d71877be8a"
+        }
+      ],
+      "n_docs": 3950
+    },
+    "harelix_via_piguard": {
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/leolee99/PIGuard/1b5751e88bf7475acbedfc8eda795ce060307c84/datasets/train.json",
+          "sha256": "806ded8bd85782a53d34faffe4fd92b3f2e0b3b431c43578ce77faea6b9ed911"
+        }
+      ],
+      "n_docs": 1174,
+      "notes": "Harelix/Prompt-Injection-Mixed-Techniques-2024 is no longer on the Hugging Face Hub (404 on 2026-10-14); PIGuard's training set keeps 1,174 of its rows, used here as a partial proxy."
+    },
+    "jackhhao_jailbreak": {
+      "files": [
+        {
+          "repo": "jackhhao/jailbreak-classification",
+          "revision": "2f2ceeb39658696fd3f462403562b6eea5306287",
+          "file": "default/jailbreak_dataset_train.csv",
+          "sha256": "a5cb24b0865ef37a248d6d82bd21026ce39c89f11abae5d26d4ae58aad3ffe40"
+        },
+        {
+          "repo": "jackhhao/jailbreak-classification",
+          "revision": "2f2ceeb39658696fd3f462403562b6eea5306287",
+          "file": "default/jailbreak_dataset_test.csv",
+          "sha256": "a546ce540973d8f5ef87ce3be4bd21ee5923154b9dda86eba5a12c7fa00829da"
+        }
+      ],
+      "n_docs": 1998
+    },
+    "jackhhao_jailbreak_train": {
+      "files": [
+        {
+          "repo": "jackhhao/jailbreak-classification",
+          "revision": "2f2ceeb39658696fd3f462403562b6eea5306287",
+          "file": "default/jailbreak_dataset_train.csv",
+          "sha256": "a5cb24b0865ef37a248d6d82bd21026ce39c89f11abae5d26d4ae58aad3ffe40"
+        }
+      ],
+      "n_docs": 1598
+    },
+    "jailbreakv_28k": {
+      "files": [
+        {
+          "repo": "JailbreakV-28K/JailBreakV-28k",
+          "revision": "f949ca582fff13d396ac8fce59596afafb2b78d3",
+          "file": "JailBreakV_28K/JailBreakV_28K.csv",
+          "sha256": "72fb8beb9eb1c1a23745f4bd56430da9dff36ba42c6f5d699e68a47e14fc87c5"
+        }
+      ],
+      "n_docs": 56000
+    },
+    "nesdeniz_boundary_train": {
+      "files": [
+        {
+          "repo": "3nesdeniz/agentic-prompt-injection-boundary-pairs",
+          "revision": "a5682e7573e1c7bc4b12e64d49c0dcd90ca776cf",
+          "file": "data/train.parquet",
+          "sha256": "12f7cb0d4790a684574b46165f8538f898966b47bfc9da322e12806089ad5e04"
+        }
+      ],
+      "n_docs": 840
+    },
+    "nesdeniz_english_train": {
+      "files": [
+        {
+          "repo": "3nesdeniz/english-prompt-injection-3k",
+          "revision": "87f017347aff7887b1de0d9457c9ec01bf7ba8b5",
+          "file": "data/train.parquet",
+          "sha256": "f419b218dc4a8e9e879d02e7caef5fa424dbc71ae025a173f277cad6e7c65a12"
+        }
+      ],
+      "n_docs": 2453
+    },
+    "nesdeniz_train": {
+      "files": [
+        {
+          "repo": "3nesdeniz/agentic-prompt-injection-5k",
+          "revision": "e658d94dcafc133e3a4483f9f9aa13507f3848c4",
+          "file": "data/train.parquet",
+          "sha256": "fc6ed1619af0c53c36d60361132422bc45984d3875337d6f465d5f4daa628cac"
+        }
+      ],
+      "n_docs": 3923
+    },
+    "neuralchemy_train": {
+      "files": [
+        {
+          "repo": "neuralchemy/Prompt-injection-dataset",
+          "revision": "7d70432dfcf47a821612cbf9d34e9d9e3ad20e75",
+          "file": "core/train-00000-of-00001.parquet",
+          "sha256": "c0724f8e00eebb65c001be9ba94291d1608e5da0374012e53dfd4077c5f92558"
+        },
+        {
+          "repo": "neuralchemy/Prompt-injection-dataset",
+          "revision": "7d70432dfcf47a821612cbf9d34e9d9e3ad20e75",
+          "file": "full/train-00000-of-00001.parquet",
+          "sha256": "47e72340dc1eea05e5a341acad936d3fedee724d205c784d1b6a196093270990"
+        }
+      ],
+      "n_docs": 18427
+    },
+    "oasst2": {
+      "files": [
+        {
+          "repo": "OpenAssistant/oasst2",
+          "revision": "179dd21fc55192153d94adb0e0ce8f69e222bf75",
+          "file": "data/train-00000-of-00001-88ba0162028a73fc.parquet",
+          "sha256": "9638227b41b0a4fb69afa5d5c4b52e3fb6abfd56c9870d81bae32c9981e769b1"
+        }
+      ],
+      "n_docs": 47443
+    },
+    "open_instruct": {
+      "files": [
+        {
+          "repo": "VMware/open-instruct",
+          "revision": "9e53e85f37988e3bfbebbee4dc9ad4942cfd37fa",
+          "file": "data/train-00000-of-00001-c6f4e090ee7100b6.parquet",
+          "sha256": "9ac59527bdbeee747ce4de6abdff89a7e4678aa339cb4063c27812df22098f4d"
+        }
+      ],
+      "n_docs": 427866
+    },
+    "or_bench_80k": {
+      "files": [
+        {
+          "repo": "bench-llm/or-bench",
+          "revision": "e36d8b80e81837c8a8f264bbb2a49f1b32c7e272",
+          "file": "or-bench-80k.csv",
+          "sha256": "22e956020cdfdd43c328f02441f003c933ee4e7083d02d9d24e414e4b42ae2e6"
+        }
+      ],
+      "n_docs": 80359
+    },
+    "piguard_train": {
+      "files": [
+        {
+          "url": "https://raw.githubusercontent.com/leolee99/PIGuard/1b5751e88bf7475acbedfc8eda795ce060307c84/datasets/train.json",
+          "sha256": "806ded8bd85782a53d34faffe4fd92b3f2e0b3b431c43578ce77faea6b9ed911"
+        }
+      ],
+      "n_docs": 76735
+    },
+    "prompts_chat": {
+      "files": [
+        {
+          "repo": "fka/prompts.chat",
+          "revision": "20888d8ddd6333f5a8eed9388d1fc405b0dd447d",
+          "file": "prompts.csv",
+          "sha256": "bb7c3ec7a5b06d72c15353053d5257fe2be1ad94a036bbe3462122f00b5678f8"
+        }
+      ],
+      "n_docs": 2452
+    },
+    "promptshield_train": {
+      "files": [
+        {
+          "repo": "hendzh/PromptShield",
+          "revision": "a5234cb1f5cdb256600cab64b8c961195b5e8404",
+          "file": "train.json",
+          "sha256": "aa33c3ffcc27bd07c0a233b52f1b8c3cbdb30606ce2412da06a88b5290cdc7b6"
+        }
+      ],
+      "n_docs": 18909
+    },
+    "rgeada_train": {
+      "files": [
+        {
+          "repo": "rgeada/tool-response-injections",
+          "revision": "39050de797f2694f0d72e1086003154de1919379",
+          "file": "tool_response_injections_train.csv",
+          "sha256": "4d7965bae0d0b1db3c50377596893923521f47a0119b0a21b83437617f387e6a"
+        }
+      ],
+      "n_docs": 11834
+    },
+    "salad_data": {
+      "files": [
+        {
+          "repo": "OpenSafetyLab/Salad-Data",
+          "revision": "d21a325e276a99bd69b1fbb8aa51a9f249486b72",
+          "file": "base_set.json",
+          "sha256": "0987630d953961ac9d9e3e272db72dea20079aa29df769378fa96e9f653f2ca1"
+        },
+        {
+          "repo": "OpenSafetyLab/Salad-Data",
+          "revision": "d21a325e276a99bd69b1fbb8aa51a9f249486b72",
+          "file": "attack_enhanced_set.json",
+          "sha256": "389da12f029a7f0c4a562f753e1dd5e53aed46d873ef1f568919d9f4b72e7062"
+        },
+        {
+          "repo": "OpenSafetyLab/Salad-Data",
+          "revision": "d21a325e276a99bd69b1fbb8aa51a9f249486b72",
+          "file": "defense_enhanced_set.json",
+          "sha256": "df1434a7e2c2057d7fe0a7b34f86f0eb3ec368aad998f9800fa3f46025c95ee0"
+        },
+        {
+          "repo": "OpenSafetyLab/Salad-Data",
+          "revision": "d21a325e276a99bd69b1fbb8aa51a9f249486b72",
+          "file": "mcq_set.json",
+          "sha256": "aef5fe4b749f54186b939d4e5da365cfe0d94cb6f982dc84b36cefcda2cec184"
+        }
+      ],
+      "n_docs": 164630
+    },
+    "slabs_train": {
+      "files": [
+        {
+          "repo": "S-Labs/prompt-injection-dataset",
+          "revision": "002a9dd18514abd021869823d6b0429b38606d99",
+          "file": "data/train.csv",
+          "sha256": "bab012fec95d4214599b18777fd6efc5cc5e9545354df581880aeca5c1d487d7"
+        }
+      ],
+      "n_docs": 11089
+    },
+    "trustairlab_2023_12_25": {
+      "files": [
+        {
+          "repo": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+          "revision": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+          "file": "jailbreak_2023_12_25/train-00000-of-00001.parquet",
+          "sha256": "55bbc5e2be771ee16ed67aed4edb5ecef5f44ac69cea317a67e5405c5c6057a4"
+        },
+        {
+          "repo": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+          "revision": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+          "file": "regular_2023_12_25/train-00000-of-00001.parquet",
+          "sha256": "23e90010ccbc85574bf46678528cddce5b02abc86d9a047209218af65cb37c68"
+        }
+      ],
+      "n_docs": 15140
+    },
+    "wambosec_subtle_train": {
+      "files": [
+        {
+          "repo": "wambosec/prompt-injections-subtle",
+          "revision": "cd789a6e362aa72624d7f835c5270c8c3bdaf524",
+          "file": "data/train-00000-of-00001.parquet",
+          "sha256": "ca582df364639e5819c3b5c28033d6325669b612f87067e0980dafdc7ea243b2"
+        }
+      ],
+      "n_docs": 839
+    },
+    "wambosec_train": {
+      "files": [
+        {
+          "repo": "wambosec/prompt-injections",
+          "revision": "071ee17a60112b7f9f808398156b430aadfaf1d2",
+          "file": "data/train-00000-of-00001.parquet",
+          "sha256": "6e98332144e5ed52658ba7f899cfd583e388cd7fda733720a8c354af340f03e9"
+        }
+      ],
+      "n_docs": 5189
+    },
+    "xstest_v2": {
+      "files": [
+        {
+          "repo": "natolambert/xstest-v2-copy",
+          "revision": "b71afe2a6d10e5a6254ea8bcb006c48b095a15d5",
+          "file": "data/prompts-00000-of-00001.parquet",
+          "sha256": "322d4e89df9fb419c296d5b360067f3265845d40a561a37d9be77a078d219522"
+        }
+      ],
+      "n_docs": 450
+    },
+    "yanismiraoui": {
+      "files": [
+        {
+          "repo": "yanismiraoui/prompt_injections",
+          "revision": "bd55359f2f332afc35f277ac3dd08f7111b024c9",
+          "file": "prompt_injections.csv",
+          "sha256": "f4843f1841fa19b980f804796a68fc72f06841775eaba2723c768c7d772aabad"
+        }
+      ],
+      "n_docs": 1034
+    }
+  },
+  "pools": {
+    "attack": {
+      "n": 200,
+      "sources": {
+        "pids_test": 200
+      }
+    },
+    "twin": {
+      "n": 200,
+      "sources": {
+        "pids_test": 200
+      }
+    },
+    "calibration": {
+      "n": 496,
+      "sources": {
+        "pids_test": 496
+      }
+    }
+  },
+  "guards": {
+    "guardshield": {
+      "complete": true,
+      "corpora": {
+        "guardshield_splits_v3": "full",
+        "guardshield_hard_examples": "full"
+      },
+      "documentation": "src/train_prescan_v3.py (splits_v3 train, validation for model selection) and scripts/train_stage1_hard_negatives.py; checkpoint models/deberta_v3_prescan_v3.",
+      "status": {
+        "pids_test:attack": "none",
+        "pids_test:benign": "none"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "piguard": {
+      "complete": true,
+      "corpora": {
+        "piguard_train": "full"
+      },
+      "documentation": "github.com/leolee99/PIGuard datasets/train.json at commit 1b5751e (the released training set: 20 open-source datasets plus LLM-augmented data).",
+      "status": {
+        "pids_test:attack": "none",
+        "pids_test:benign": "none"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "protectai_v2": {
+      "complete": false,
+      "corpora": {
+        "xstest_v2": "listed",
+        "open_instruct": "listed",
+        "chatbot_instruction_prompts": "listed",
+        "grok_harmless": "listed",
+        "salad_data": "listed",
+        "jackhhao_jailbreak": "listed",
+        "harelix_via_piguard": "listed"
+      },
+      "documentation": "Model card at the pinned revision counts 22 training datasets by licence but names only 7; Harelix's set has been removed from the Hub (partial copy via PIGuard). The other 15 are undisclosed, so no overlap means unknown.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "deepset": {
+      "complete": true,
+      "corpora": {
+        "deepset_train": "full"
+      },
+      "documentation": "Model card: fine-tuned on deepset/prompt-injections (JasperLS/prompt-injections).",
+      "status": {
+        "pids_test:attack": "none",
+        "pids_test:benign": "none"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "fmops": {
+      "complete": true,
+      "corpora": {
+        "deepset_train": "full"
+      },
+      "documentation": "Model card metadata lists only deepset/prompt-injections.",
+      "status": {
+        "pids_test:attack": "none",
+        "pids_test:benign": "none"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "horizon_guard_base": {
+      "complete": false,
+      "corpora": {
+        "gandalf_train": "full",
+        "deepset_train": "full",
+        "jackhhao_jailbreak_train": "full",
+        "neuralchemy_train": "full",
+        "slabs_train": "full",
+        "wambosec_train": "full",
+        "wambosec_subtle_train": "full",
+        "promptshield_train": "full",
+        "nesdeniz_train": "full",
+        "nesdeniz_english_train": "full",
+        "nesdeniz_boundary_train": "full",
+        "yanismiraoui": "full",
+        "trustairlab_2023_12_25": "sampled",
+        "rgeada_train": "sampled",
+        "jailbreakv_28k": "listed",
+        "oasst2": "sampled",
+        "or_bench_80k": "sampled",
+        "prompts_chat": "full"
+      },
+      "documentation": "Model card (Training section) and data/build_v0.py of github.com/horizon-ai-labs/agent-io-guards at commit 45fbbf8: Gandalf train split only, deepset train split, a 12k sample of OASST2 root prompts, 8k of or-bench-80k. Not audited: about 80k unreleased synthetic examples (Qwen3.8-27B), LLMail-Inject, the NVIDIA Nemotron sets, Aya, UltraChat, glaive outputs and FineWeb web text, so no overlap means unknown.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "mezzo_v2_base": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Model card describes a 200k-example training set without naming sources.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "sentinel_v2": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Gated model; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "prompt_guard_v1": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "prompt_guard_v1_jailbreak": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "prompt_guard_2_86m": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "prompt_guard_2_22m": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "llama_guard_3_1b": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "llama_guard_3_8b": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "llama_guard_4_12b": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Meta; training data not disclosed.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "qwen3guard_gen_0_6b": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Qwen; training data not released.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "qwen3guard_gen_8b": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "Qwen; training data not released.",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    },
+    "wildguard": {
+      "complete": false,
+      "corpora": {},
+      "documentation": "WildGuardMix is gated (AI2 licence not accepted on the user's behalf).",
+      "status": {
+        "pids_test:attack": "unknown",
+        "pids_test:benign": "unknown"
+      },
+      "pools": {
+        "attack": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "twin": {
+          "n": 200,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        },
+        "calibration": {
+          "n": 496,
+          "n_verbatim": 0,
+          "n_jaccard80": 0,
+          "n_containment50": 0,
+          "n_containment80": 0,
+          "n_contaminated": 0,
+          "by_corpus": {}
+        }
+      },
+      "contaminated_pairs": [],
+      "contaminated_calibration": [],
+      "matches": []
+    }
+  }
+}

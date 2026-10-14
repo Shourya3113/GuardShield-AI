@@ -1,0 +1,250 @@
+{
+  "_comment": "Training sources of each auditable guard, for the contamination audit (guard_audit/contamination.py, paper1/SPEC.md section 3). Revisions are pinned commit SHAs; local files and URL downloads are pinned by SHA-256. Corpus usage per guard: 'full' = the guard's documentation or released code shows it trained on every audited row, so an overlap is known contamination; 'listed' = the model card lists the corpus but not the rows used, and 'sampled' = the guard trained on an undisclosed subset, so an overlap is likely contamination. 'complete' = the audited corpora cover the guard's whole training set, so no overlap means none; otherwise no overlap means unknown.",
+  "corpora": {
+    "guardshield_splits_v3": {
+      "type": "local_json",
+      "paths": ["data/processed/splits_v3/train.json", "data/processed/splits_v3/validation.json"],
+      "text_fields": ["prompt"],
+      "meta_fields": ["source", "label"]
+    },
+    "guardshield_hard_examples": {
+      "type": "python_lists",
+      "path": "scripts/train_stage1_hard_negatives.py",
+      "names": ["HARD_NEGATIVES_BENIGN", "HARD_ATTACKS_RETENTION"]
+    },
+    "piguard_train": {
+      "type": "url_json",
+      "url": "https://raw.githubusercontent.com/leolee99/PIGuard/1b5751e88bf7475acbedfc8eda795ce060307c84/datasets/train.json",
+      "sha256": "806ded8bd85782a53d34faffe4fd92b3f2e0b3b431c43578ce77faea6b9ed911",
+      "text_fields": ["prompt"],
+      "meta_fields": ["source", "label"]
+    },
+    "harelix_via_piguard": {
+      "type": "url_json",
+      "url": "https://raw.githubusercontent.com/leolee99/PIGuard/1b5751e88bf7475acbedfc8eda795ce060307c84/datasets/train.json",
+      "sha256": "806ded8bd85782a53d34faffe4fd92b3f2e0b3b431c43578ce77faea6b9ed911",
+      "filter": {"source": ["Prompt-Injection-Mixed-Techniques"]},
+      "text_fields": ["prompt"],
+      "meta_fields": ["source", "label"],
+      "notes": "Harelix/Prompt-Injection-Mixed-Techniques-2024 is no longer on the Hugging Face Hub (404 on 2026-10-14); PIGuard's training set keeps 1,174 of its rows, used here as a partial proxy."
+    },
+    "deepset_train": {
+      "type": "hf",
+      "repo": "deepset/prompt-injections",
+      "revision": "4f61ecb038e9c3fb77e21034b22511b523772cdd",
+      "files": ["data/train-00000-of-00001-9564e8b05b4757ab.parquet"],
+      "text_fields": ["text"]
+    },
+    "gandalf_train": {
+      "type": "hf",
+      "repo": "Lakera/gandalf_ignore_instructions",
+      "revision": "04737b65e90a6794ec227012e4a255a7def6344b",
+      "files": ["data/train-00000-of-00001-ded53be747ff55cd.parquet"],
+      "text_fields": ["text"]
+    },
+    "xstest_v2": {
+      "type": "hf",
+      "repo": "natolambert/xstest-v2-copy",
+      "revision": "b71afe2a6d10e5a6254ea8bcb006c48b095a15d5",
+      "files": ["data/prompts-00000-of-00001.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "open_instruct": {
+      "type": "hf",
+      "repo": "VMware/open-instruct",
+      "revision": "9e53e85f37988e3bfbebbee4dc9ad4942cfd37fa",
+      "files": ["data/train-00000-of-00001-c6f4e090ee7100b6.parquet"],
+      "text_fields": ["instruction", "alpaca_prompt", "response"],
+      "meta_fields": ["source"]
+    },
+    "chatbot_instruction_prompts": {
+      "type": "hf",
+      "repo": "alespalla/chatbot_instruction_prompts",
+      "revision": "6ea5ce09647e5451860801a46db6a46b28e259bf",
+      "files": ["data/train-00000-of-00001-d3450385c0ae3f98.parquet", "data/test-00000-of-00001-8d5da67d5c6856ed.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "grok_harmless": {
+      "type": "hf",
+      "repo": "HuggingFaceH4/grok-conversation-harmless",
+      "revision": "01185ad52860775c65cbd6d0c9254ac8e9089fe0",
+      "files": ["data/train_sft-00000-of-00001-71f7b2a54cfc90b9.parquet", "data/test_sft-00000-of-00001-8e8f87780d2fd798.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "salad_data": {
+      "type": "hf",
+      "repo": "OpenSafetyLab/Salad-Data",
+      "revision": "d21a325e276a99bd69b1fbb8aa51a9f249486b72",
+      "files": ["base_set.json", "attack_enhanced_set.json", "defense_enhanced_set.json", "mcq_set.json"]
+    },
+    "jackhhao_jailbreak": {
+      "type": "hf",
+      "repo": "jackhhao/jailbreak-classification",
+      "revision": "2f2ceeb39658696fd3f462403562b6eea5306287",
+      "files": ["default/jailbreak_dataset_train.csv", "default/jailbreak_dataset_test.csv"],
+      "text_fields": ["prompt"]
+    },
+    "jackhhao_jailbreak_train": {
+      "type": "hf",
+      "repo": "jackhhao/jailbreak-classification",
+      "revision": "2f2ceeb39658696fd3f462403562b6eea5306287",
+      "files": ["default/jailbreak_dataset_train.csv"],
+      "text_fields": ["prompt"]
+    },
+    "oasst2": {
+      "type": "hf",
+      "repo": "OpenAssistant/oasst2",
+      "revision": "179dd21fc55192153d94adb0e0ce8f69e222bf75",
+      "files": ["data/train-00000-of-00001-88ba0162028a73fc.parquet"],
+      "text_fields": ["text"],
+      "filter": {"role": ["prompter"]}
+    },
+    "neuralchemy_train": {
+      "type": "hf",
+      "repo": "neuralchemy/Prompt-injection-dataset",
+      "revision": "7d70432dfcf47a821612cbf9d34e9d9e3ad20e75",
+      "files": ["core/train-00000-of-00001.parquet", "full/train-00000-of-00001.parquet"],
+      "text_fields": ["text"]
+    },
+    "slabs_train": {
+      "type": "hf",
+      "repo": "S-Labs/prompt-injection-dataset",
+      "revision": "002a9dd18514abd021869823d6b0429b38606d99",
+      "files": ["data/train.csv"],
+      "text_fields": ["text"]
+    },
+    "wambosec_train": {
+      "type": "hf",
+      "repo": "wambosec/prompt-injections",
+      "revision": "071ee17a60112b7f9f808398156b430aadfaf1d2",
+      "files": ["data/train-00000-of-00001.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "wambosec_subtle_train": {
+      "type": "hf",
+      "repo": "wambosec/prompt-injections-subtle",
+      "revision": "cd789a6e362aa72624d7f835c5270c8c3bdaf524",
+      "files": ["data/train-00000-of-00001.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "promptshield_train": {
+      "type": "hf",
+      "repo": "hendzh/PromptShield",
+      "revision": "a5234cb1f5cdb256600cab64b8c961195b5e8404",
+      "files": ["train.json"],
+      "text_fields": ["prompt"]
+    },
+    "nesdeniz_train": {
+      "type": "hf",
+      "repo": "3nesdeniz/agentic-prompt-injection-5k",
+      "revision": "e658d94dcafc133e3a4483f9f9aa13507f3848c4",
+      "files": ["data/train.parquet"],
+      "text_fields": ["text"]
+    },
+    "nesdeniz_english_train": {
+      "type": "hf",
+      "repo": "3nesdeniz/english-prompt-injection-3k",
+      "revision": "87f017347aff7887b1de0d9457c9ec01bf7ba8b5",
+      "files": ["data/train.parquet"],
+      "text_fields": ["text"]
+    },
+    "nesdeniz_boundary_train": {
+      "type": "hf",
+      "repo": "3nesdeniz/agentic-prompt-injection-boundary-pairs",
+      "revision": "a5682e7573e1c7bc4b12e64d49c0dcd90ca776cf",
+      "files": ["data/train.parquet"],
+      "text_fields": ["text"]
+    },
+    "trustairlab_2023_12_25": {
+      "type": "hf",
+      "repo": "TrustAIRLab/in-the-wild-jailbreak-prompts",
+      "revision": "a10aab8eff1c73165a442d4464dce192bd28b9c5",
+      "files": ["jailbreak_2023_12_25/train-00000-of-00001.parquet", "regular_2023_12_25/train-00000-of-00001.parquet"],
+      "text_fields": ["prompt"]
+    },
+    "yanismiraoui": {
+      "type": "hf",
+      "repo": "yanismiraoui/prompt_injections",
+      "revision": "bd55359f2f332afc35f277ac3dd08f7111b024c9",
+      "files": ["prompt_injections.csv"],
+      "text_fields": ["prompt_injections"]
+    },
+    "rgeada_train": {
+      "type": "hf",
+      "repo": "rgeada/tool-response-injections",
+      "revision": "39050de797f2694f0d72e1086003154de1919379",
+      "files": ["tool_response_injections_train.csv"],
+      "text_fields": ["text"]
+    },
+    "jailbreakv_28k": {
+      "type": "hf",
+      "repo": "JailbreakV-28K/JailBreakV-28k",
+      "revision": "f949ca582fff13d396ac8fce59596afafb2b78d3",
+      "files": ["JailBreakV_28K/JailBreakV_28K.csv"],
+      "text_fields": ["jailbreak_query", "redteam_query"]
+    },
+    "or_bench_80k": {
+      "type": "hf",
+      "repo": "bench-llm/or-bench",
+      "revision": "e36d8b80e81837c8a8f264bbb2a49f1b32c7e272",
+      "files": ["or-bench-80k.csv"],
+      "text_fields": ["prompt"]
+    },
+    "prompts_chat": {
+      "type": "hf",
+      "repo": "fka/prompts.chat",
+      "revision": "20888d8ddd6333f5a8eed9388d1fc405b0dd447d",
+      "files": ["prompts.csv"],
+      "text_fields": ["prompt"]
+    }
+  },
+  "guards": {
+    "guardshield": {
+      "complete": true,
+      "corpora": {"guardshield_splits_v3": "full", "guardshield_hard_examples": "full"},
+      "documentation": "src/train_prescan_v3.py (splits_v3 train, validation for model selection) and scripts/train_stage1_hard_negatives.py; checkpoint models/deberta_v3_prescan_v3."
+    },
+    "piguard": {
+      "complete": true,
+      "corpora": {"piguard_train": "full"},
+      "documentation": "github.com/leolee99/PIGuard datasets/train.json at commit 1b5751e (the released training set: 20 open-source datasets plus LLM-augmented data)."
+    },
+    "protectai_v2": {
+      "complete": false,
+      "corpora": {"xstest_v2": "listed", "open_instruct": "listed", "chatbot_instruction_prompts": "listed", "grok_harmless": "listed",
+                  "salad_data": "listed", "jackhhao_jailbreak": "listed", "harelix_via_piguard": "listed"},
+      "documentation": "Model card at the pinned revision counts 22 training datasets by licence but names only 7; Harelix's set has been removed from the Hub (partial copy via PIGuard). The other 15 are undisclosed, so no overlap means unknown."
+    },
+    "deepset": {
+      "complete": true,
+      "corpora": {"deepset_train": "full"},
+      "documentation": "Model card: fine-tuned on deepset/prompt-injections (JasperLS/prompt-injections)."
+    },
+    "fmops": {
+      "complete": true,
+      "corpora": {"deepset_train": "full"},
+      "documentation": "Model card metadata lists only deepset/prompt-injections."
+    },
+    "horizon_guard_base": {
+      "complete": false,
+      "corpora": {"gandalf_train": "full", "deepset_train": "full", "jackhhao_jailbreak_train": "full", "neuralchemy_train": "full",
+                  "slabs_train": "full", "wambosec_train": "full", "wambosec_subtle_train": "full", "promptshield_train": "full",
+                  "nesdeniz_train": "full", "nesdeniz_english_train": "full", "nesdeniz_boundary_train": "full", "yanismiraoui": "full",
+                  "trustairlab_2023_12_25": "sampled", "rgeada_train": "sampled", "jailbreakv_28k": "listed",
+                  "oasst2": "sampled", "or_bench_80k": "sampled", "prompts_chat": "full"},
+      "documentation": "Model card (Training section) and data/build_v0.py of github.com/horizon-ai-labs/agent-io-guards at commit 45fbbf8: Gandalf train split only, deepset train split, a 12k sample of OASST2 root prompts, 8k of or-bench-80k. Not audited: about 80k unreleased synthetic examples (Qwen3.8-27B), LLMail-Inject, the NVIDIA Nemotron sets, Aya, UltraChat, glaive outputs and FineWeb web text, so no overlap means unknown."
+    },
+    "mezzo_v2_base": {"complete": false, "corpora": {}, "documentation": "Model card describes a 200k-example training set without naming sources."},
+    "sentinel_v2": {"complete": false, "corpora": {}, "documentation": "Gated model; training data not disclosed."},
+    "prompt_guard_v1": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "prompt_guard_v1_jailbreak": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "prompt_guard_2_86m": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "prompt_guard_2_22m": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "llama_guard_3_1b": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "llama_guard_3_8b": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "llama_guard_4_12b": {"complete": false, "corpora": {}, "documentation": "Meta; training data not disclosed."},
+    "qwen3guard_gen_0_6b": {"complete": false, "corpora": {}, "documentation": "Qwen; training data not released."},
+    "qwen3guard_gen_8b": {"complete": false, "corpora": {}, "documentation": "Qwen; training data not released."},
+    "wildguard": {"complete": false, "corpora": {}, "documentation": "WildGuardMix is gated (AI2 licence not accepted on the user's behalf)."}
+  }
+}

@@ -5,7 +5,9 @@ Generates every number, table and figure the paper uses from a run's metrics.jso
   python paper1/paper/make_assets.py            # Study A, run obf_main
 
 Writes paper1/paper/generated/: numbers.tex (\\newcommand macros), tab_clean.tex, tab_auroc.tex,
-tab_pja.tex, fig_failure_map.pdf/.png. Re-run after any metrics change and commit the outputs.
+tab_pja.tex, fig_failure_map.pdf/.png, and from the contamination audit (contamination.json of both primary
+runs, metrics_decontaminated.json) numbers_contamination.tex and tab_contamination.tex. Re-run after any
+metrics change and commit the outputs.
 """
 
 import argparse
@@ -184,6 +186,88 @@ def write_numbers(m, G, A):
     (OUT / "numbers.tex").write_text(s, encoding="utf-8")
 
 
+CONTAM_GUARDS = [  # guards whose training data could be audited, in GUARDS order; PIGuard is audited but not scored
+    ("guardshield", "GuardShield (ours)"), ("protectai_v2", "ProtectAI v2"), ("deepset", "deepset"), ("fmops", "fmops"),
+    ("horizon_guard_base", "Horizon guard-base"), ("piguard", "PIGuard$^\\dagger$"),
+]
+CONTAM_COLUMNS = [("obf", "gandalf:attack", ("attack",)), ("obf", "dolly:benign", ("twin", "calibration")),
+                  ("pids", "pids_test:attack", ("attack",)), ("pids", "pids_test:benign", ("twin", "calibration"))]
+DECON_MIN_PAIRS = 100  # sensitivity analysis is read only for guards keeping at least this many pairs
+
+
+def contamination(run, pids_run):
+    C = {"obf": json.loads((Path(run) / "contamination.json").read_text(encoding="utf-8")),
+         "pids": json.loads((Path(pids_run) / "contamination.json").read_text(encoding="utf-8"))}
+    D = json.loads((Path(run) / "metrics_decontaminated.json").read_text(encoding="utf-8"))["guards"]
+    return C, D
+
+
+def contam_count(c, guard, pools):
+    p = c["guards"][guard]["pools"]
+    return sum(p[x]["n_contaminated"] for x in pools), sum(p[x]["n"] for x in pools)
+
+
+def write_contamination(G, C, D):
+    obf = C["obf"]["guards"]
+    s = "% contamination audit (contamination.json of obf_main and pids_main; metrics_decontaminated.json)\n"
+    s += macro("nAuditCorpora", len(C["obf"]["corpora"]))
+    s += macro("nAuditGuards", sum(1 for g in obf.values() if g["corpora"]))
+
+    def counts(tag, guard):
+        out = ""
+        for pool, name in (("attack", "Attacks"), ("twin", "Twins"), ("calibration", "Cal")):
+            k = obf[guard]["pools"][pool]["n_contaminated"]
+            out += macro(f"{tag}Contam{name}", k)
+        a = obf[guard]["pools"]["attack"]
+        return out + macro(f"{tag}ContamAttacksPct", f"{100 * a['n_contaminated'] / a['n']:.0f}")
+
+    for g, tag in (("guardshield", "gs"), ("horizon_guard_base", "horizon"), ("protectai_v2", "protectai"), ("piguard", "piguard")):
+        s += counts(tag, g)
+    s += macro("gsContamAttacksVerbatim", obf["guardshield"]["pools"]["attack"]["n_verbatim"])
+    s += macro("gsContamPairs", len(obf["guardshield"]["contaminated_pairs"]))
+    s += macro("pidsAuditTexts", sum(v["n"] for v in C["pids"]["pools"].values()))
+    s += macro("pidsContamTexts", len({(m["pool"], m["id"]) for g in C["pids"]["guards"].values() for m in g["matches"]}))
+
+    # sensitivity: each guard without its own contaminated pairs
+    cells = changed_mode = changed_mode_fpr = 0
+    changed_sig, shifts, guards_read = [], [], []
+    for g, d in D.items():
+        n_left = d["conditions"]["clean"]["n_pairs"]
+        tag = {"guardshield": "gs", "horizon_guard_base": "horizon", "protectai_v2": "protectai"}.get(g)
+        if tag:
+            s += macro(f"{tag}DeconPairs", n_left)
+        if n_left < DECON_MIN_PAIRS:
+            continue
+        guards_read.append(g)
+        for f, _, _ in FAMILIES:
+            a, b = G[g]["conditions"][f], d["conditions"][f]
+            cells += 1
+            changed_mode += a["policies"]["default"]["failure_mode"] != b["policies"]["default"]["failure_mode"]
+            changed_mode_fpr += a["policies"]["fpr@0.05"]["failure_mode"] != b["policies"]["fpr@0.05"]["failure_mode"]
+            shifts.append(abs(a["auroc"] - b["auroc"]))
+            if a["signal"] != b["signal"]:
+                changed_sig.append(f"{a['signal']}->{b['signal']}")
+    s += macro("deconMinPairs", DECON_MIN_PAIRS) + macro("deconCells", cells)
+    s += macro("deconModeChanged", changed_mode) + macro("deconModeFprChanged", changed_mode_fpr)
+    s += macro("deconSigChanged", len(changed_sig))
+    s += macro("deconSigUp", sum(c == "destroyed->degraded" for c in changed_sig))
+    s += macro("deconAucShiftMax", f"{max(shifts):.2f}")
+    (OUT / "numbers_contamination.tex").write_text(s, encoding="utf-8")
+
+    rows = []
+    for g, n in CONTAM_GUARDS:
+        cells = []
+        for run, key, pools in CONTAM_COLUMNS:
+            guard = C[run]["guards"][g]
+            k, total = contam_count(C[run], g, pools)
+            cells.append(f"{guard['status'][key]} ({k}/{total})")
+        rows.append(f"{n} & " + " & ".join(cells) + " \\\\")
+    rest = [n for g, n, kind in GUARDS if kind != "base" and (g not in obf or not obf[g]["corpora"])]
+    rows.append(f"\\midrule\nOther {len(rest)} detectors & \\multicolumn{{4}}{{c}}{{unknown (training data undisclosed or gated)}} \\\\")
+    (OUT / "tab_contamination.tex").write_text("% columns: guard & Gandalf attacks & Dolly benign & PIDS attacks & PIDS benign\n"
+                                               + "\n".join(rows) + "\n", encoding="utf-8")
+
+
 def write_tables(G):
     # clean condition
     rows = []
@@ -262,6 +346,8 @@ def write_figure(G):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--run", default=str(BASE_DIR / "paper1" / "runs" / "obf_main"))
+    p.add_argument("--pids-run", default=str(BASE_DIR / "paper1" / "runs" / "pids_main"),
+                   help="second primary run (contamination audit only until it is scored)")
     args = p.parse_args()
     m = json.loads((Path(args.run) / "metrics.json").read_text(encoding="utf-8"))
     G = m["guards"]
@@ -272,6 +358,7 @@ def main():
     A = aggregates(G)
     write_numbers(m, G, A)
     write_tables(G)
+    write_contamination(G, *contamination(args.run, args.pids_run))
     write_figure(G)
     print("wrote", sorted(p.name for p in OUT.iterdir()))
 
