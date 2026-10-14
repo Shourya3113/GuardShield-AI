@@ -141,6 +141,22 @@ Figure~\ref{fig:map} shows every guard--family cell. The intent signal is intact
 \label{fig:map}
 \end{figure*}
 
+% defined here so that it floats to the top of the next page, near the contamination paragraph
+\begin{table*}[t]
+\centering\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+& \multicolumn{2}{c}{Study A (Gandalf $\times$ Dolly)} & \multicolumn{2}{c}{PIDS-Bench} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Detector & attacks & benign & attacks & benign \\
+\midrule
+\input{generated/tab_contamination.tex}
+\bottomrule
+\end{tabular}
+\caption{Contamination audit: status, with contaminated / audited texts per evaluation pool. Benign pools include the twins and the calibration prompts. Known: overlap with data the detector trained on in full; likely: overlap with a corpus its model card lists; none: complete training data audited without overlap; unknown: training data partly or wholly undisclosed. $^\dagger$ audited but not scored.}
+\label{tab:contamination}
+\end{table*}
+
 \subsection{Attack-only evaluation hides both failure directions}
 
 At the default threshold, \nModeClosed{} of \nModeCells{} cells fail closed, \nModeOpen{} fail open, \nModeBoth{} fail both ways, and \nModeStable{} are stable. Attack-only robustness evaluation cannot see the first group. Of the \nAttackRobust{} cells whose attack recall stays within 5 points of clean, which such an evaluation would report as robust, \nAttackRobustFC{} (\pctAttackRobustFC\%) are fail-closed: the detector also flags at least 20 points more of the benign twins. ProtectAI v2, for example, keeps \protectaiBsfTPR\% recall under Base64 while flagging \protectaiBsfFPR\% of benign twins (AUROC \protectaiBsfAUC), and \protectaiShyTPR\% recall under soft hyphens with \protectaiShyFPR\% FPR. Symmetrically, of the \nBenignRobust{} cells whose benign FPR stays within 5 points of clean, \nBenignRobustFO{} (\pctBenignRobustFO\%) lose at least 20 points of recall. Prompt Guard 2 86M falls from \pgTwoEightSixCleanTPR\% clean recall to \pgTwoEightSixShyTPR\% under soft hyphens, leetspeak and diacritics while its FPR stays at \pgTwoEightSixShyFPR\%, and its AUROC under those families (\pgTwoEightSixShyAUC, \pgTwoEightSixLeetAUC, \pgTwoEightSixDiacAUC) shows the detector cannot tell the two apart. A benign-only over-defense audit would score that cell as perfect.
@@ -172,22 +188,7 @@ Ranking the \hTwoN{} detectors with a default threshold by mean perturbed-attack
 
 Three overlaps matter. Horizon guard-base trained on Gandalf's train split, which holds \horizonContamAttacks{} of our \nPairs{} attacks (\horizonContamAttacksPct\%). GuardShield's SPML training data contain \gsContamAttacks{} of them (\gsContamAttacksPct\%), \gsContamAttacksVerbatim{} as verbatim lines. On the benign side, ProtectAI v2's model card lists VMware's open-instruct collection, which includes Dolly: \protectaiContamTwins{} of the \nPairs{} twins and \protectaiContamCal{} of the \nCalibration{} calibration prompts occur in it, so ProtectAI's clean-condition FPR may partly reflect benign prompts seen in training. PIGuard's released training set contains \piguardContamTwins{} twins and \piguardContamCal{} calibration prompts; PIGuard is not in the scored roster. No audited corpus contains any of the \pidsAuditTexts{} PIDS-Bench texts.
 
-Recomputing each detector without its own contaminated pairs leaves GuardShield with \gsDeconPairs{} pairs and Horizon guard-base with \horizonDeconPairs{}. Across their \deconCells{} perturbed cells, \deconModeChanged{} failure modes change at the default threshold and \deconModeFprChanged{} at the 5\%-FPR threshold. \deconSigChanged{} intent-signal statuses change, \deconSigUp{} of them from destroyed to degraded: the AUROC moves by at most \deconAucShiftMax{}, while the smaller sample widens its confidence interval across the 0.75 bound. ProtectAI v2 keeps only \protectaiDeconPairs{} uncontaminated pairs, too few for this check. Training-data overlap would favour clean-condition results; it does not explain the failure map.
-
-\begin{table*}[t]
-\centering\small
-\begin{tabular}{@{}lllll@{}}
-\toprule
-& \multicolumn{2}{c}{Study A (Gandalf $\times$ Dolly)} & \multicolumn{2}{c}{PIDS-Bench} \\
-\cmidrule(lr){2-3}\cmidrule(l){4-5}
-Detector & attacks & benign & attacks & benign \\
-\midrule
-\input{generated/tab_contamination.tex}
-\bottomrule
-\end{tabular}
-\caption{Contamination audit: status, with contaminated / audited texts per evaluation pool. Benign pools include the twins and the calibration prompts. Known: overlap with data the detector trained on in full; likely: overlap with a corpus its model card lists; none: complete training data audited without overlap; unknown: training data partly or wholly undisclosed. $^\dagger$ audited but not scored.}
-\label{tab:contamination}
-\end{table*}
+Recomputing each detector without its own contaminated pairs leaves GuardShield with \gsDeconPairs{} pairs and Horizon guard-base with \horizonDeconPairs{}. Of their \deconCells{} perturbed cells, the failure mode changes in \deconModeChanged{} at the default threshold and in \deconModeFprChanged{} at the 5\%-FPR threshold, and the intent-signal status changes in \deconSigChanged{} (\deconSigUp{} from destroyed to degraded): the AUROC moves by at most \deconAucShiftMax{}, while the smaller sample widens its confidence interval across the 0.75 bound. ProtectAI v2 keeps only \protectaiDeconPairs{} uncontaminated pairs, too few for this check. Training-data overlap would favour clean-condition results; it does not explain the failure map.
 
 % =====================================================================
 \section{Study B: Hindi, Romanized Hindi and Hinglish}
