@@ -236,8 +236,36 @@ class GuardShieldGuard(Guard):
         model_dir = spec.get("model_dir")
         self.engine = PreScanSecurityFilter(model_dir=BASE_DIR / model_dir if model_dir else None)
 
-    def score(self, texts: List[str]) -> List[float]:
-        return [self.engine.inspect_prompt(t)["risk_score"] for t in texts]
+    @torch.no_grad()
+    def score(self, texts: List[str], max_chunk: int = 126, stride: int = 64, batch_size: int = 64) -> List[float]:
+        """Batched equivalent of PreScanSecurityFilter.inspect_prompt: [CLS] tokens [SEP] for short prompts, the same
+        sliding windows (max over windows) for long ones, risk = P(injection) rounded to 4 decimals."""
+        e = self.engine
+        tok, model = e.tokenizer, e.model
+        cls_id, sep_id, pad_id = tok.cls_token_id or 1, tok.sep_token_id or 2, tok.pad_token_id or 0
+        seqs, owner = [], []
+        for i, t in enumerate(texts):
+            ids = tok.encode(t, add_special_tokens=False)
+            if len(ids) <= max_chunk:
+                seqs.append([cls_id] + ids + [sep_id])
+                owner.append(i)
+                continue
+            for start in range(0, len(ids), stride):
+                seqs.append([cls_id] + ids[start:start + max_chunk] + [sep_id])
+                owner.append(i)
+                if start + max_chunk >= len(ids):
+                    break
+        risk = [0.0] * len(texts)
+        order = sorted(range(len(seqs)), key=lambda k: len(seqs[k]))  # length-sorted batches: little padding
+        for b in range(0, len(order), batch_size):
+            idx = order[b:b + batch_size]
+            width = max(len(seqs[k]) for k in idx)
+            input_ids = torch.tensor([seqs[k] + [pad_id] * (width - len(seqs[k])) for k in idx], device=model.device)
+            mask = torch.tensor([[1] * len(seqs[k]) + [0] * (width - len(seqs[k])) for k in idx], device=model.device)
+            probs = torch.softmax(model(input_ids=input_ids, attention_mask=mask).logits.float() / e.temperature, dim=-1)[:, 1]
+            for k, p in zip(idx, probs.tolist()):
+                risk[owner[k]] = max(risk[owner[k]], p)
+        return [round(r, 4) for r in risk]
 
     def info(self) -> Dict[str, Any]:
         from prescan_filter import weights_sha256

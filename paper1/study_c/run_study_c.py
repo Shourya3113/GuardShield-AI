@@ -27,7 +27,8 @@ TRAIN = ([("none", 0.0, s) for s in SEEDS] + [("augment", 1.0, s) for s in SEEDS
          [("canon_augment", 1.0, s) for s in SEEDS] +
          [("augment", r, s) for r in (0.25, 0.5) for s in COUPLING_SEEDS])
 SHIPPED = ["guardshield", "protectai_v2", "guardshield_canon_naive", "guardshield_canon_script", "guardshield_rescan_only",
-           "protectai_v2_canon_naive", "protectai_v2_canon_script", "protectai_v2_rescan_only"]
+           "protectai_v2_canon_naive", "protectai_v2_canon_script", "protectai_v2_rescan_only",
+           "guardshield_canon_replace", "protectai_v2_canon_replace"]
 GUARDS_FILE = Path(__file__).resolve().parent / "guards_study_c.json"
 MODEL_ROOT = BASE_DIR / "models" / "study_c"
 
@@ -63,10 +64,10 @@ def guards():
         base = {"type": "guardshield", "family": "study_c", "model_dir": str(summary.parent.relative_to(BASE_DIR)).replace("\\", "/"),
                 "study_c": {"arm": s["arm"], "ratio": s["ratio"], "seed": s["seed"], "inference": "raw"}}
         specs[name] = base
-        inference = {"none": [("naive", False), ("script_aware", True), ("none", True)],
-                     "canon_augment": [("script_aware", True)]}.get(s["arm"], [])
-        for canon, rescan in inference:
-            tag = {"naive": "naive", "script_aware": "script", "none": "rescan"}[canon]
+        inference = {"none": [("naive", False, "naive"), ("script_aware", True, "script"), ("none", True, "rescan"),
+                              ("script_aware", "replace", "replace")],
+                     "canon_augment": [("script_aware", True, "script"), ("script_aware", "replace", "replace")]}.get(s["arm"], [])
+        for canon, rescan, tag in inference:
             specs[f"{name}_{tag}"] = {"type": "canonicalized", "family": "study_c", "base": name, "base_spec": base,
                                       "canonicalizer": canon, "rescan": rescan,
                                       "study_c": {**base["study_c"], "inference": tag}}

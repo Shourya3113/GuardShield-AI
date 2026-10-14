@@ -33,10 +33,12 @@ GROUPS = {
 ARMS = {  # arm -> regex over guard names (seed in group 1); shipped checkpoints are single models
     "none": r"gs_none_r0_s(\d+)$", "naive": r"gs_none_r0_s(\d+)_naive$", "script_aware": r"gs_none_r0_s(\d+)_script$",
     "rescan_only": r"gs_none_r0_s(\d+)_rescan$", "augment": r"gs_augment_r1_s(\d+)$",
-    "canon_augment": r"gs_canon_augment_r1_s(\d+)_script$",
+    "canon_augment": r"gs_canon_augment_r1_s(\d+)_script$", "script_replace": r"gs_none_r0_s(\d+)_replace$",
+    "canon_augment_replace": r"gs_canon_augment_r1_s(\d+)_replace$",
     "augment_r0.25": r"gs_augment_r0\.25_s(\d+)$", "augment_r0.5": r"gs_augment_r0\.5_s(\d+)$",
     "shipped_gs_none": r"guardshield()$", "shipped_gs_naive": r"guardshield_canon_naive()$",
     "shipped_gs_script_aware": r"guardshield_canon_script()$", "shipped_gs_rescan_only": r"guardshield_rescan_only()$",
+    "shipped_gs_script_replace": r"guardshield_canon_replace()$", "protectai_script_replace": r"protectai_v2_canon_replace()$",
     "protectai_none": r"protectai_v2()$", "protectai_naive": r"protectai_v2_canon_naive()$",
     "protectai_script_aware": r"protectai_v2_canon_script()$", "protectai_rescan_only": r"protectai_v2_rescan_only()$",
 }

@@ -239,6 +239,8 @@ def test_canonicalizers_undo_seen_families_and_keep_devanagari_joiners():
     assert any(text in v for v in C.views(b64, "none", rescan=True))
     assert any("previous instructions" in v for v in C.views(rot, "none", rescan=True))
     assert C.views(text, "script_aware", rescan=True) == [text]
+    assert C.views(b64, "none", rescan="replace") == [C.base64_view(b64)]  # the encoded input is not scored
+    assert C.views(text, "none", rescan="replace") == [text]
 
 
 def test_canonicalized_guard_scores_the_maximum_over_views():

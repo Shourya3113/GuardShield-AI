@@ -254,6 +254,10 @@
     "protectai_v2_canon_script": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "script_aware", "rescan": true,
       "notes": "Study C arm 3 on the ProtectAI v2 backbone."},
     "protectai_v2_rescan_only": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "none", "rescan": true,
-      "notes": "Study C arm 4 on the ProtectAI v2 backbone."}
+      "notes": "Study C arm 4 on the ProtectAI v2 backbone."},
+    "guardshield_canon_replace": {"type": "canonicalized", "family": "study_c", "base": "guardshield", "canonicalizer": "script_aware", "rescan": "replace",
+      "notes": "Study C ablation (added 2026-10-14): script-aware canonicalizer, decoded text replaces the encoded input."},
+    "protectai_v2_canon_replace": {"type": "canonicalized", "family": "study_c", "base": "protectai_v2", "canonicalizer": "script_aware", "rescan": "replace",
+      "notes": "Study C ablation (added 2026-10-14) on the ProtectAI v2 backbone."}
   }
 }

@@ -130,11 +130,14 @@ def base64_view(text: str):
     return out if changed else None
 
 
-def views(text: str, canonicalizer: str = "none", rescan: bool = False) -> List[str]:
+def views(text: str, canonicalizer: str = "none", rescan=False) -> List[str]:
+    """rescan: False; True or "max" scores the text and its decodings (SPEC: score = max of raw and decoded);
+    "replace" scores only the decodings when any exist. Max can repair a guard that misses encoded attacks but
+    never one that flags the encoding itself; replace can repair both, at the cost of trusting the decoder."""
     base = CANONICALIZERS[canonicalizer](text)
-    out = [base]
-    if rescan:
-        for v in (base64_view(base), rot13_view(base)):
-            if v is not None and v not in out:
-                out.append(v)
-    return out
+    if not rescan:
+        return [base]
+    decoded = [v for v in (base64_view(base), rot13_view(base)) if v is not None and v != base]
+    if rescan == "replace":
+        return decoded or [base]
+    return [base] + [v for i, v in enumerate(decoded) if v not in decoded[:i]]
