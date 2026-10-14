@@ -17,11 +17,12 @@ There is no LaTeX on the laptop, so build on Overleaf:
 
 | Section | State |
 |---|---|
-| Abstract, introduction, protocol, metrics, setup | drafted; Study B/C sentences marked `\todo` |
-| Study A results (Gandalf × Dolly, 18 guards) | drafted from generated numbers |
-| Study A second source (`pids_main`) | waiting for the Kaggle run |
+| Scope | Paper 1 = Study 1 (audit; SPEC Study A) + Study 2 (mitigation; SPEC Study C) + H4. The Hindi benchmark (SPEC Study B) moved to Paper 2 on 2026-10-14 |
+| Abstract, introduction, protocol, metrics, setup | drafted; Study 2 sentences marked `\todo` |
+| Study 1 results (Gandalf × Dolly, 18 guards) | drafted from generated numbers |
+| Study 1 second source (`pids_main`) | done: replication section and appendix figure |
 | Contamination audit | done (`guard_audit/contamination.py`, `configs/training_sources.json`): table and sensitivity analysis generated from both runs' `contamination.json` and `obf_main/metrics_decontaminated.json` |
 | Mechanism (H4, tokenizer fragmentation) | not started |
-| Study B, Study C | waiting for data / experiments |
-| Related work | Study A clusters drafted; Indic and canonicalization paragraphs are `\todo` |
+| Study 2 (canonicalization vs augmentation) | not started |
+| Related work | drafted; the canonicalization paragraph is `\todo` (Indic related work moves to Paper 2) |
 | References | verified 2026-10-14 against the arXiv API, the ACL Anthology and Crossref |

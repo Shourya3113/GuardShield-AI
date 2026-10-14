@@ -2,7 +2,7 @@
 
 **Working title:** Guards that reject the unfamiliar: format-triggered over-defense in prompt-injection detectors
 
-Status: revised 2026-10-13 after the novelty check. Changes to anything marked **frozen** after the first full run must be recorded in section 10.
+Status: revised 2026-10-13 after the novelty check; rescoped 2026-10-14: **Paper 1 = Study A + Study C + the H4 mechanism analysis. Study B (H3, section 4) moves to Paper 2 (semester 8)** with the lighter design in section 4. Changes to anything marked **frozen** after the first full run must be recorded in section 10.
 
 Background and positioning:
 - [`reports/LLM guardrail research gaps.md`](../reports/LLM%20guardrail%20research%20gaps.md): landscape and gap analysis
@@ -12,14 +12,14 @@ Background and positioning:
 
 ## 1. Research question and hypotheses
 
-**RQ.** When a prompt's surface form is unfamiliar to a prompt-injection detector (character obfuscation, encoding wrappers, Devanagari, romanized Hindi, Hindi-English code-mixing), does the detector still separate injection intent from benign intent, or does it react to the format? Which intervention restores intent sensitivity without losing attack recall?
+**RQ.** When a prompt's surface form is unfamiliar to a prompt-injection detector (character obfuscation, encoding wrappers; Devanagari, romanized Hindi and Hindi-English code-mixing in Paper 2), does the detector still separate injection intent from benign intent, or does it react to the format? Which intervention restores intent sensitivity without losing attack recall?
 
 | ID | Hypothesis | Tested by |
 |---|---|---|
 | H1 | Attack-only robustness evaluations misread guards: under perturbation, some guards keep high attack recall only because they also flag the benign twins (fail-closed), and others keep a low FPR only because they also miss the attacks (fail-open). | Study A: TPR vs FPR vs PJA; failure mode per guard × family |
 | H1b | The same guard can fail closed under some families and open under others. | Failure-mode table (section 5) |
 | H2 | Guard rankings change when scored on pairs instead of attacks alone. | Kendall τ between the ranking by perturbed-attack recall and the ranking by PJA |
-| H3 | Benign Hindi / romanized Hindi / Hinglish prompts are flagged far more often than their English equivalents, and the gap is largest for small encoder classifiers. | Study B: per-register FPR and fairness metrics |
+| H3 (Paper 2) | Benign Hindi / romanized Hindi / Hinglish prompts are flagged far more often than their English equivalents, and the gap is largest for small encoder classifiers. | Study B: per-register FPR and fairness metrics |
 | H4 | Over-defense and signal loss track tokenizer fragmentation (characters per token) more than script or language as such. | Section 7 |
 | H5 | For character-level families, script-aware canonicalization restores the intent signal better than benign-twin augmentation, including on held-out families, at matched attack recall, and without the recall/FPR coupling reported for augmentation-trained guards. | Study C |
 
@@ -48,12 +48,12 @@ The benign arm and the scaffold control follow Zhang et al. ([arXiv 2609.26176](
 
 Note: the earlier `scripts/benchmark_adaptive_attacks.py` used *different* wrapper templates for attacks and benign prompts. Its wrapper rows are confounded and are not used in the paper. The script was made label-blind on 2026-10-12.
 
-**Study B: Hindi / Hinglish registers.** Section 4. The `condition` is the register (`en`, `hi_deva`, `hi_roman`, `hinglish`), with `en` as the reference condition. Pairs link an injection seed to a benign seed within each register.
+**Study B (moved to Paper 2): Hindi / Hinglish registers.** Section 4. The `condition` is the register (`en`, `hi_deva`, `hi_roman`, `hinglish`), with `en` as the reference condition. Pairs link an injection seed to a benign seed within each register.
 
 **Study C: mitigation.** On two guard backbones, GuardShield DeBERTa-v3-small and ProtectAI v2 (Apache-2.0):
 
 1. **None:** the current checkpoint.
-2. **Naive canonicalizer (ablation):** NFKC plus stripping every Unicode format character (category Cf), as LLM Guard's InvisibleText scanner does. This also deletes Devanagari ZWJ/ZWNJ; its damage to Study B items is measured and reported.
+2. **Naive canonicalizer (ablation):** NFKC plus stripping every Unicode format character (category Cf), as LLM Guard's InvisibleText scanner does. This also deletes Devanagari ZWJ/ZWNJ; its damage is measured on native-written Hindi text from a public corpus (licence to be verified), so Paper 1 needs no team-written Hindi.
 3. **Script-aware canonicalizer (inference-time, no retraining):**
    - NFKC
    - remove U+200B, U+00AD, U+2060 and U+FEFF, but keep ZWJ/ZWNJ (U+200D/U+200C) inside Devanagari words
@@ -130,7 +130,14 @@ Results (28 corpora; contaminated / audited texts; "benign" = twins + calibratio
 | Prompt Guard 2 86M | FPR 0.0–0.6% on agent tool outputs | Liu 2026 |
 | Llama Guard 3 1B | obfuscated recall 0.484 | PIDS-Bench Table 7 |
 
-## 4. Hindi / Hinglish benchmark (Study B): see [`annotation/GUIDELINES.md`](annotation/GUIDELINES.md)
+## 4. Hindi / Hinglish benchmark (Study B, Paper 2): see [`annotation/GUIDELINES.md`](annotation/GUIDELINES.md)
+
+**Rescoped design (2026-10-14).** Writing all 400 seeds in three registers is too much work alongside Paper 1, so Paper 2 combines:
+- **Natural benign text from public native-written corpora** in Devanagari and in romanized / code-mixed Hindi, for per-register FPR without team writing. Candidate corpora, their provenance and licences are to be verified before use.
+- **A small parallel core:** 50 of the 400 seeds (balanced benign / injection, including trigger-word benign seeds) written by the team in all three registers, about 50 texts per author, for the controlled same-content comparison and for attack recall.
+- **The machine-translation contrast** of the same seeds.
+
+The original design below remains the reference for the parallel core.
 
 - **400 seeds:** 200 benign (30% trigger-word) and 200 injection across five categories, in `annotation/seeds.csv`.
 - **English versions:** drafted by Claude and edited by the authors (this is disclosed in the paper). They were checked to have zero overlap with GuardShield's training and test data and with the Study A sources.
@@ -184,7 +191,7 @@ These terms describe the classifier's error direction under perturbation. They d
 | Ours | GuardShield DeBERTa-v3-small |
 | Encoder classifiers | ProtectAI v2, deepset, fmops, PIGuard*, Prompt Guard v1†‡, Prompt Guard 2 86M† / 22M†, Mezzo Prompt Guard v2 Base (lists Hindi), Horizon-Labs prompt-injection-guard-base (lists Hindi), Sentinel v2† |
 | Content-safety judges | Llama Guard 3 1B† / 8B†, Llama Guard 4 12B†, Qwen3Guard-Gen 0.6B / 8B, WildGuard† |
-| To configure | HiveTraceGuard-Pro (Apache-2.0; the only external guard trained on two-sided obfuscation) and PolyGuard-Qwen-Smol (for Study B). Both are generative with their own output format: add the template and verdict strings, then pass `check_guard` |
+| To configure | HiveTraceGuard-Pro (Apache-2.0; the only external guard trained on two-sided obfuscation) and PolyGuard-Qwen-Smol (for Study B, Paper 2). Both are generative with their own output format: add the template and verdict strings, then pass `check_guard` |
 | Baseline | GPT-2 perplexity filter |
 
 \* PIGuard executes code from its model repository; review `modeling_piguard.py` at the pinned revision before enabling it.
@@ -195,7 +202,7 @@ Content-safety judges classify *harmfulness*, not injection, so low injection re
 
 ## 7. Mechanism analysis (H4)
 
-`run_audit tokens` reports, per guard tokenizer and condition: mean tokens, characters per token, and the share over the input limit. Benign-twin FPR and within-condition AUROC are regressed on characters per token, across conditions and registers, pooled and per guard; Broken-Token ([arXiv 2510.26847](https://arxiv.org/abs/2510.26847)) is the precedent for characters per token as an obfuscation signal. Prompt Guard 2's immunity to zero-width characters and letter spacing is explained by its tokenizer-level normalization, as documented by Meta's model card and an XPN InfoSec analysis; the paper cites both. A supplementary encoder-only analysis computes the Mahalanobis distance of the [CLS] representation from the clean benign calibration pool.
+`run_audit tokens` reports, per guard tokenizer and condition: mean tokens, characters per token, and the share over the input limit. Benign-twin FPR and within-condition AUROC are regressed on characters per token across conditions (and registers, in Paper 2), pooled and per guard; Broken-Token ([arXiv 2510.26847](https://arxiv.org/abs/2510.26847)) is the precedent for characters per token as an obfuscation signal. Prompt Guard 2's immunity to zero-width characters and letter spacing is explained by its tokenizer-level normalization, as documented by Meta's model card and an XPN InfoSec analysis; the paper cites both. A supplementary encoder-only analysis computes the Mahalanobis distance of the [CLS] representation from the clean benign calibration pool.
 
 ## 8. Statistics and reporting rules
 
@@ -242,6 +249,7 @@ The guide left these decisions to the team (2026-10-12). Revisit them here, with
 | 2026-10-13 | Truncation and length | Primary analysis on pairs under every classifier's input limit; length-confound AUROC reported per condition. |
 | 2026-10-13 | Roster | Added Mezzo Prompt Guard v2 Base, Horizon-Labs guard-base and Sentinel v2; HiveTraceGuard-Pro and PolyGuard-Qwen-Smol to be configured. |
 | 2026-10-13 | Study C | Added the naive canonicalizer and decode-and-rescan-only arms, and per-round recall/FPR plots for augmentation. |
+| 2026-10-14 | Scope | Paper 1 = Study A + Study C + H4. Study B moves to Paper 2 (semester 8) with natural native-written corpora plus a 50-seed parallel core (section 4): the full 400 × 3 registers is too much work now, and Paper 1 should reach arXiv quickly given the competing preprints. |
 | 2026-10-14 | Data | Second primary source fixed: PIDS-Bench v3 test split, 200 pairs (`pids_main`, section 3); BIPIA rejected. Study A on Gandalf × Dolly complete for 18 guards. |
 | 2026-10-14 | Contamination audit | Done for both primary runs (section 3). Exact 8-gram Jaccard replaces MinHash. A text is contaminated if it is a verbatim copy (whole text or one line) or ≥ 80% contained; under 8 words, verbatim only. Status "none" added for guards whose whole training set was audited without overlap. Known: Horizon-Labs and GuardShield on Gandalf; likely: ProtectAI v2 on Dolly. Sensitivity without contaminated pairs changes no failure mode. |
 
@@ -249,7 +257,7 @@ The guide left these decisions to the team (2026-10-12). Revisit them here, with
 
 The novelty statement the evidence supports:
 
-> We give the first paired, label-blind audit of prompt-injection detectors in which every attack and its length-matched benign twin receive the identical perturbation, show with within-condition AUROC that the same guard can fail closed or fail open depending on the perturbation family, extend the audit to a native-speaker Hindi/romanized/Hinglish benchmark with FPR fairness metrics, and compare script-aware canonicalization against benign-twin augmentation on held-out families.
+> We give the first paired, label-blind audit of prompt-injection detectors in which every attack and its length-matched benign twin receive the identical perturbation, show with within-condition AUROC that the same guard can fail closed or fail open depending on the perturbation family, replicate this on a second attack and benign source, and compare script-aware canonicalization against benign-twin augmentation on held-out families. (The Hindi/romanized/Hinglish benchmark with FPR fairness metrics is Paper 2's claim.)
 
 Do **not** claim:
 - the benign arm or the scaffold control as new (Zhang et al. 2609.26176)
