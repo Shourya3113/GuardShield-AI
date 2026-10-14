@@ -17,7 +17,9 @@
 \input{generated/numbers.tex}
 \input{generated/numbers_contamination.tex}
 \input{generated/numbers_pids.tex}
-\makeatletter\setlength{\@fptop}{0pt}\makeatother  % pages holding only floats start at the top
+\makeatletter  % pages holding only floats start at the top (single- and double-column floats)
+\setlength{\@fptop}{0pt}\setlength{\@dblfptop}{0pt}
+\makeatother
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\dg}{$^\circ$}       % degraded intent signal
 \newcommand{\ds}{$^\dagger$}     % destroyed intent signal
