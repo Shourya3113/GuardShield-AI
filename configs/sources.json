@@ -14,7 +14,7 @@
       "constant_label": 1,
       "max_chars": 1500,
       "role": "attack",
-      "contamination": "Unknown for commercial/vendor guards; not in GuardShield training."
+      "contamination": "Unknown for vendor guards. No verbatim copy in GuardShield training, but 94 of obf_main's 500 attacks share >= 50% of their word 8-grams with GuardShield's SPML training rows (likely contamination)."
     },
     "deepset_test": {
       "type": "hf_parquet",

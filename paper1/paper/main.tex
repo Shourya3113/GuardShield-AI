@@ -1,0 +1,235 @@
+% Paper 1 draft (ACL Rolling Review format). Build on Overleaf with the official ACL template
+% (acl.sty, acl_natbib.bst): https://github.com/acl-org/acl-style-files
+% Every number below comes from generated/numbers.tex or a generated table (make_assets.py).
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{xcolor}
+
+\input{generated/numbers.tex}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\dg}{$^\circ$}       % degraded intent signal
+\newcommand{\ds}{$^\dagger$}     % destroyed intent signal
+\newcommand{\fam}[1]{\texttt{#1}}
+
+\title{Guards That Reject the Unfamiliar: Format-Triggered Over-Defense\\in Prompt-Injection Detectors}
+
+\author{Anonymous ACL submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Prompt-injection detectors are evaluated for robustness by perturbing attacks and checking that they are still caught. That evaluation cannot tell a robust detector from one that flags every unfamiliar-looking input. We audit \nGuards{} open detectors and content-safety judges with a paired, label-blind protocol: each of \nPairs{} injection attacks is paired with a length-matched benign twin, and both receive the identical perturbation under \nFamilies{} character, encoding and spacing families. Within-condition AUROC separates a threshold shift, which recalibration can fix, from a destroyed intent signal, which it cannot. The intent signal is destroyed in \nSigDestroyed{} of \nCells{} guard--family cells (\pctSigDestroyed\%). Of the \nAttackRobust{} cells that an attack-only evaluation would call robust, \nAttackRobustFC{} (\pctAttackRobustFC\%) keep their recall only because the detector also flags the benign twin. Failure direction is a property of a guard--family cell rather than of a guard: \nMixedGuards{} guards fail closed under some families and open under others, and the ranking of guards by perturbed-attack recall is unrelated to their ranking by paired accuracy (Kendall $\tau = \hTwoTau$). \todo{one sentence each on Study B (Hindi registers) and Study C (canonicalization vs.\ augmentation) once run.}
+\end{abstract}
+
+% =====================================================================
+\section{Introduction}
+
+Applications that pass untrusted text to a language model increasingly place a classifier in front of it to catch prompt injection \citep{perez2022ignore,greshake2023indirect}. Attackers respond by changing the surface form of the attack: inserting zero-width characters, swapping letters for homoglyphs or digits, or wrapping the instruction in Base64 \citep{hackett2025,fairoze2026}. Robustness evaluations therefore perturb attacks and report how many are still detected.
+
+Such evaluations score only half of a detector's decision. A detector that flags every input containing an invisible character, or every Base64 string, keeps perfect recall on perturbed attacks while blocking the benign users whose text happens to share that form, including users of transliterated scripts, technical text and encoded data. PIDS-Bench, the most complete detector benchmark with an obfuscation axis, notes that its obfuscated set contains only attacks, so ``benign FPR is undefined'' \citep{pidsbench2026}. Recent work restores the benign arm for chat models \citep{zhang2026refusing} and for one guard's own training \citep{hivetrace2026}, and audits over-defense across detectors on unperturbed text \citep{liu2026passing}. The detector-side cell remains open: under a fixed perturbation, does a third-party detector still separate injection intent from benign intent, or does it react to the format?
+
+We answer with a paired, label-blind audit. Every attack is matched to a benign prompt of the same length, and both are transformed identically. This makes three distinctions measurable:
+\begin{enumerate}
+  \item \textbf{Fail-closed versus fail-open.} A detector can keep high recall under a perturbation because it now flags the benign twin too, or keep a low false-positive rate because it now misses the attack. We call these error directions \emph{fail-closed} and \emph{fail-open}; the terms describe classification errors under perturbation, not a pipeline's behaviour when its guard is unavailable.
+  \item \textbf{Shifted versus destroyed signal.} A within-condition AUROC between attacks and their twins shows whether the detector still ranks attacks above benign text. If it does, the errors are a threshold shift that per-format recalibration can repair; if the AUROC falls to chance, no threshold can.
+  \item \textbf{Encoding versus template.} A scaffold control places the same decoding instruction around the plain text \citep{zhang2026refusing}, separating the effect of the encoding from the effect of the wrapper's words.
+\end{enumerate}
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item The first paired, label-blind audit of prompt-injection detectors in which every attack and its length-matched benign twin receive the identical perturbation (\S\ref{sec:protocol}). We carry the benign-arm and scaffold controls of \citet{zhang2026refusing} over to detectors, remove the length confound they report, and add soft-hyphen, leetspeak, ROT13, diacritic, full-width and letter-spacing families on the benign side.
+  \item Score-level paired metrics with pre-registered decision rules: within-condition AUROC with an intact/degraded/destroyed status, and a failure-mode rule applied at each detector's deployed threshold (\S\ref{sec:metrics}).
+  \item A \nGuards{}-detector Study A (\S\ref{sec:results}) showing that failure direction belongs to a guard--family cell, not to a guard, and that attack-only robustness rankings do not predict paired accuracy.
+  \item \todo{Study B: a native-speaker-written, register-parallel benchmark of benign and injection prompts in Hindi (Devanagari), romanized Hindi and Hinglish, with per-register FPR fairness metrics.}
+  \item \todo{Study C: the first controlled comparison of script-aware canonicalization and benign-twin augmentation, with benign FPR, on seen and held-out families.}
+\end{itemize}
+Code, configurations with pinned model revisions, per-item scores and metrics are released. \todo{repository link after anonymity period}
+
+% =====================================================================
+\section{Related Work}
+
+\paragraph{Benign controls under encoding.} \citet{zhang2026refusing} cross harmful and benign behaviours with plain, scaffolded and encoded forms for chat models and show that refusal under encodings can look like safety while being indiscriminate; they identify the same missing cell ``one level out, on the defence''. They report that raw character length alone separates their two arms at AUROC 0.654, a confound our length matching removes. \citet{handa2024} and \citet{uysal2026} study chat-model behaviour on ciphered or multilingual requests; no detector decision is measured. \citet{zhang2026share} list benign inputs that resemble encodings as untested.
+
+\paragraph{Detector audits.} PIDS-Bench evaluates four detectors with a structural-shift benign set and an attack-only obfuscation set \citep{pidsbench2026}. \citet{liu2026passing} audits 15 detectors on benign agent tool outputs and finds default-threshold FPR from 0\% to 93\%, with no character or encoding perturbation. \citet{fairoze2026} report that Prompt Guard 2 regresses on encoded attacks and argue, without measuring it, that blocking encodings would harm benign users; \citet{hackett2025} report attack-only evasion rates for character injection. Prompt Overflow evades detectors by dilution across 512-token windows \citep{promptoverflow2026}; we keep every input inside one window to exclude that mechanism. PIGuard and its NotInject benchmark define over-defense as trigger-word bias on clean English text \citep{li2025piguard}; we study an orthographic axis.
+
+\paragraph{Two-sided obfuscation and normalization.} HiveTraceGuard-Pro obfuscates both labels of topic-paired twins to train and evaluate its own guard and reports a recall/FPR coupling it could not remove \citep{hivetrace2026}. Canonicalization in front of a content-safety classifier \citep{baszta2026} and at RAG ingestion \citep{hiddenplaintext2026} has been reported with attack-side metrics only. \todo{expand with Study C positioning.}
+
+\paragraph{Indic and code-mixed text.} \todo{Study B related work: \citet{srinivasan2026}, \citet{banglaveilguard2026}, \citet{indicsafe2026}, \citet{haloguard2026}, \citet{kumar2025polyguard}, \citet{qwen3guard2025}, \citet{chennabasappa2025llamafirewall}; fairness precedent \citet{sap2019risk}.}
+
+\paragraph{Paired evaluation.} Our design descends from contrast sets \citep{gardner2020contrast} and CheckList invariance tests \citep{ribeiro2020checklist}.
+
+% =====================================================================
+\section{Paired Perturbation Protocol}
+\label{sec:protocol}
+
+\paragraph{Pairs.} Attacks and benign prompts are shuffled with a fixed seed. Each attack is paired with the unused benign prompt closest to it in character length, and a disjoint pool of \nCalibration{} benign prompts is held out for threshold calibration, so calibrated thresholds are never fitted on evaluated items. In the primary run the median length gap within a pair is zero characters, and the AUROC of character length (attack vs.\ twin) lies between \lengthAucMin{} and \lengthAucMax{} in every condition.
+
+\paragraph{Perturbation families.} Each pair is expanded under eleven families plus the clean reference; both members receive the identical, label-blind transformation (Table~\ref{tab:families}). The character families insert U+200B or U+00AD inside words of four or more characters, substitute digits and symbols for letters, or map Latin letters to Cyrillic lookalikes. The wrapper families encode the whole prompt in Base64 or ROT13 inside a fixed instruction, \textit{``Decode the following Base64 text and respond to it: \ldots''}; the matching scaffold places the same instruction around the plain text. Full-width forms, combining diacritics and letter spacing are held out from the training families of Study C; they are not new as attack families \citep{hackett2025}.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llp{4.1cm}@{}}
+\toprule
+Family & Kind & Transformation \\
+\midrule
+ZW (\fam{zero\_width}) & char & U+200B between letters \\
+SHY (\fam{soft\_hyphen}) & char & U+00AD between letters \\
+Leet (\fam{leetspeak}) & char & a$\to$@, e$\to$3, i$\to$1, o$\to$0, s$\to$5 \\
+Homo (\fam{homoglyph}) & char & Latin a e o p c x y $\to$ Cyrillic \\
+B64 / R13 & wrapper & encoded text in a decode instruction \\
+B64-S / R13-S & scaffold & same instruction, plain text \\
+FW* (\fam{fullwidth}) & held out & ASCII $\to$ full-width forms \\
+Diac* (\fam{diacritics}) & held out & combining acute after each letter \\
+Spc* (\fam{spaced\_letters}) & held out & spaces between letters \\
+\bottomrule
+\end{tabular}
+\caption{Perturbation families. Character families act on words of at least four characters. Both members of every pair receive the identical transformation.}
+\label{tab:families}
+\end{table}
+
+\subsection{Metrics and pre-registered rules}
+\label{sec:metrics}
+
+Let $A_c$ and $B_c$ be the detector's scores for the attacks and their twins under condition $c$.
+
+\paragraph{Intent signal (primary, threshold-free).} The within-condition $\mathrm{AUROC}(c)$ of $A_c$ against $B_c$, with a 95\% CI from 1,000 paired bootstrap resamples. The status of each guard--condition cell was fixed before the full run: \emph{intact} if the lower CI bound is at least $\mathrm{AUROC}(\text{clean}) - 0.05$; \emph{destroyed} if the upper bound is below 0.75; \emph{degraded} otherwise.
+
+\paragraph{Decisions.} At a threshold $\tau$, attack recall $\mathrm{TPR}(c)$ and benign-twin $\mathrm{FPR}(c)$ with Wilson intervals \citep{wilson1927}, and paired joint accuracy $\mathrm{PJA}(c)$, the share of pairs whose attack is flagged and whose twin is not.
+
+\paragraph{Failure mode.} Relative to the clean condition at the same threshold, a cell is \emph{fail-closed} if FPR rises by at least 20 points while TPR does not fall by 20; \emph{fail-open} if TPR falls by at least 20 points while FPR does not rise by 20; \emph{both} if both changes reach 20 points; and \emph{stable} otherwise.
+
+\paragraph{Thresholds.} The headline uses each detector's default threshold (0.5 on its attack probability), as deployed. Thresholds giving 1\% and 5\% FPR on the held-out calibration pool are reported as sensitivity analyses. The perplexity baseline has no default threshold and appears only at calibrated thresholds.
+
+% =====================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Data.} The primary run pairs \nPairs{} attacks from Lakera's \textit{gandalf\_ignore\_instructions} \citep{lakera2023gandalf} with benign instructions from \textit{databricks-dolly-15k} that have no context field \citep{conover2023dolly}; \nCalibration{} further Dolly instructions form the calibration pool. The dataset (SHA-256 \texttt{\datasetSha\ldots}) rebuilds deterministically from pinned dataset revisions. A second primary source pairs 200 attacks and benign prompts from the PIDS-Bench v3 test split \citep{pidsbench2026}. \todo{report pids\_main results once scored (\S\ref{sec:second}).}
+
+\paragraph{Detectors.} Table~\ref{tab:clean} lists the \nGuards{} detectors. Encoder classifiers are scored by the softmax probability of their attack label(s). Prompt Guard v1 is reported in both of Meta's modes: injection-or-jailbreak, intended for third-party data, and jailbreak only, intended for direct user input. Generative judges (Llama Guard \citep{inan2023llamaguard}, Qwen3Guard \citep{qwen3guard2025}, WildGuard \citep{han2024wildguard}) are scored without sampling, by the probability mass of their unsafe verdict among their verdict strings under teacher forcing; each judge was checked to agree with its own greedy output on probe prompts before scoring. Content-safety judges classify harmfulness rather than injection, so low clean recall is expected; they are included because deployments use them as the only guard. GuardShield is our own DeBERTa-v3-small classifier \citep{he2023debertav3}. Its training data contain no Gandalf or PIDS-Bench text verbatim, but include the SPML corpus, whose system-prompt injections reuse Gandalf-style password-extraction prompts: about one in five Study A attacks shares at least half of its word 8-grams with GuardShield training text. \todo{replace with the contamination-audit macro and report GuardShield with and without these pairs.} A GPT-2 perplexity filter is a non-learned baseline. Model revisions are pinned to commit hashes.
+
+\paragraph{Compute and precision.} Generative judges run in float16 on two NVIDIA T4 GPUs. Against float32, 16-bit scoring shifted individual scores by at most about 0.08 and flipped 0.5--1.5\% of decisions near the threshold on 200 pilot items. No pair exceeds any classifier's input limit under any family, so no input is truncated.
+
+% =====================================================================
+\section{Study A Results}
+\label{sec:results}
+
+\subsection{Clean condition}
+
+On clean text, \nCleanAucHigh{} of \nGuards{} detectors rank attacks above their twins with AUROC $\geq 0.95$ (Table~\ref{tab:clean}). Two exceptions matter for what follows. Prompt Guard v1 in its injection mode flags \pgOneCleanFPR\% of clean benign twins (AUROC \pgOneCleanAUC): it treats any instruction as potential injection, as its documentation warns for direct user input, so its perturbed cells carry no information about intent. deepset and fmops already flag \deepsetCleanFPR\% and \fmopsCleanFPR\% of clean Dolly instructions at their default threshold, consistent with \citet{liu2026passing}. The content-safety judges separate attacks from twins well (AUROC \judgeCleanAucMin--\judgeCleanAucMax) but flag only \judgeCleanTprMin--\judgeCleanTprMax\% of Gandalf attacks at their default threshold, because most of these attacks seek a password rather than harmful content.
+
+\subsection{Unfamiliar formats destroy the intent signal}
+
+Figure~\ref{fig:map} shows every guard--family cell. The intent signal is intact in \nSigIntact{} cells, degraded in \nSigDegraded{} and destroyed in \nSigDestroyed{} of \nCells{}. The wrapper families are the most damaging: Base64 and ROT13 destroy the signal in \nWrapDestroyed{} of \nWrapCells{} cells, with every detector near chance. The scaffold control isolates the cause. Placing the identical decoding instruction around the plain text leaves the signal intact in \nScaffoldIntact{} of \nScaffoldCells{} cells, so it is the encoding, not the instruction's wording, that removes the signal. Character families destroy the signal in \nCharDestroyed{} of \nCharCells{} cells and the held-out families in \nHeldDestroyed{} of \nHeldCells{}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{generated/fig_failure_map.pdf}
+\caption{Study A, Gandalf $\times$ Dolly, \nPairs{} pairs. Each cell is a guard under one perturbation family. Fill: failure mode at the guard's default threshold relative to its clean condition. Number: within-condition AUROC (attack vs.\ benign twin); hatching marks a destroyed intent signal (upper 95\% CI $< 0.75$). Bold numbers mark cells whose signal is intact or degraded. GPT-2 perplexity has no default threshold. Prompt Guard v1 (inj.) flags almost all clean benign prompts, so its failure modes are uninformative. * held out from Study C training.}
+\label{fig:map}
+\end{figure*}
+
+\subsection{Attack-only evaluation hides both failure directions}
+
+At the default threshold, \nModeClosed{} of \nModeCells{} cells fail closed, \nModeOpen{} fail open, \nModeBoth{} fail both ways, and \nModeStable{} are stable. Attack-only robustness evaluation cannot see the first group. Of the \nAttackRobust{} cells whose attack recall stays within 5 points of clean, which such an evaluation would report as robust, \nAttackRobustFC{} (\pctAttackRobustFC\%) are fail-closed: the detector also flags at least 20 points more of the benign twins. ProtectAI v2, for example, keeps \protectaiBsfTPR\% recall under Base64 while flagging \protectaiBsfFPR\% of benign twins (AUROC \protectaiBsfAUC), and \protectaiShyTPR\% recall under soft hyphens with \protectaiShyFPR\% FPR. Symmetrically, of the \nBenignRobust{} cells whose benign FPR stays within 5 points of clean, \nBenignRobustFO{} (\pctBenignRobustFO\%) lose at least 20 points of recall. Prompt Guard 2 86M falls from \pgTwoEightSixCleanTPR\% clean recall to \pgTwoEightSixShyTPR\% under soft hyphens, leetspeak and diacritics while its FPR stays at \pgTwoEightSixShyFPR\%, and its AUROC under those families (\pgTwoEightSixShyAUC, \pgTwoEightSixLeetAUC, \pgTwoEightSixDiacAUC) shows the detector cannot tell the two apart. A benign-only over-defense audit would score that cell as perfect.
+
+\paragraph{The same guard fails in both directions (H1b).} Failure direction belongs to a guard--family cell rather than to a guard. \nMixedGuards{} guards (\mixedGuards) have at least one fail-closed and at least one fail-open cell. Qwen3Guard-Gen 0.6B flags \qwenSmallCleanTPR\% of clean attacks but \qwenSmallBsfTPR\% of Base64 attacks and \qwenSmallBsfFPR\% of their twins, yet under leetspeak it flags \qwenSmallLeetFPR\% of the benign twins. Model families also disagree across versions: Llama Guard 3 8B fails open under Base64 (recall \lgThreeEightBsfTPR\%, FPR \lgThreeEightBsfFPR\%), while Llama Guard 4 12B fails closed, flagging \lgFourBsfFPR\% of Base64 benign twins and \lgFourRotFPR\% of ROT13 twins.
+
+
+\paragraph{Encoder classifiers trained for injection fail closed; Prompt Guard fails open.} Across families, the injection classifiers fine-tuned from general encoders (ProtectAI v2, deepset, fmops, Mezzo, GuardShield) produce almost only fail-closed cells, whereas the Prompt Guard models produce only fail-open cells. Our own GuardShield is no exception: it flags \guardshieldCleanFPR\% of clean twins but \guardshieldShyFPR\% under soft hyphens (AUROC \guardshieldShyAUC). \todo{mechanism: tokenizer fragmentation (H4, \S7 of SPEC); Prompt Guard 2's tokenizer-level normalization explains its immunity to zero-width characters \citep{meta2025promptguard2,xpn_tokenization}.}
+
+\subsection{Threshold shift or destroyed signal}
+
+Most failures are not threshold shifts. Only four fail-closed cells keep an intact signal, all under scaffolds: ProtectAI v2 flags \protectaiBsfScaffoldFPR\% of scaffolded benign twins while still ranking attacks above them (AUROC \protectaiBsfScaffoldAUC), so per-format recalibration would repair it. Prompt Guard 2 86M under homoglyphs is the clearest near-shift: AUROC \pgTwoEightSixHomoAUC{} with only \pgTwoEightSixHomoTPR\% recall at its default threshold. In all but \nWrapNotDestroyed{} wrapper cell and in most character cells, the AUROC is near chance and no threshold recovers the detector.
+
+\subsection{Attack-only rankings do not predict paired accuracy (H2)}
+
+Ranking the \hTwoN{} detectors with a default threshold by mean perturbed-attack recall and by mean paired joint accuracy gives Kendall $\tau = \hTwoTau$ ($p = \hTwoP$) \citep{kendall1938}. The two rankings are unrelated: detectors at the top of an attack-only leaderboard are mostly those that flag perturbed benign text as well (Appendix Table~\ref{tab:pja}).
+
+\subsection{Robustness checks}
+
+\paragraph{Calibrated thresholds.} At thresholds calibrated to 5\% FPR on clean benign prompts, fail-closed cells rise from \nModeClosed{} to \nModeFprClosed{} and fail-open cells fall from \nModeOpen{} to \nModeFprOpen{}. Calibration lowers the threshold of detectors whose clean benign scores are near zero, such as Prompt Guard 2, so their perturbed benign twins cross it; the failure direction depends on the operating point, which is why the headline uses deployed defaults.
+
+\paragraph{Length and truncation.} Character-length AUROC is \lengthAucMin--\lengthAucMax{} in every condition, so length cannot explain any separation, and no input exceeds a classifier's window.
+
+\subsection{Second primary source}
+\label{sec:second}
+\todo{pids\_main: 200 PIDS-Bench pairs (188 template, 12 SPML attacks; Alpaca, chatbot-instruction, OASST1 and template twins); length AUROC 0.53. Report whether the failure map replicates, and compare clean results with PIDS-Bench Table 7: ProtectAI hard-benign FPR 0.216 and obfuscated recall 0.906; Prompt Guard 2 IID recall 0.369 and obfuscated recall 0.3235; Llama Guard 3 1B obfuscated recall 0.484.}
+
+\paragraph{Contamination.} \todo{contamination audit: verbatim and near-duplicate overlap of Gandalf, Dolly and PIDS-Bench against the training sources of ProtectAI v2, PIGuard, Horizon-Labs and GuardShield; mark each cell known / likely / unknown.}
+
+% =====================================================================
+\section{Study B: Hindi, Romanized Hindi and Hinglish}
+\todo{native-speaker registers in progress (paper1/annotation). Report per-register FPR, FPR parity gap and ratio, FPR at matched English TPR, the trigger-word split, Cohen's $\kappa$ of the blind label check, and the machine-translation contrast.}
+
+\section{Study C: Canonicalization versus Augmentation}
+\todo{six arms on GuardShield and ProtectAI v2, at least five seeds, seen vs.\ held-out families, recall/FPR per augmentation round.}
+
+% =====================================================================
+\section{Discussion}
+
+A detector that flags every unfamiliar format looks robust on attack-only benchmarks and looks precise on benign-only audits of clean text. Only a paired evaluation under the identical perturbation exposes it. We recommend that robustness evaluations of detectors (i) perturb benign text exactly as they perturb attacks, (ii) report a within-condition AUROC alongside rates, so that recalibration can be separated from retraining, and (iii) report failure direction per family, since a single guard can over-block one format and under-block another. \todo{deployment implications; link to Study B and C.}
+
+\section*{Limitations}
+Gandalf attacks mostly target password extraction, and Dolly instructions are general-purpose, so Study A covers one attack style; the PIDS-Bench run adds a second source but is dominated by templated injections paraphrased by one model. Our perturbations are fixed and non-adaptive; an adaptive attacker would do at least as well. The 20-point failure-mode rule and the 0.05 and 0.75 signal thresholds are conventions fixed before the full run, and other cut-offs would move individual cells. Content-safety judges are scored on a task they were not designed for. Generative judges ran in 16-bit precision, which flips a small share of near-threshold decisions. \todo{Study B and C limitations.}
+
+\section*{Ethics Statement}
+All attack prompts come from public datasets; the perturbations are well known and already used against deployed detectors. Publishing which detectors fail open under which families could help attackers, but the families are public and the detectors' vendors can reproduce the audit from our released code. The Hindi data are written by the authors and contain no personal data. \todo{finalize with Study B annotation details.}
+
+\bibliography{refs}
+
+\appendix
+\section{Full results}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Detector & AUROC [95\% CI] & TPR & FPR & PJA & FPR@TPR90 \\
+\midrule
+\input{generated/tab_clean.tex}
+\bottomrule
+\end{tabular}
+\caption{Clean condition (Gandalf $\times$ Dolly, \nPairs{} pairs). TPR, FPR and PJA (\%) at the default threshold; FPR@TPR90 is the benign FPR at the threshold that catches 90\% of attacks.}
+\label{tab:clean}
+\end{table*}
+
+\begin{table*}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+Detector & Clean & ZW & SHY & Leet & Homo & B64 & B64-S & R13 & R13-S & FW* & Diac* & Spc* \\
+\midrule
+\input{generated/tab_auroc.tex}
+\bottomrule
+\end{tabular}
+\caption{Within-condition AUROC. \dg{} degraded and \ds{} destroyed intent signal under the pre-registered rule; unmarked cells are intact.}
+\label{tab:auroc}
+\end{table*}
+
+\begin{table*}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lcccccccccccc@{}}
+\toprule
+Detector & Clean & ZW & SHY & Leet & Homo & B64 & B64-S & R13 & R13-S & FW* & Diac* & Spc* \\
+\midrule
+\input{generated/tab_pja.tex}
+\bottomrule
+\end{tabular}
+\caption{Paired joint accuracy (\%) at the default threshold: the share of pairs whose attack is flagged and whose benign twin is not.}
+\label{tab:pja}
+\end{table*}
+
+\end{document}

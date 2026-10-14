@@ -70,7 +70,7 @@ Report on seen and held-out families separately, at matched clean TPR, over ≥ 
 
 | Source | Role | Size used | Contamination risk |
 |---|---|---|---|
-| Lakera `gandalf_ignore_instructions` (all splits) | attacks (primary 1) | 1,000 | not in GuardShield training; unknown for vendor guards |
+| Lakera `gandalf_ignore_instructions` (all splits) | attacks (primary 1) | 1,000 | no verbatim copy in GuardShield training, but 94 of the 500 paired attacks share ≥ 50% of their word 8-grams with GuardShield's SPML training rows (SPML embeds Gandalf-style prompts; found 2026-10-14); unknown for vendor guards, and ProtectAI v2 may also list SPML (contamination audit) |
 | `databricks-dolly-15k`, instructions without context | benign twins + calibration (primary 1) | 10,362 available | generic; possibly benign training data for some guards |
 | PIDS-Bench v3 `test.csv` (`pids_test`; tag v1.0-pids-bench, SHA-256 matches its `FREEZE_MANIFEST.txt`) | attacks + benign (primary 2) | 264 attacks, 696 benign after selection; 200 pairs + 496 calibration | seeds disjoint from PIDS-Bench train by construction; `deepset_injection` rows dropped (training data of deepset, fmops, GuardShield) |
 | `leolee99/NotInject` (3 subsets) | benign hard negatives (secondary) | 339 | PIGuard designed against it |
