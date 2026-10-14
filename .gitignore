@@ -71,3 +71,6 @@ Desktop.ini
 /runs/
 paper1/runs/*/dataset.jsonl
 paper1/runs/*/report.md
+
+# Overleaf bundle, rebuilt on demand
+paper1/paper/overleaf_upload.zip

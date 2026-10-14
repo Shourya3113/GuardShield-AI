@@ -78,22 +78,23 @@ Code, configurations with pinned model revisions, per-item scores and metrics ar
 
 \begin{table}[t]
 \centering\small
-\begin{tabular}{@{}llp{4.1cm}@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llp{3.7cm}@{}}
 \toprule
 Family & Kind & Transformation \\
 \midrule
-ZW (\fam{zero\_width}) & char & U+200B between letters \\
-SHY (\fam{soft\_hyphen}) & char & U+00AD between letters \\
-Leet (\fam{leetspeak}) & char & a$\to$@, e$\to$3, i$\to$1, o$\to$0, s$\to$5 \\
-Homo (\fam{homoglyph}) & char & Latin a e o p c x y $\to$ Cyrillic \\
-B64 / R13 & wrapper & encoded text in a decode instruction \\
-B64-S / R13-S & scaffold & same instruction, plain text \\
-FW* (\fam{fullwidth}) & held out & ASCII $\to$ full-width forms \\
-Diac* (\fam{diacritics}) & held out & combining acute after each letter \\
-Spc* (\fam{spaced\_letters}) & held out & spaces between letters \\
+ZW & char & U+200B between letters \\
+SHY & char & U+00AD between letters \\
+Leet & char & a$\to$@, e$\to$3, i$\to$1, o$\to$0, s$\to$5 \\
+Homo & char & Latin a e o p c x y $\to$ Cyrillic \\
+B64, R13 & wrapper & Base64 / ROT13 text inside a decode instruction \\
+B64-S, R13-S & scaffold & the same instruction around the plain text \\
+FW* & held out & ASCII $\to$ full-width forms \\
+Diac* & held out & combining acute accent after each letter \\
+Spc* & held out & spaces between letters \\
 \bottomrule
 \end{tabular}
-\caption{Perturbation families. Character families act on words of at least four characters. Both members of every pair receive the identical transformation.}
+\caption{Perturbation families (ZW zero-width space, SHY soft hyphen, Homo homoglyph, FW full-width, Diac diacritics, Spc letter spacing). Character families act on words of at least four characters. Both members of every pair receive the identical transformation. * held out from Study C training.}
 \label{tab:families}
 \end{table}
 
