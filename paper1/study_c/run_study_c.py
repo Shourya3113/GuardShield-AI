@@ -50,10 +50,23 @@ def setup():
         print(f"{dst}: dataset and shipped-checkpoint scores in place")
 
 
-def train():
+def train(attempts: int = 3):
+    """Trains every arm x seed not yet trained. A failed run (e.g. a laptop GPU fault) is retried from scratch,
+    and the remaining runs continue; failures are listed at the end."""
+    failed = []
     for arm, ratio, seed in TRAIN:
-        subprocess.run([sys.executable, str(Path(__file__).with_name("train_arm.py")), "--arm", arm,
-                        "--seed", str(seed), "--ratio", str(ratio)], check=True)
+        out = MODEL_ROOT / model_name(arm, ratio, seed)
+        for attempt in range(attempts):
+            if (out / "training_summary.json").exists():
+                break
+            shutil.rmtree(out, ignore_errors=True)  # partial checkpoints from a failed attempt
+            r = subprocess.run([sys.executable, str(Path(__file__).with_name("train_arm.py")), "--arm", arm,
+                                "--seed", str(seed), "--ratio", str(ratio)])
+            if r.returncode != 0:
+                print(f"{out.name}: attempt {attempt + 1} failed (exit {r.returncode})", flush=True)
+        if not (out / "training_summary.json").exists():
+            failed.append(out.name)
+    print("training failures:", failed or "none")
 
 
 def guards():

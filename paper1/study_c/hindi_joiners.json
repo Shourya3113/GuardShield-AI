@@ -1,0 +1,26 @@
+{
+  "source": "aya_hindi",
+  "revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+  "all": {
+    "texts": 1153,
+    "texts_with_joiner": 1,
+    "words": 27231,
+    "words_with_joiner": 1,
+    "joiners": 1,
+    "joiners_deleted_naive": 1,
+    "joiners_deleted_script_aware": 0,
+    "texts_changed_naive": 15,
+    "texts_changed_script_aware": 14
+  },
+  "original_annotations": {
+    "texts": 773,
+    "texts_with_joiner": 1,
+    "words": 16288,
+    "words_with_joiner": 1,
+    "joiners": 1,
+    "joiners_deleted_naive": 1,
+    "joiners_deleted_script_aware": 0,
+    "texts_changed_naive": 8,
+    "texts_changed_script_aware": 7
+  }
+}

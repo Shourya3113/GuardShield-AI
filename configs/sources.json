@@ -60,6 +60,19 @@
       "provenance": "PIDS-Bench v3 test split (arXiv 2609.15017), tag v1.0-pids-bench (commit 87dc835); SHA-256 equals FREEZE_MANIFEST.txt. Unobfuscated rows only (we apply our own perturbations); encoded_attack rows dropped (already encoded); deepset_injection dropped (training data of deepset, fmops, GuardShield); stackexchange dropped (Dolly instructions, the Study A benign source); one row per parent seed (paraphrases share seeds); <= 200 characters so that length-matched twins exist.",
       "contamination": "Seeds disjoint from PIDS-Bench train by construction. Audited 2026-10-14 (paper1/runs/pids_main/contamination.json): no overlap with any audited training corpus (GuardShield, PIGuard, deepset, fmops: none; ProtectAI v2 and Horizon-Labs: unknown, training data partly undisclosed)."
     },
+    "aya_hindi": {
+      "type": "hf_parquet",
+      "repo": "CohereLabs/aya_dataset",
+      "revision": "f9ea04583f02a8f86404ff6c58bf75fe637df8a2",
+      "files": ["data/train-00000-of-00001.parquet"],
+      "text_field": "inputs",
+      "filter": {"language_code": "hin"},
+      "constant_label": 0,
+      "role": "benign (Study C joiner check only)",
+      "licence": "Apache-2.0",
+      "provenance": "Aya Dataset: prompts written by native-speaker annotators (773 'original-annotations', 380 're-annotations', 47 annotators for Hindi). Approved for use 2026-10-15. Used only to count Devanagari ZWJ/ZWNJ deleted by the canonicalizers (paper1/study_c/hindi_joiners.py).",
+      "contamination": "Not an evaluation source for any detector result."
+    },
     "notinject": {
       "type": "hf_parquet",
       "repo": "leolee99/NotInject",

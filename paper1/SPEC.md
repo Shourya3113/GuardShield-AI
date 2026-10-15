@@ -50,21 +50,22 @@ Note: the earlier `scripts/benchmark_adaptive_attacks.py` used *different* wrapp
 
 **Study B (moved to Paper 2): Hindi / Hinglish registers.** Section 4. The `condition` is the register (`en`, `hi_deva`, `hi_roman`, `hinglish`), with `en` as the reference condition. Pairs link an injection seed to a benign seed within each register.
 
-**Study C: mitigation.** On two guard backbones, GuardShield DeBERTa-v3-small and ProtectAI v2 (Apache-2.0):
+**Study C: mitigation.** On two guard backbones, GuardShield DeBERTa-v3-small and ProtectAI v2 (Apache-2.0). Revised 2026-10-15 (section 10): only GuardShield is retrained (arms 1–6, five seeds each); ProtectAI v2 gets the inference-time arms (1–4) on its shipped checkpoint. Code: `guard_audit/canonicalize.py`, `paper1/study_c/` (driver `run_study_c.py`, training `train_arm.py`, analysis `analyze.py`); results in `paper1/runs/study_c_{obf,pids}`.
 
-1. **None:** the current checkpoint.
-2. **Naive canonicalizer (ablation):** NFKC plus stripping every Unicode format character (category Cf), as LLM Guard's InvisibleText scanner does. This also deletes Devanagari ZWJ/ZWNJ; its damage is measured on native-written Hindi text from a public corpus (licence to be verified), so Paper 1 needs no team-written Hindi.
+1. **None:** the checkpoint retrained with the shipped two-stage recipe (five seeds), plus the shipped checkpoint for reference.
+2. **Naive canonicalizer (ablation):** NFKC plus stripping every Unicode format character (category Cf), as LLM Guard's InvisibleText scanner does. This also deletes Devanagari ZWJ/ZWNJ; its damage is measured on the native-written Hindi prompts of the Aya Dataset (`aya_hindi`, Apache-2.0, approved 2026-10-15; `paper1/study_c/hindi_joiners.py`), so Paper 1 needs no team-written Hindi. Result: 1 of 1,153 prompts (1 of 27,231 words) contains a joiner; the naive canonicalizer deletes it, the script-aware one keeps it. Both canonicalizers' NFKC step also decomposes precomposed nukta letters (e.g. U+095C) in about 14 prompts, a canonically equivalent change.
 3. **Script-aware canonicalizer (inference-time, no retraining):**
    - NFKC
    - remove U+200B, U+00AD, U+2060 and U+FEFF, but keep ZWJ/ZWNJ (U+200D/U+200C) inside Devanagari words
    - map Cyrillic/Greek confusables to Latin only within words that are mostly Latin
    - collapse letter spacing
    - decode-and-rescan Base64/ROT13 spans (score = max of raw and decoded)
+   - **ablation (added 2026-10-14): decode-and-replace**, which scores only the decodings when any exist. The max rule can repair a guard that misses encoded attacks but never one that flags the encoding itself.
 4. **Decode-and-rescan only:** its benign FPR on its own, which no prior work has measured.
-5. **Augment:** retrain with perturbed attacks *and* perturbed benign twins for the seen families only.
-6. **Canonicalize + augment.**
+5. **Augment:** retrain with perturbed attacks *and* perturbed benign twins for the seen families only: each training example gets, with probability 1.0, one copy perturbed by a seen family drawn uniformly, keeping its label.
+6. **Canonicalize + augment:** arm 5 with every training text canonicalized (script-aware), and the script-aware canonicalizer at inference.
 
-Report on seen and held-out families separately, at matched clean TPR, over ≥ 5 training seeds (mean ± std). For augmentation, plot recall and benign FPR jointly per training round, to test whether the recall/FPR coupling reported for HiveTraceGuard-Pro ([arXiv 2609.01046](https://arxiv.org/abs/2609.01046)) recurs.
+Report on seen and held-out families separately, at matched clean TPR (each model's threshold flags 90% of its clean attacks), over 5 training seeds (mean ± std). For augmentation, plot recall and benign FPR jointly over augmentation mixing ratios 0, 0.25, 0.5 and 1.0 (0.25 and 0.5 with 3 seeds), to test whether the recall/FPR coupling reported for HiveTraceGuard-Pro ([arXiv 2609.01046](https://arxiv.org/abs/2609.01046)) recurs. Primary evaluation run: `study_c_pids` (no overlap with GuardShield's training data); `study_c_obf` is secondary, since 157 of its attacks occur in GuardShield's SPML training rows for every arm alike.
 
 ## 3. Data sources (`configs/sources.json`, revisions pinned)
 
@@ -249,6 +250,7 @@ The guide left these decisions to the team (2026-10-12). Revisit them here, with
 | 2026-10-13 | Truncation and length | Primary analysis on pairs under every classifier's input limit; length-confound AUROC reported per condition. |
 | 2026-10-13 | Roster | Added Mezzo Prompt Guard v2 Base, Horizon-Labs guard-base and Sentinel v2; HiveTraceGuard-Pro and PolyGuard-Qwen-Smol to be configured. |
 | 2026-10-13 | Study C | Added the naive canonicalizer and decode-and-rescan-only arms, and per-round recall/FPR plots for augmentation. |
+| 2026-10-15 | Study C | Only GuardShield is retrained (arms 1–6, five seeds); ProtectAI v2 keeps the inference-time arms on its shipped checkpoint, because most of its training data is undisclosed and DeBERTa-v3-base does not fit training on the 4 GB laptop GPU. The recall/FPR coupling is traced over augmentation mixing ratios (0 / 0.25 / 0.5 / 1.0), not "per training round". Decode-and-replace added as an ablation of the max rule (2026-10-14). Matched clean TPR fixed at 90%. |
 | 2026-10-14 | Scope | Paper 1 = Study A + Study C + H4. Study B moves to Paper 2 (semester 8) with natural native-written corpora plus a 50-seed parallel core (section 4): the full 400 × 3 registers is too much work now, and Paper 1 should reach arXiv quickly given the competing preprints. |
 | 2026-10-14 | Data | Second primary source fixed: PIDS-Bench v3 test split, 200 pairs (`pids_main`, section 3); BIPIA rejected. Study A on Gandalf × Dolly complete for 18 guards. |
 | 2026-10-14 | Contamination audit | Done for both primary runs (section 3). Exact 8-gram Jaccard replaces MinHash. A text is contaminated if it is a verbatim copy (whole text or one line) or ≥ 80% contained; under 8 words, verbatim only. Status "none" added for guards whose whole training set was audited without overlap. Known: Horizon-Labs and GuardShield on Gandalf; likely: ProtectAI v2 on Dolly. Sensitivity without contaminated pairs changes no failure mode. |
