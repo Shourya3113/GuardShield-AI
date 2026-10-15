@@ -145,21 +145,6 @@ Figure~\ref{fig:map} shows every guard--family cell. The intent signal is intact
 \label{fig:map}
 \end{figure*}
 
-% defined here so that it floats to the top of the next page, near the contamination paragraph
-\begin{table*}[t]
-\centering\small
-\begin{tabular}{@{}lllll@{}}
-\toprule
-& \multicolumn{2}{c}{Study 1 (Gandalf $\times$ Dolly)} & \multicolumn{2}{c}{PIDS-Bench} \\
-\cmidrule(lr){2-3}\cmidrule(l){4-5}
-Detector & attacks & benign & attacks & benign \\
-\midrule
-\input{generated/tab_contamination.tex}
-\bottomrule
-\end{tabular}
-\caption{Contamination audit: status, with contaminated / audited texts per evaluation pool. Benign pools include the twins and the calibration prompts. Known: overlap with data the detector trained on in full; likely: overlap with a corpus its model card lists; none: complete training data audited without overlap; unknown: training data partly or wholly undisclosed. $^\dagger$ audited but not scored.}
-\label{tab:contamination}
-\end{table*}
 
 \subsection{Attack-only evaluation hides both failure directions}
 
@@ -215,7 +200,7 @@ Ranking the \hTwoN{} detectors with a default threshold by mean perturbed-attack
 
 \subsection{Second primary source}
 \label{sec:second}
-A single attack source could make the failure map a property of Gandalf. We therefore repeated Study 1 on \pidsPairs{} pairs from the PIDS-Bench v3 test split \citep{pidsbench2026}, whose attacks are constructed and paraphrased rather than crowd-sourced. We kept unobfuscated rows (we apply our own perturbations), one paraphrase per seed, and texts of at most 200 characters, because PIDS-Bench's benign prompts are much shorter than its longest attacks. The attacks are \pidsTemplateAttacks{} templated injections and \pidsSpmlAttacks{} from SPML; their twins are Alpaca, chatbot-instruction, OASST1 and template prompts. Twins are matched against the whole benign pool before the calibration pool is drawn from the remainder, which keeps the length AUROC at \pidsLengthAuc{}.
+A single attack source could make the failure map a property of Gandalf. We therefore repeated Study 1 on \pidsPairs{} pairs from the PIDS-Bench v3 test split \citep{pidsbench2026}, whose attacks are constructed and paraphrased rather than crowd-sourced. We kept unobfuscated rows, one paraphrase per seed and texts of at most 200 characters, since PIDS-Bench's benign prompts are much shorter than its longest attacks; the attacks are \pidsTemplateAttacks{} templated and \pidsSpmlAttacks{} SPML injections, and matching twins against the whole benign pool keeps the length AUROC at \pidsLengthAuc{}.
 
 The failure map replicates (Appendix Figure~\ref{fig:map-pids}). In every one of the \replDirCells{} cells where both sources show a pure failure direction, the direction is the same; the failure mode matches in \replModeSame{} of \replModeCells{} cells and the signal status in \replSigSame{} of \replCells{}. The same \replMixedSame{} guards fail in both directions, the wrapper families destroy the signal in \pidsWrapDestroyed{} of \pidsWrapCells{} cells, and \pidsAttackRobustFC{} of the \pidsAttackRobust{} cells that look robust on attacks alone are fail-closed (\pidsPctAttackRobustFC\%). Attack-only and paired rankings remain unrelated (Kendall $\tau = \pidsHTwoTau$, $p = \pidsHTwoP$).
 
@@ -223,7 +208,7 @@ Clean-condition recall depends on the attack source, as PIDS-Bench found. Prompt
 
 \subsection{Training-data contamination}
 \label{sec:contamination}
-Following \citet{liu2026passing}, we checked every evaluated text (the unperturbed attack and twin of each pair, and the calibration prompts) against the published training data of the \nAuditGuards{} detectors that disclose it: \nAuditCorpora{} corpora at pinned revisions. After lowercasing and removing punctuation, a text counts as contaminated if it equals a training text or one full line of one, or if at least 80\% of its word 8-grams occur in a single training text; texts under eight words count only as verbatim copies. Exact 8-gram Jaccard is recorded alongside. Table~\ref{tab:contamination} marks each cell \emph{known} (overlap with data the detector trained on in full), \emph{likely} (overlap with a corpus its model card lists without saying which rows were used), \emph{none} (complete training data audited, no overlap) or \emph{unknown}.
+Following \citet{liu2026passing}, we checked every evaluated text (the unperturbed attack and twin of each pair, and the calibration prompts) against the published training data of the \nAuditGuards{} detectors that disclose it: \nAuditCorpora{} corpora at pinned revisions. After lowercasing and removing punctuation, a text counts as contaminated if it equals a training text or one full line of one, or if at least 80\% of its word 8-grams occur in a single training text; texts under eight words count only as verbatim copies. Exact 8-gram Jaccard is recorded alongside. Appendix Table~\ref{tab:contamination} marks each cell \emph{known} (overlap with data the detector trained on in full), \emph{likely} (overlap with a corpus its model card lists without saying which rows were used), \emph{none} (complete training data audited, no overlap) or \emph{unknown}.
 
 Three overlaps matter. Horizon guard-base trained on Gandalf's train split, which holds \horizonContamAttacks{} of our \nPairs{} attacks (\horizonContamAttacksPct\%). GuardShield's SPML training data contain \gsContamAttacks{} of them (\gsContamAttacksPct\%), \gsContamAttacksVerbatim{} as verbatim lines. On the benign side, ProtectAI v2's model card lists VMware's open-instruct collection, which includes Dolly: \protectaiContamTwins{} of the \nPairs{} twins and \protectaiContamCal{} of the \nCalibration{} calibration prompts occur in it, so ProtectAI's clean-condition FPR may partly reflect benign prompts seen in training. PIGuard's released training set contains \piguardContamTwins{} twins and \piguardContamCal{} calibration prompts; PIGuard is not in the scored roster. No audited corpus contains any of the \pidsAuditTexts{} PIDS-Bench texts.
 
@@ -235,14 +220,7 @@ Recomputing each detector without its own contaminated pairs leaves GuardShield 
 
 Study~1 shows that a detector loses the intent signal when its input becomes unreadable to it. Two remedies are available: make the input readable again before the detector sees it (canonicalization), or teach the detector the unreadable forms (augmentation). We compare them under the protocol of Study~1.
 
-\paragraph{Arms.} On GuardShield we retrain the detector with its shipped two-stage recipe under five seeds per arm, so that every arm is compared with a retrained baseline rather than with a single checkpoint:
-(1)~\emph{none};
-(2)~a \emph{naive canonicalizer} (NFKC and deletion of every Unicode format character, as LLM Guard's InvisibleText scanner does \citep{llmguard_invisible});
-(3)~a \emph{script-aware canonicalizer} (NFKC; deletion of zero-width spaces, soft hyphens, word joiners and byte-order marks, but not of the ZWJ/ZWNJ joiners that Devanagari spelling uses; Cyrillic and Greek confusables mapped to Latin inside mostly-Latin words; collapsed letter spacing; Base64 and ROT13 spans decoded and rescored, with the maximum score kept);
-(4)~\emph{decode-and-rescan} alone;
-(5)~\emph{benign-twin augmentation}, which gives every training example one copy perturbed by a seen family, attacks and benign prompts alike;
-(6)~\emph{canonicalization plus augmentation}.
-Seen families are the four character families and the two wrappers; full-width forms, diacritics and letter spacing are never used in training. Because the maximum rule in arm~(3) cannot lower a score, we add \emph{decode-and-replace}, which scores only the decoded text when decoding succeeds. ProtectAI~v2, whose training data are mostly undisclosed, receives arms (1)--(4) on its shipped checkpoint. Each model is read at the threshold that flags 90\% of its clean attacks. The primary evaluation uses the PIDS-Bench pairs, which share no text with GuardShield's training data (\S\ref{sec:contamination}); the Gandalf pairs are secondary.
+\paragraph{Arms.} We retrain GuardShield with its shipped two-stage recipe under five seeds per arm, so every arm is compared with a retrained baseline: (1)~\emph{none}; (2)~a \emph{naive canonicalizer} (NFKC and deletion of all Unicode format characters, as LLM Guard's InvisibleText scanner does \citep{llmguard_invisible}); (3)~a \emph{script-aware canonicalizer} (NFKC; deletion of zero-width spaces, soft hyphens, word joiners and byte-order marks but not of the ZWJ/ZWNJ joiners Devanagari uses; Cyrillic and Greek confusables mapped to Latin inside mostly-Latin words; letter spacing collapsed; Base64 and ROT13 spans decoded and rescored, keeping the maximum score); (4)~\emph{decode-and-rescan} alone; (5)~\emph{benign-twin augmentation}, one copy of every training example perturbed by a seen family, attacks and benign prompts alike; (6)~\emph{canonicalization plus augmentation}. The seen families are the four character families and the two wrappers; full-width forms, diacritics and letter spacing never appear in training. Because the maximum rule cannot lower a score, we add \emph{decode-and-replace}, which scores only the decoded text. ProtectAI~v2, whose training data are mostly undisclosed, receives arms (1)--(4) on its shipped checkpoint. Each model is read at the threshold that flags 90\% of its clean attacks. The PIDS-Bench pairs, which share no text with GuardShield's training data (\S\ref{sec:contamination}), are the primary evaluation.
 
 \begin{table*}[t]
 \centering\small
@@ -268,14 +246,8 @@ Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held ou
 
 \paragraph{Decoding needs to replace, not add.} Decode-and-rescan restores the wrapper signal (AUROC \scPidsNoneSeenWrapperAuc{} to \scPidsRescanOnlySeenWrapperAuc{}) but leaves the benign FPR at \scPidsRescanOnlySeenWrapperFpr\%: under the maximum rule, a detector that flags the encoded text itself still flags it. Replacing the encoded input with its decoding lowers the FPR to \scPidsScriptReplaceSeenWrapperFpr\% (\scPidsCanonAugmentReplaceSeenWrapperFpr\% with augmentation). Replacement does not help ProtectAI~v2, whose benign FPR stays at \scPidsProtectaiScriptReplaceSeenWrapperFpr\% because it flags the decoding instruction itself: \scPidsProtectaiNoneScaffoldFpr\% of plain-text scaffolds.
 
-\paragraph{Augmentation couples recall and FPR (H5).} Figure~\ref{fig:coupling} traces augmentation over training mixtures. At the default threshold, seen-family recall falls from \scPidsNoneSeenCharTprDefault\% without augmentation to \scPidsAugmentSeenCharTprDefault\% with a perturbed copy of every example, while the benign FPR falls from \scPidsNoneSeenCharFprDefault\% to \scPidsAugmentSeenCharFprDefault\%; the intermediate mixtures lie between. The AUROC moves far less (\scPidsNoneSeenCharAuc{} to \scPidsAugmentSeenCharAuc{}): augmentation mostly shifts the detector's operating point rather than restoring its ranking, the coupling HiveTraceGuard-Pro reported for its own guard \citep{hivetrace2026}.
+\paragraph{Augmentation couples recall and FPR (H5).} Appendix Figure~\ref{fig:coupling} traces augmentation over training mixtures. At the default threshold, seen-family recall falls from \scPidsNoneSeenCharTprDefault\% without augmentation to \scPidsAugmentSeenCharTprDefault\% with a perturbed copy of every example, while the benign FPR falls from \scPidsNoneSeenCharFprDefault\% to \scPidsAugmentSeenCharFprDefault\%; the intermediate mixtures lie between. The AUROC moves far less (\scPidsNoneSeenCharAuc{} to \scPidsAugmentSeenCharAuc{}): augmentation mostly shifts the detector's operating point rather than restoring its ranking, the coupling HiveTraceGuard-Pro reported for its own guard \citep{hivetrace2026}.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.72\textwidth]{generated/fig_coupling.pdf}
-\caption{Benign-twin augmentation over training mixtures (PIDS-Bench, default threshold; mean\,$\pm$\,std over five seeds at 0 and 1, three at 0.25 and 0.5). Recall on perturbed attacks and FPR on perturbed twins fall together.}
-\label{fig:coupling}
-\end{figure*}
 
 \paragraph{The script-aware rule rarely matters for Hindi.} Deleting all format characters also deletes the joiners that select Devanagari conjunct forms. In the \ayaTexts{} native-written Hindi prompts of the Aya Dataset \citep{singh2024aya}, however, only \ayaTextsJoiner{} prompt (\ayaWordsJoiner{} of \ayaWords{} words) contains one. The naive canonicalizer deletes it and the script-aware one keeps it, so the script-aware rule is a safeguard rather than a measurable gain on natural Hindi text.
 
@@ -357,6 +329,28 @@ Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held ou
 \includegraphics[width=0.92\textwidth]{generated/fig_failure_map_pids.pdf}
 \caption{Study 1 repeated on the second primary source, PIDS-Bench v3, \pidsPairs{} pairs; encoding as in Figure~\ref{fig:map}. Wherever both sources show a pure failure direction, it is the same in both.}
 \label{fig:map-pids}
+\end{figure*}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+& \multicolumn{2}{c}{Study 1 (Gandalf $\times$ Dolly)} & \multicolumn{2}{c}{PIDS-Bench} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Detector & attacks & benign & attacks & benign \\
+\midrule
+\input{generated/tab_contamination.tex}
+\bottomrule
+\end{tabular}
+\caption{Contamination audit: status, with contaminated / audited texts per evaluation pool. Benign pools include the twins and the calibration prompts. Known: overlap with data the detector trained on in full; likely: overlap with a corpus its model card lists; none: complete training data audited without overlap; unknown: training data partly or wholly undisclosed. $^\dagger$ audited but not scored.}
+\label{tab:contamination}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.72\textwidth]{generated/fig_coupling.pdf}
+\caption{Benign-twin augmentation over training mixtures (PIDS-Bench, default threshold; mean\,$\pm$\,std over five seeds at 0 and 1, three at 0.25 and 0.5). Recall on perturbed attacks and FPR on perturbed twins fall together.}
+\label{fig:coupling}
 \end{figure*}
 
 \end{document}
