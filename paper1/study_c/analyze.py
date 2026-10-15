@@ -61,8 +61,9 @@ def model_metrics(items, scores):
     return out
 
 
-def summarize(run: Path):
+def summarize(run: Path, exclude_pairs=frozenset(), suffix: str = ""):
     items = [json.loads(l) for l in (run / "dataset.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    items = [it for it in items if it["pair_id"] not in exclude_pairs]
     per_model = {}
     for f in sorted((run / "scores").glob("*.jsonl")):
         name = f.stem
@@ -89,11 +90,20 @@ def summarize(run: Path):
                 agg[k][metric] = {"mean": statistics.fmean(vals), "std": statistics.stdev(vals) if len(vals) > 1 else 0.0}
         arms[arm] = {"n_models": len(members), "models": sorted(members), "metrics": agg}
     out = {"target_tpr": TARGET_TPR, "groups": GROUPS, "arms": arms, "per_model": per_model}
-    (run / "study_c_summary.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    out["excluded_pairs"] = sorted(exclude_pairs)
+    (run / f"study_c_summary{suffix}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     print(f"{run.name}: {len(per_model)} models, arms {list(arms)}")
     return out
+
+
+def guardshield_contaminated_pairs(source_run: str):
+    """Pairs whose attack or twin occurs in GuardShield's training data (contamination audit), which every
+    retrained arm shares; reported as a sensitivity analysis on the Gandalf run."""
+    path = BASE_DIR / "paper1" / "runs" / source_run / "contamination.json"
+    return frozenset(json.loads(path.read_text(encoding="utf-8"))["guards"]["guardshield"]["contaminated_pairs"])
 
 
 if __name__ == "__main__":
     for r in ("study_c_obf", "study_c_pids"):
         summarize(BASE_DIR / "paper1" / "runs" / r)
+    summarize(BASE_DIR / "paper1" / "runs" / "study_c_obf", guardshield_contaminated_pairs("obf_main"), "_decontaminated")

@@ -1,0 +1,30 @@
+{
+  "guard": {
+    "name": "gs_none_r0_s3_naive",
+    "type": "canonicalized",
+    "default_threshold": 0.5,
+    "base": {
+      "name": "gs_none_r0_s3",
+      "type": "guardshield",
+      "default_threshold": 0.5,
+      "model_dir": "models\\study_c\\none_r0_s3",
+      "weights_sha256": "ae878466e2a18d3419ab48b9afc7ad1f30c821e7005395f5d3339b7ee27c6866"
+    },
+    "canonicalizer": "naive",
+    "rescan": false
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "5f6e81a0f94228c39a520bddc66ff89d0d42f080-dirty",
+    "timestamp": "2026-10-15T18:48:17Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 83.57,
+  "texts_per_second": 155.51
+}

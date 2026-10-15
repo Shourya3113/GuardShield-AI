@@ -1,0 +1,30 @@
+{
+  "guard": {
+    "name": "guardshield_rescan_only",
+    "type": "canonicalized",
+    "default_threshold": 0.5,
+    "base": {
+      "name": "guardshield",
+      "type": "guardshield",
+      "default_threshold": 0.5,
+      "model_dir": "models\\deberta_v3_prescan_v3",
+      "weights_sha256": "cd1e81a29c1eb942a61fd152dff0515bd29bd58d7e8cde671ce77478f85ee446"
+    },
+    "canonicalizer": "none",
+    "rescan": true
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "2add3b0d1bef39b62b6a7a6ad0f1356551c26e86",
+    "timestamp": "2026-10-14T13:12:18Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 763.89,
+  "texts_per_second": 17.01
+}

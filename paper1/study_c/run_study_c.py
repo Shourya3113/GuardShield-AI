@@ -102,5 +102,26 @@ def metrics():
                        cwd=BASE_DIR, check=True)
 
 
+def pack():
+    """Per-item scores (about 65 MB across both runs) are committed as one LZMA zip per run (about 3 MB)."""
+    import zipfile
+    for run in RUNS:
+        scores = BASE_DIR / "paper1" / "runs" / run / "scores"
+        with zipfile.ZipFile(scores.parent / "scores.zip", "w", zipfile.ZIP_LZMA) as z:
+            for f in sorted(scores.glob("*.jsonl")):
+                z.write(f, f.name)
+        print(f"{scores.parent / 'scores.zip'}: {len(list(scores.glob('*.jsonl')))} score files")
+
+
+def unpack():
+    import zipfile
+    for run in RUNS:
+        run_dir = BASE_DIR / "paper1" / "runs" / run
+        with zipfile.ZipFile(run_dir / "scores.zip") as z:
+            z.extractall(run_dir / "scores")
+        print(f"{run_dir / 'scores'}: restored")
+
+
 if __name__ == "__main__":
-    {"setup": setup, "train": train, "guards": guards, "score": score, "metrics": metrics}[sys.argv[1]]()
+    {"setup": setup, "train": train, "guards": guards, "score": score, "metrics": metrics,
+     "pack": pack, "unpack": unpack}[sys.argv[1]]()

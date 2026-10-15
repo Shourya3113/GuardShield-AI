@@ -1,0 +1,15 @@
+\multicolumn{8}{@{}l}{\textit{GuardShield (5 seeds)}} \\
+\quad none (retrained) & 0.92\,$\pm$\,0.05 & 0.55\,$\pm$\,0.01 & 0.46\,$\pm$\,0.05 & 0.62\,$\pm$\,0.02 & 100 & 100 & 75\,$\pm$\,6 \\
+\quad naive canonicalizer & 0.92\,$\pm$\,0.05 & 0.77\,$\pm$\,0.02 & 0.46\,$\pm$\,0.05 & 0.62\,$\pm$\,0.02 & 63\,$\pm$\,9 & 100 & 75\,$\pm$\,6 \\
+\quad decode-and-rescan only & 0.92\,$\pm$\,0.05 & 0.55\,$\pm$\,0.01 & 0.80\,$\pm$\,0.10 & 0.62\,$\pm$\,0.02 & 100 & 100 & 75\,$\pm$\,6 \\
+\quad script-aware + rescan (max) & 0.92\,$\pm$\,0.05 & 0.84\,$\pm$\,0.04 & 0.80\,$\pm$\,0.10 & 0.74\,$\pm$\,0.04 & 46\,$\pm$\,14 & 100 & 61\,$\pm$\,10 \\
+\quad script-aware + decode-and-replace & 0.92\,$\pm$\,0.05 & 0.83\,$\pm$\,0.04 & 0.91\,$\pm$\,0.05 & 0.74\,$\pm$\,0.04 & 46\,$\pm$\,14 & 59\,$\pm$\,26 & 61\,$\pm$\,10 \\
+\quad benign-twin augmentation & 0.90\,$\pm$\,0.06 & 0.62\,$\pm$\,0.03 & 0.57\,$\pm$\,0.03 & 0.66\,$\pm$\,0.02 & 86\,$\pm$\,16 & 94\,$\pm$\,7 & 69\,$\pm$\,17 \\
+\quad canonicalize + augment (max) & 0.93\,$\pm$\,0.04 & 0.87\,$\pm$\,0.03 & 0.80\,$\pm$\,0.10 & 0.78\,$\pm$\,0.04 & 43\,$\pm$\,14 & 92\,$\pm$\,13 & 59\,$\pm$\,12 \\
+\quad canonicalize + augment (replace) & 0.93\,$\pm$\,0.04 & 0.87\,$\pm$\,0.02 & 0.93\,$\pm$\,0.04 & 0.78\,$\pm$\,0.04 & 43\,$\pm$\,14 & 29\,$\pm$\,20 & 59\,$\pm$\,12 \\
+\multicolumn{8}{@{}l}{\textit{ProtectAI v2 (shipped checkpoint)}} \\
+\quad none & 0.99 & 0.59 & 0.46 & 0.69 & 100 & 100 & 68 \\
+\quad naive canonicalizer & 0.99 & 0.83 & 0.46 & 0.69 & 51 & 100 & 68 \\
+\quad decode-and-rescan only & 0.99 & 0.58 & 0.81 & 0.69 & 100 & 100 & 68 \\
+\quad script-aware + rescan (max) & 0.99 & 0.87 & 0.81 & 0.82 & 27 & 100 & 37 \\
+\quad script-aware + decode-and-replace & 0.99 & 0.86 & 0.90 & 0.82 & 27 & 96 & 37 \\

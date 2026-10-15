@@ -1,0 +1,23 @@
+{
+  "guard": {
+    "name": "gs_none_r0_s4",
+    "type": "guardshield",
+    "default_threshold": 0.5,
+    "model_dir": "models\\study_c\\none_r0_s4",
+    "weights_sha256": "0f4038c99b0952df7eb13f27888eab3c77cea4acdb94463c8508e1716e71772d"
+  },
+  "dataset_sha256": "4ea17832e3273dc0b5b8f8e2417d90e804dcde02cb12037cd3ab6bbc9ac21de9",
+  "status": "complete",
+  "environment": {
+    "git_commit": "5f6e81a0f94228c39a520bddc66ff89d0d42f080-dirty",
+    "timestamp": "2026-10-15T18:54:56Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 111.95,
+  "texts_per_second": 116.09
+}

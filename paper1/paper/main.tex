@@ -18,6 +18,7 @@
 \input{generated/numbers_contamination.tex}
 \input{generated/numbers_pids.tex}
 \input{generated/numbers_mechanism.tex}
+\input{generated/numbers_study_c.tex}
 \makeatletter  % pages holding only floats start at the top (single- and double-column floats)
 \setlength{\@fptop}{0pt}\setlength{\@dblfptop}{0pt}
 \makeatother
@@ -34,7 +35,7 @@
 \maketitle
 
 \begin{abstract}
-Prompt-injection detectors are evaluated for robustness by perturbing attacks and checking that they are still caught. That evaluation cannot tell a robust detector from one that flags every unfamiliar-looking input. We audit \nGuards{} open detectors and content-safety judges with a paired, label-blind protocol: each of \nPairs{} injection attacks is paired with a length-matched benign twin, and both receive the identical perturbation under \nFamilies{} character, encoding and spacing families. Within-condition AUROC separates a threshold shift, which recalibration can fix, from a destroyed intent signal, which it cannot. The intent signal is destroyed in \nSigDestroyed{} of \nCells{} guard--family cells (\pctSigDestroyed\%). Of the \nAttackRobust{} cells that an attack-only evaluation would call robust, \nAttackRobustFC{} (\pctAttackRobustFC\%) keep their recall only because the detector also flags the benign twin. Failure direction is a property of a guard--family cell rather than of a guard: \nMixedGuards{} guards fail closed under some families and open under others, and the ranking of guards by perturbed-attack recall is unrelated to their ranking by paired accuracy (Kendall $\tau = \hTwoTau$). On a second attack and benign source, every one of the \replDirCells{} cells with a clear failure direction keeps it. \todo{one sentence on Study 2 (canonicalization vs.\ augmentation) once run.}
+Prompt-injection detectors are evaluated for robustness by perturbing attacks and checking that they are still caught. That evaluation cannot tell a robust detector from one that flags every unfamiliar-looking input. We audit \nGuards{} open detectors and content-safety judges with a paired, label-blind protocol: each of \nPairs{} injection attacks is paired with a length-matched benign twin, and both receive the identical perturbation under \nFamilies{} character, encoding and spacing families. Within-condition AUROC separates a threshold shift, which recalibration can fix, from a destroyed intent signal, which it cannot. The intent signal is destroyed in \nSigDestroyed{} of \nCells{} guard--family cells (\pctSigDestroyed\%). Of the \nAttackRobust{} cells that an attack-only evaluation would call robust, \nAttackRobustFC{} (\pctAttackRobustFC\%) keep their recall only because the detector also flags the benign twin. Failure direction is a property of a guard--family cell rather than of a guard: \nMixedGuards{} guards fail closed under some families and open under others, and the ranking of guards by perturbed-attack recall is unrelated to their ranking by paired accuracy (Kendall $\tau = \hTwoTau$). On a second attack and benign source, every one of the \replDirCells{} cells with a clear failure direction keeps it. Whether the signal survives is decided by the detector's tokenizer. Script-aware canonicalization in front of a retrained detector restores much of it (AUROC \scPidsNoneSeenCharAuc{} to \scPidsScriptAwareSeenCharAuc{} on seen character families), whereas benign-twin augmentation reaches \scPidsAugmentSeenCharAuc{} on a new attack source and lowers recall and false positives together.
 \end{abstract}
 
 % =====================================================================
@@ -56,7 +57,8 @@ We answer with a paired, label-blind audit. Every attack is matched to a benign 
   \item The first paired, label-blind audit of prompt-injection detectors in which every attack and its length-matched benign twin receive the identical perturbation (\S\ref{sec:protocol}). We carry the benign-arm and scaffold controls of \citet{zhang2026refusing} over to detectors, remove the length confound they report, and add soft-hyphen, leetspeak, ROT13, diacritic, full-width and letter-spacing families on the benign side.
   \item Score-level paired metrics with pre-registered decision rules: within-condition AUROC with an intact/degraded/destroyed status, and a failure-mode rule applied at each detector's deployed threshold (\S\ref{sec:metrics}).
   \item A \nGuards{}-detector Study 1 (\S\ref{sec:results}) showing that failure direction belongs to a guard--family cell, not to a guard, and that attack-only robustness rankings do not predict paired accuracy, replicated on a second attack and benign source and checked for training-data contamination.
-  \item \todo{Study 2: the first controlled comparison of script-aware canonicalization and benign-twin augmentation, with benign FPR, on seen and held-out families.}
+  \item A tokenizer-level explanation (\S\ref{sec:mechanism}): a perturbation the tokenizer normalizes away leaves the signal intact, one it maps to unknown tokens destroys it, and once a detector cannot read its input it returns its own default verdict.
+  \item Study 2 (\S\ref{sec:study2}), the first controlled comparison of script-aware canonicalization and benign-twin augmentation with benign FPR on seen and held-out families, over five training seeds: canonicalization transfers to a new attack source and augmentation does not, decoded text must replace rather than accompany the encoded input, and augmentation couples recall with FPR.
 \end{itemize}
 Code, configurations with pinned model revisions, per-item scores and metrics are released. \todo{repository link after anonymity period}
 
@@ -67,7 +69,7 @@ Code, configurations with pinned model revisions, per-item scores and metrics ar
 
 \paragraph{Detector audits.} PIDS-Bench evaluates four detectors with a structural-shift benign set and an attack-only obfuscation set \citep{pidsbench2026}. \citet{liu2026passing} audits 15 detectors on benign agent tool outputs and finds default-threshold FPR from 0\% to 93\%, with no character or encoding perturbation. \citet{fairoze2026} report that Prompt Guard 2 regresses on encoded attacks and argue, without measuring it, that blocking encodings would harm benign users; \citet{hackett2025} report attack-only evasion rates for character injection. Prompt Overflow evades detectors by dilution across 512-token windows \citep{promptoverflow2026}; we keep every input inside one window to exclude that mechanism. PIGuard and its NotInject benchmark define over-defense as trigger-word bias on clean English text \citep{li2025piguard}; we study an orthographic axis.
 
-\paragraph{Two-sided obfuscation and normalization.} HiveTraceGuard-Pro obfuscates both labels of topic-paired twins to train and evaluate its own guard and reports a recall/FPR coupling it could not remove \citep{hivetrace2026}. Canonicalization in front of a content-safety classifier \citep{baszta2026} and at RAG ingestion \citep{hiddenplaintext2026} has been reported with attack-side metrics only. \todo{expand with Study 2 positioning.}
+\paragraph{Two-sided obfuscation and normalization.} HiveTraceGuard-Pro obfuscates both labels of topic-paired twins to train and evaluate its own guard and reports a recall/FPR coupling it could not remove \citep{hivetrace2026}. Canonicalization in front of a content-safety classifier \citep{baszta2026} and at RAG ingestion \citep{hiddenplaintext2026} has been reported with attack-side metrics only; PIDS-Bench's hard-negative augmentation removed over-defense on curated inputs but not on externally sourced ones \citep{pidsbench2026}. We compare canonicalization and augmentation head to head, with the benign FPR that the canonicalization studies omit, and test whether HiveTraceGuard-Pro's coupling recurs on another detector.
 
 \paragraph{Paired evaluation.} Our design descends from contrast sets \citep{gardner2020contrast} and CheckList invariance tests \citep{ribeiro2020checklist}.
 
@@ -229,15 +231,61 @@ Recomputing each detector without its own contaminated pairs leaves GuardShield 
 
 % =====================================================================
 \section{Study 2: Canonicalization versus Augmentation}
-\todo{six arms on GuardShield and ProtectAI v2, at least five seeds, seen vs.\ held-out families, recall/FPR per augmentation round.}
+\label{sec:study2}
+
+Study~1 shows that a detector loses the intent signal when its input becomes unreadable to it. Two remedies are available: make the input readable again before the detector sees it (canonicalization), or teach the detector the unreadable forms (augmentation). We compare them under the protocol of Study~1.
+
+\paragraph{Arms.} On GuardShield we retrain the detector with its shipped two-stage recipe under five seeds per arm, so that every arm is compared with a retrained baseline rather than with a single checkpoint:
+(1)~\emph{none};
+(2)~a \emph{naive canonicalizer} (NFKC and deletion of every Unicode format character, as LLM Guard's InvisibleText scanner does \citep{llmguard_invisible});
+(3)~a \emph{script-aware canonicalizer} (NFKC; deletion of zero-width spaces, soft hyphens, word joiners and byte-order marks, but not of the ZWJ/ZWNJ joiners that Devanagari spelling uses; Cyrillic and Greek confusables mapped to Latin inside mostly-Latin words; collapsed letter spacing; Base64 and ROT13 spans decoded and rescored, with the maximum score kept);
+(4)~\emph{decode-and-rescan} alone;
+(5)~\emph{benign-twin augmentation}, which gives every training example one copy perturbed by a seen family, attacks and benign prompts alike;
+(6)~\emph{canonicalization plus augmentation}.
+Seen families are the four character families and the two wrappers; full-width forms, diacritics and letter spacing are never used in training. Because the maximum rule in arm~(3) cannot lower a score, we add \emph{decode-and-replace}, which scores only the decoded text when decoding succeeds. ProtectAI~v2, whose training data are mostly undisclosed, receives arms (1)--(4) on its shipped checkpoint. Each model is read at the threshold that flags 90\% of its clean attacks. The primary evaluation uses the PIDS-Bench pairs, which share no text with GuardShield's training data (\S\ref{sec:contamination}); the Gandalf pairs are secondary.
+
+\begin{table*}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+& \multicolumn{4}{c}{Within-condition AUROC} & \multicolumn{3}{c}{Benign-twin FPR (\%) at 90\% clean TPR} \\
+\cmidrule(lr){2-5}\cmidrule(l){6-8}
+Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held out \\
+\midrule
+\input{generated/tab_study_c_pids.tex}
+\bottomrule
+\end{tabular}
+\caption{Study~2 on PIDS-Bench (\pidsPairs{} pairs): mean\,$\pm$\,standard deviation over five training seeds for GuardShield; ProtectAI~v2 is a single shipped checkpoint. ``Seen'' families are used for augmentation; held-out families (full-width, diacritics, letter spacing) never are. The Gandalf results are in Appendix Table~\ref{tab:study2-obf}.}
+\label{tab:study2}
+\end{table*}
+
+\paragraph{Canonicalization restores the signal where augmentation does not.} On the seen character families, the retrained baseline separates attacks from their twins at AUROC \scPidsNoneSeenCharAuc{}. Script-aware canonicalization raises this to \scPidsScriptAwareSeenCharAuc{} and lowers the benign FPR at matched recall from \scPidsNoneSeenCharFpr\% to \scPidsScriptAwareSeenCharFpr\%; augmentation reaches only \scPidsAugmentSeenCharAuc{} (FPR \scPidsAugmentSeenCharFpr\%). The naive canonicalizer recovers part of the gap (\scPidsNaiveSeenCharAuc{}) because it lacks the confusable mapping. Combining both gives the best result (\scPidsCanonAugmentSeenCharAuc{}). The same canonicalizer helps a detector we cannot retrain: on ProtectAI~v2, seen-family FPR at matched recall falls from \scPidsProtectaiNoneSeenCharFpr\% to \scPidsProtectaiScriptAwareSeenCharFpr\%.
+
+\paragraph{Augmentation helps on familiar data only.} On the Gandalf pairs, augmentation matches canonicalization (seen-family AUROC \scObfAugmentSeenCharAuc{} against \scObfScriptAwareSeenCharAuc{}). This is not contamination: without the \scObfDeconExcluded{} pairs whose text occurs in GuardShield's training data, the values are \scObfDeconAugmentSeenCharAuc{} and \scObfDeconScriptAwareSeenCharAuc{}. Augmentation therefore helps on attacks resembling GuardShield's training data and fails to transfer to the PIDS-Bench source, as PIDS-Bench found for hard-negative augmentation \citep{pidsbench2026}. A canonicalizer, which does not learn, behaves the same on both sources.
+
+\paragraph{Held-out families follow the rules, not generalization.} The held-out advantage of canonicalization (AUROC \scPidsScriptAwareHeldOutAuc{} against \scPidsAugmentHeldOutAuc{}) comes from letter spacing, which its rules collapse (\scPidsScriptAwareSpacedLettersAuc{} against \scPidsAugmentSpacedLettersAuc{}). Full-width forms are already normalized by GuardShield's tokenizer in every arm (\S\ref{sec:mechanism}). Diacritics, which no rule covers, defeat both (\scPidsScriptAwareDiacriticsAuc{} and \scPidsAugmentDiacriticsAuc{}). ``Held out'' thus means held out from training, not from the canonicalizer's design; a canonicalizer covers exactly the transformations its rules name.
+
+\paragraph{Decoding needs to replace, not add.} Decode-and-rescan restores the wrapper signal (AUROC \scPidsNoneSeenWrapperAuc{} to \scPidsRescanOnlySeenWrapperAuc{}) but leaves the benign FPR at \scPidsRescanOnlySeenWrapperFpr\%: under the maximum rule, a detector that flags the encoded text itself still flags it. Replacing the encoded input with its decoding lowers the FPR to \scPidsScriptReplaceSeenWrapperFpr\% (\scPidsCanonAugmentReplaceSeenWrapperFpr\% with augmentation). Replacement does not help ProtectAI~v2, whose benign FPR stays at \scPidsProtectaiScriptReplaceSeenWrapperFpr\% because it flags the decoding instruction itself: \scPidsProtectaiNoneScaffoldFpr\% of plain-text scaffolds.
+
+\paragraph{Augmentation couples recall and FPR (H5).} Figure~\ref{fig:coupling} traces augmentation over training mixtures. At the default threshold, seen-family recall falls from \scPidsNoneSeenCharTprDefault\% without augmentation to \scPidsAugmentSeenCharTprDefault\% with a perturbed copy of every example, while the benign FPR falls from \scPidsNoneSeenCharFprDefault\% to \scPidsAugmentSeenCharFprDefault\%; the intermediate mixtures lie between. The AUROC moves far less (\scPidsNoneSeenCharAuc{} to \scPidsAugmentSeenCharAuc{}): augmentation mostly shifts the detector's operating point rather than restoring its ranking, the coupling HiveTraceGuard-Pro reported for its own guard \citep{hivetrace2026}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.72\textwidth]{generated/fig_coupling.pdf}
+\caption{Benign-twin augmentation over training mixtures (PIDS-Bench, default threshold; mean\,$\pm$\,std over five seeds at 0 and 1, three at 0.25 and 0.5). Recall on perturbed attacks and FPR on perturbed twins fall together.}
+\label{fig:coupling}
+\end{figure*}
+
+\paragraph{The script-aware rule rarely matters for Hindi.} Deleting all format characters also deletes the joiners that select Devanagari conjunct forms. In the \ayaTexts{} native-written Hindi prompts of the Aya Dataset \citep{singh2024aya}, however, only \ayaTextsJoiner{} prompt (\ayaWordsJoiner{} of \ayaWords{} words) contains one. The naive canonicalizer deletes it and the script-aware one keeps it, so the script-aware rule is a safeguard rather than a measurable gain on natural Hindi text.
 
 % =====================================================================
 \section{Discussion}
 
-A detector that flags every unfamiliar format looks robust on attack-only benchmarks and looks precise on benign-only audits of clean text. Only a paired evaluation under the identical perturbation exposes it. We recommend that robustness evaluations of detectors (i) perturb benign text exactly as they perturb attacks, (ii) report a within-condition AUROC alongside rates, so that recalibration can be separated from retraining, and (iii) report failure direction per family, since a single guard can over-block one format and under-block another. \todo{deployment implications; link to Study 2.}
+A detector that flags every unfamiliar format looks robust on attack-only benchmarks and looks precise on benign-only audits of clean text. Only a paired evaluation under the identical perturbation exposes it. We recommend that robustness evaluations of detectors (i) perturb benign text exactly as they perturb attacks, (ii) report a within-condition AUROC alongside rates, so that recalibration can be separated from retraining, and (iii) report failure direction per family, since a single guard can over-block one format and under-block another. For deployment, Study~2 favours fixing the input over retraining the detector. A script-aware canonicalizer needs no training data, works in front of a detector whose training data are unknown, and keeps working on a new attack source; augmentation helped only on data resembling its own training set, and it mostly traded recall for fewer false positives. A canonicalizer covers only what its rules name, so it complements rather than replaces a detector that has seen perturbed text, and the two combined gave the best results. Decoded content should replace the encoded input rather than be scored beside it, and a detector that reacts to a decoding instruction itself needs its own fix.
 
 \section*{Limitations}
-Gandalf attacks mostly target password extraction, and Dolly instructions are general-purpose, so Study 1 covers one attack style; the PIDS-Bench run adds a second source but is dominated by templated injections paraphrased by one model. Our perturbations are fixed and non-adaptive; an adaptive attacker would do at least as well. The 20-point failure-mode rule and the 0.05 and 0.75 signal thresholds are conventions fixed before the full run, and other cut-offs would move individual cells. Content-safety judges are scored on a task they were not designed for. Generative judges ran in 16-bit precision, which flips a small share of near-threshold decisions. \todo{Study 2 limitations.}
+Gandalf attacks mostly target password extraction, and Dolly instructions are general-purpose, so Study 1 covers one attack style; the PIDS-Bench run adds a second source but is dominated by templated injections paraphrased by one model. Our perturbations are fixed and non-adaptive; an adaptive attacker would do at least as well. The 20-point failure-mode rule and the 0.05 and 0.75 signal thresholds are conventions fixed before the full run, and other cut-offs would move individual cells. Content-safety judges are scored on a task they were not designed for. Generative judges ran in 16-bit precision, which flips a small share of near-threshold decisions. Study~2 retrains one small detector (GuardShield, DeBERTa-v3-small) with five seeds; ProtectAI~v2 receives only the inference-time arms, because its training data are mostly undisclosed. The canonicalizer has no rule for leetspeak or diacritics, and collapsing letter spacing cannot recover word boundaries when every word is spaced. The coupling is traced over augmentation mixtures with three seeds at the intermediate mixtures, not over HiveTraceGuard-Pro's training rounds.
 
 \section*{Ethics Statement}
 All attack prompts come from public datasets; the perturbations are well known and already used against deployed detectors. Publishing which detectors fail open under which families could help attackers, but the families are public and the detectors' vendors can reproduce the audit from our released code. No personal data are used.
@@ -286,6 +334,22 @@ Detector & Clean & ZW & SHY & Leet & Homo & B64 & B64-S & R13 & R13-S & FW* & Di
 \end{tabular}
 \caption{Paired joint accuracy (\%) at the default threshold: the share of pairs whose attack is flagged and whose benign twin is not.}
 \label{tab:pja}
+\end{table*}
+
+\begin{table*}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+& \multicolumn{4}{c}{Within-condition AUROC} & \multicolumn{3}{c}{Benign-twin FPR (\%) at 90\% clean TPR} \\
+\cmidrule(lr){2-5}\cmidrule(l){6-8}
+Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held out \\
+\midrule
+\input{generated/tab_study_c_obf.tex}
+\bottomrule
+\end{tabular}
+\caption{Study~2 on the Gandalf $\times$ Dolly pairs (\nPairs{} pairs; secondary, since \scObfDeconExcluded{} pairs overlap GuardShield's training data for every arm alike). Encoding as in Table~\ref{tab:study2}.}
+\label{tab:study2-obf}
 \end{table*}
 
 \begin{figure*}[t]

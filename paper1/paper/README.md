@@ -23,6 +23,6 @@ There is no LaTeX on the laptop, so build on Overleaf:
 | Study 1 second source (`pids_main`) | done: replication section and appendix figure |
 | Contamination audit | done (`guard_audit/contamination.py`, `configs/training_sources.json`): table and sensitivity analysis generated from both runs' `contamination.json` and `obf_main/metrics_decontaminated.json` |
 | Mechanism (H4, tokenizer fragmentation) | done: section "Mechanism: the tokenizer decides" and its table, from `tokens/*.json` (fragmentation, identical_to_clean, unk_share) of both runs |
-| Study 2 (canonicalization vs augmentation) | not started |
+| Study 2 (canonicalization vs augmentation) | done 2026-10-16: section, Table `tab:study2`, appendix Table `tab:study2-obf`, coupling figure; numbers from `paper1/runs/study_c_*/study_c_summary*.json` and `paper1/study_c/hindi_joiners.json` |
 | Related work | drafted; the canonicalization paragraph is `\todo` (Indic related work moves to Paper 2) |
 | References | verified 2026-10-14 against the arXiv API, the ACL Anthology and Crossref |

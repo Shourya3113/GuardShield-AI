@@ -522,8 +522,9 @@ def write_study_c(runs_dir):
                         ("joiners_deleted_script_aware", "DeletedScript"), ("texts_changed_naive", "ChangedNaive"),
                         ("texts_changed_script_aware", "ChangedScript")):
             s += macro(f"aya{name}", f"{J[k]:,}".replace(",", "{,}"))
-    for tag, run in (("Pids", "study_c_pids"), ("Obf", "study_c_obf")):
-        path = runs_dir / run / "study_c_summary.json"
+    for tag, run, suffix in (("Pids", "study_c_pids", ""), ("Obf", "study_c_obf", ""),
+                             ("ObfDecon", "study_c_obf", "_decontaminated")):
+        path = runs_dir / run / f"study_c_summary{suffix}.json"
         if not path.exists():
             continue
         S = json.loads(path.read_text(encoding="utf-8"))
@@ -541,15 +542,21 @@ def write_study_c(runs_dir):
                      _ms(m["held_out"]["auroc"]), _ms(m["seen_char"]["fpr"], 100, 0), _ms(m["seen_wrapper"]["fpr"], 100, 0),
                      _ms(m["held_out"]["fpr"], 100, 0)]
             lines.append(f"\\quad {label} & " + " & ".join(cells) + " \\\\")
-            key = re.sub(r"[^A-Za-z]", "", arm.title())
-            for grp in ("clean", "seen_char", "seen_wrapper", "held_out", "scaffold"):
+        for arm, a in arms.items():  # macros for every arm, including the coupling ratios outside the table
+            m = a["metrics"]
+            key = re.sub(r"[^A-Za-z]", "", arm.replace("_r0.25", "_quarter").replace("_r0.5", "_half").title())
+            for grp in ("clean", "seen_char", "seen_wrapper", "held_out", "scaffold", "fullwidth", "diacritics",
+                        "spaced_letters"):
                 g = re.sub(r"[^A-Za-z]", "", grp.title())
                 s += macro(f"sc{tag}{key}{g}Auc", f"{m[grp]['auroc']['mean']:.2f}")
                 s += macro(f"sc{tag}{key}{g}Fpr", f"{100 * m[grp]['fpr']['mean']:.0f}")
                 s += macro(f"sc{tag}{key}{g}Tpr", f"{100 * m[grp]['tpr']['mean']:.0f}")
                 s += macro(f"sc{tag}{key}{g}FprDefault", f"{100 * m[grp]['fpr_default']['mean']:.0f}")
                 s += macro(f"sc{tag}{key}{g}TprDefault", f"{100 * m[grp]['tpr_default']['mean']:.0f}")
-            s += macro(f"sc{tag}{key}Seeds", arms[arm]["n_models"])
+            s += macro(f"sc{tag}{key}Seeds", a["n_models"])
+        if suffix:
+            s += macro(f"sc{tag}Excluded", len(S.get("excluded_pairs", [])))
+            continue
         (OUT / f"tab_study_c_{tag.lower()}.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
         if tag == "Pids":
             write_coupling(arms)
@@ -576,14 +583,14 @@ def write_coupling(arms):
             ax.errorbar(xs, ys, yerr=es, color=color, linestyle=ls, linewidth=2, marker="o", markersize=4, capsize=2, label=label)
         ax.set_title(title, fontsize=7, color="#0b0b0b")
         ax.set_xlabel("share of training examples given a perturbed copy", color="#52514e")
-        ax.set_xticks([r for r, _ in points])
+        ax.set_xticks([r for r, _ in points], [f"{r:g}" for r, _ in points])
         ax.grid(axis="y", color="#e6e5e1", linewidth=0.5)
         for sp in ("top", "right"):
             ax.spines[sp].set_visible(False)
         ax.tick_params(colors="#52514e")
     axes[0].set_ylabel("% at default threshold", color="#52514e")
     axes[0].set_ylim(0, 100)
-    axes[1].legend(frameon=False, loc="lower right")
+    axes[1].legend(frameon=False, loc="upper right")
     fig.tight_layout()
     fig.savefig(OUT / "fig_coupling.pdf")
     fig.savefig(OUT / "fig_coupling.png", dpi=200)
