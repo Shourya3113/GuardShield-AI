@@ -235,6 +235,18 @@
       "approx_gb": 15,
       "verify": "Template copied from the model card's prompt-only usage; confirm before the first run."
     },
+    "hivetraceguard_pro": {
+      "type": "generative",
+      "family": "content guard",
+      "hf_id": "hivetrace/HiveTraceGuard-Pro",
+      "revision": "ed008276c96253e14885e6ade3b7b6d58daa2480",
+      "prompt_mode": "chat_template",
+      "response_prefix": "",
+      "labels": {"safe": 0, "unsafe": 1},
+      "dtype": "bfloat16",
+      "approx_gb": 1.2,
+      "notes": "Added 2026-10-16: Qwen3-0.6B guard (Apache-2.0) trained on two-sided obfuscation (arXiv 2609.01046), tag 1.1.0. Its chat template embeds the policy and ends with the assistant prefix; verdict tokens 'safe' (18675) and 'unsafe' (38157) per the model card, so P(unsafe) equals the card's two-logit softmax."
+    },
     "perplexity_gpt2": {
       "type": "perplexity",
       "family": "baseline",

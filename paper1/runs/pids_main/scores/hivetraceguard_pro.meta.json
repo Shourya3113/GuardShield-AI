@@ -1,0 +1,35 @@
+{
+  "guard": {
+    "name": "hivetraceguard_pro",
+    "type": "generative",
+    "default_threshold": 0.5,
+    "hf_id": "hivetrace/HiveTraceGuard-Pro",
+    "revision": "ed008276c96253e14885e6ade3b7b6d58daa2480",
+    "resolved_commit": "ed008276c96253e14885e6ade3b7b6d58daa2480",
+    "verdicts": {
+      "safe": 0,
+      "unsafe": 1
+    },
+    "response_prefix": "",
+    "dtype": "bfloat16",
+    "config_overrides": null,
+    "device_map": [
+      "0"
+    ],
+    "prompt_mode": "chat_template"
+  },
+  "dataset_sha256": "3d8a8714b2a898dc40964f16de882935c0a1c2f9f7c5b4adbc44e26e0cb7b06a",
+  "status": "complete",
+  "environment": {
+    "git_commit": "342ec0aa759110e065e3bc8fbe8d1160e4c50ca2-dirty",
+    "timestamp": "2026-10-16T07:54:58Z",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "torch": "2.6.0+cu124",
+    "transformers": "4.57.0",
+    "device": "NVIDIA GeForce RTX 3050 4GB Laptop GPU"
+  },
+  "resumed_from_items": 0,
+  "scoring_seconds": 596.6,
+  "texts_per_second": 8.88
+}

@@ -39,8 +39,10 @@ GUARDS = [  # display order: ours, encoder classifiers, content-safety judges, b
     ("qwen3guard_gen_0_6b", "Qwen3Guard-Gen 0.6B", "judge"),
     ("qwen3guard_gen_8b", "Qwen3Guard-Gen 8B", "judge"),
     ("wildguard", "WildGuard", "judge"),
+    ("hivetraceguard_pro", "HiveTraceGuard-Pro", "judge"),  # generative, but trained for injection too
     ("perplexity_gpt2", "GPT-2 perplexity", "base"),
 ]
+INJECTION_JUDGES = {"hivetraceguard_pro"}  # generative guards whose policy covers prompt injection
 FAMILIES = [  # (name, short column label, kind)
     ("zero_width", "ZW", "char"), ("soft_hyphen", "SHY", "char"), ("leetspeak", "Leet", "char"),
     ("homoglyph", "Homo", "char"), ("base64_wrap", "B64", "wrap"), ("base64_scaffold", "B64-S", "scaffold"),
@@ -176,8 +178,16 @@ def write_numbers(m, G, A):
     s += cell("pgOneCleanFPR", "prompt_guard_v1", "clean", "fpr")
     s += cell("pplCleanAUC", "perplexity_gpt2", "clean", "auroc")
     s += cell("qwenSmallCleanTPR", "qwen3guard_gen_0_6b", "clean", "tpr")
+    # HiveTraceGuard-Pro: the only public detector trained with both labels obfuscated
+    ht = G["hivetraceguard_pro"]["conditions"]
+    s += cell("htCleanAUC", "hivetraceguard_pro", "clean", "auroc") + cell("htCleanFPR", "hivetraceguard_pro", "clean", "fpr")
+    s += macro("htDestroyed", sum(c["signal"] == "destroyed" for k, c in ht.items() if k != "clean"))
+    s += macro("htBoth", sum(c["policies"]["default"]["failure_mode"] == "both" for k, c in ht.items() if k != "clean"))
+    s += cell("htDiacTPR", "hivetraceguard_pro", "diacritics", "tpr") + cell("htDiacFPR", "hivetraceguard_pro", "diacritics", "fpr")
+    s += cell("htBsfTPR", "hivetraceguard_pro", "base64_wrap", "tpr") + cell("htBsfFPR", "hivetraceguard_pro", "base64_wrap", "fpr")
+    s += cell("htBsfAUC", "hivetraceguard_pro", "base64_wrap", "auroc")
     s += cell("deepsetCleanFPR", "deepset", "clean", "fpr") + cell("fmopsCleanFPR", "fmops", "clean", "fpr")
-    judges = [g for g, _, kind in GUARDS if kind == "judge"]
+    judges = [g for g, _, kind in GUARDS if kind == "judge" and g not in INJECTION_JUDGES]  # content-safety judges
     j_auc = [G[g]["conditions"]["clean"]["auroc"] for g in judges]
     j_tpr = [G[g]["conditions"]["clean"]["policies"]["default"]["tpr"]["value"] for g in judges]
     s += macro("judgeCleanAucMin", f"{min(j_auc):.2f}") + macro("judgeCleanAucMax", f"{max(j_auc):.2f}")
@@ -308,7 +318,7 @@ def write_figure(G, stem="fig_failure_map"):
     ink = {"fail_closed": "#ffffff", "fail_open": "#ffffff", "both": "#ffffff", "stable": "#52514e", None: "#52514e"}
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 7, "hatch.linewidth": 0.6})
     rows = [(g, n) for g, n, _ in GUARDS]
-    fig, ax = plt.subplots(figsize=(6.6, 4.6))
+    fig, ax = plt.subplots(figsize=(6.6, 4.85))
     for i, (g, _) in enumerate(rows):  # column 0: clean AUROC, the reference for every cell in its row
         ax.text(0.5, i + 0.5, f"{G[g]['conditions']['clean']['auroc']:.2f}".lstrip("0"), ha="center", va="center",
                 color="#0b0b0b", fontsize=6.2)
@@ -330,7 +340,8 @@ def write_figure(G, stem="fig_failure_map"):
     ax.xaxis.tick_top()
     for spine in ax.spines.values():
         spine.set_visible(False)
-    for y in (11, 17):  # group separators: encoders | judges | baseline
+    kinds = [k for _, _, k in GUARDS]
+    for y in (kinds.index("judge"), kinds.index("base")):  # group separators: encoders | judges | baseline
         ax.axhline(y, color="#52514e", linewidth=0.6)
     handles = [Patch(facecolor=fill["fail_closed"], label="fail-closed (benign FPR +20 pts)"),
                Patch(facecolor=fill["fail_open"], label="fail-open (attack recall -20 pts)"),
@@ -390,6 +401,8 @@ def write_replication(G, P, manifest):
     s += macro("replModeSame", mode_same) + macro("replModeCells", mode_cells)
     s += macro("replDirSame", dir_same) + macro("replDirCells", dir_cells)
     s += macro("replMixedSame", len(set(A["mixed"]) & set(aggregates(G)["mixed"])))
+    s += macro("htPidsDestroyed", sum(c["signal"] == "destroyed"
+                                      for k, c in P["hivetraceguard_pro"]["conditions"].items() if k != "clean"))
 
     def mean_pja(M, g):
         conds = [c for c in M[g]["conditions"] if c != "clean"]

@@ -11,12 +11,13 @@
     "prompt_guard_2_22m",
     "prompt_guard_2_86m",
     "prompt_guard_v1",
+    "prompt_guard_v1_jailbreak",
     "protectai_v2",
     "qwen3guard_gen_0_6b",
     "qwen3guard_gen_8b",
     "sentinel_v2",
     "wildguard",
-    "prompt_guard_v1_jailbreak"
+    "hivetraceguard_pro"
   ],
   "pairs": []
 }

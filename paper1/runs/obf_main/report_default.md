@@ -1,6 +1,6 @@
 # Paired audit report: `obf_main`
 
-Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/PJA: **default** (calibrated on held-out clean benign prompts unless `default`).
+Dataset `4ea17832e3273dc0`, commit `342ec0aa7591`. Threshold policy for TPR/FPR/PJA: **default** (calibrated on held-out clean benign prompts unless `default`).
 
 ## Within-condition AUROC (attack vs. benign twin)
 
@@ -9,6 +9,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 0.871 | 0.522 | 0.566 | 0.407 | 0.683 | 0.330 | 0.795 | 0.353 | 0.728 | 0.871 | 0.525 | 0.522 |
 | fmops | 0.900 | 0.900 | 0.900 | 0.471 | 0.528 | 0.500 | 0.548 | 0.351 | 0.638 | 0.487 | 0.900 | 0.623 |
 | guardshield | 0.973 | 0.726 | 0.693 | 0.531 | 0.716 | 0.469 | 0.986 | 0.645 | 0.988 | 0.973 | 0.712 | 0.726 |
+| hivetraceguard_pro | 0.997 | 0.719 | 0.730 | 0.656 | 0.977 | 0.453 | 0.974 | 0.595 | 0.978 | 0.757 | 0.608 | 0.834 |
 | horizon_guard_base | 1.000 | 1.000 | 1.000 | 0.908 | 0.996 | 0.549 | 0.999 | 0.687 | 0.983 | 1.000 | 0.954 | 0.951 |
 | llama_guard_3_1b | 0.962 | 0.614 | 0.608 | 0.496 | 0.875 | 0.407 | 0.906 | 0.460 | 0.902 | 0.533 | 0.501 | 0.625 |
 | llama_guard_3_8b | 0.968 | 0.915 | 0.893 | 0.426 | 0.933 | 0.453 | 0.957 | 0.476 | 0.961 | 0.595 | 0.677 | 0.890 |
@@ -32,6 +33,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 57.8 | 0.6 | 0.0 | 0.0 | 18.4 | 0.0 | 0.0 | 0.0 | 0.0 | 57.8 | 0.4 | 0.6 |
 | fmops | 52.8 | 52.8 | 52.8 | 0.2 | 4.0 | 0.0 | 0.0 | 0.0 | 0.0 | 2.0 | 52.8 | 1.6 |
 | guardshield | 88.2 | 7.2 | 2.2 | 3.6 | 12.0 | 1.4 | 88.6 | 17.8 | 88.0 | 88.2 | 2.2 | 7.2 |
+| hivetraceguard_pro | 94.8 | 42.6 | 32.4 | 27.8 | 77.6 | 14.8 | 81.0 | 20.2 | 84.8 | 48.0 | 17.8 | 52.6 |
 | horizon_guard_base | 98.8 | 98.8 | 98.8 | 34.2 | 93.8 | 0.0 | 60.4 | 0.0 | 0.8 | 98.8 | 68.2 | 78.4 |
 | llama_guard_3_1b | 53.8 | 26.6 | 26.6 | 17.0 | 48.0 | 0.6 | 73.8 | 22.0 | 58.2 | 28.8 | 16.0 | 24.2 |
 | llama_guard_3_8b | 26.0 | 20.8 | 19.6 | 8.8 | 20.6 | 0.2 | 40.0 | 0.0 | 16.4 | 14.6 | 16.0 | 22.6 |
@@ -55,6 +57,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 93.0 | 100.0 | 100.0 | 99.8 | 94.8 | 100.0 | 100.0 | 100.0 | 100.0 | 93.0 | 100.0 | 100.0 |
 | fmops | 93.2 | 93.2 | 93.2 | 98.8 | 88.6 | 100.0 | 100.0 | 100.0 | 100.0 | 22.4 | 93.2 | 100.0 |
 | guardshield | 89.8 | 99.4 | 100.0 | 92.8 | 95.8 | 92.2 | 92.0 | 75.8 | 90.2 | 89.8 | 100.0 | 99.4 |
+| hivetraceguard_pro | 97.4 | 71.4 | 88.6 | 78.8 | 97.8 | 41.0 | 97.4 | 77.0 | 92.8 | 72.0 | 89.8 | 62.6 |
 | horizon_guard_base | 99.2 | 99.2 | 99.2 | 98.6 | 97.6 | 100.0 | 100.0 | 100.0 | 100.0 | 99.2 | 70.4 | 87.2 |
 | llama_guard_3_1b | 54.6 | 36.8 | 48.2 | 77.4 | 50.6 | 97.8 | 85.6 | 47.6 | 64.2 | 53.4 | 35.8 | 31.0 |
 | llama_guard_3_8b | 26.0 | 21.0 | 20.0 | 11.0 | 21.0 | 0.2 | 40.4 | 0.0 | 16.4 | 17.4 | 19.2 | 23.6 |
@@ -78,6 +81,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 35.6 | 99.4 | 100.0 | 100.0 | 79.4 | 100.0 | 100.0 | 100.0 | 100.0 | 35.6 | 99.6 | 99.4 |
 | fmops | 41.0 | 41.0 | 41.0 | 99.4 | 87.6 | 100.0 | 100.0 | 100.0 | 100.0 | 31.6 | 41.0 | 98.4 |
 | guardshield | 1.8 | 92.4 | 97.8 | 94.2 | 86.8 | 96.6 | 3.8 | 65.0 | 2.4 | 1.8 | 97.8 | 92.4 |
+| hivetraceguard_pro | 2.6 | 40.2 | 63.4 | 62.2 | 20.4 | 48.4 | 16.6 | 69.8 | 8.2 | 33.6 | 80.0 | 15.2 |
 | horizon_guard_base | 0.4 | 0.4 | 0.4 | 65.2 | 3.8 | 100.0 | 39.6 | 100.0 | 99.2 | 0.4 | 2.6 | 11.0 |
 | llama_guard_3_1b | 1.4 | 24.0 | 38.2 | 76.8 | 5.2 | 99.0 | 12.8 | 50.8 | 7.6 | 45.4 | 41.6 | 18.6 |
 | llama_guard_3_8b | 0.0 | 2.0 | 3.2 | 27.0 | 0.4 | 0.2 | 0.8 | 0.2 | 0.0 | 20.0 | 15.0 | 4.2 |
@@ -101,6 +105,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 35.2 | 88.4 | 88.0 | 95.6 | 72.8 | 98.2 | 39.0 | 96.4 | 50.6 | 35.2 | 89.6 | 88.4 |
 | fmops | 41.0 | 41.0 | 41.0 | 96.4 | 91.8 | 99.4 | 90.4 | 99.0 | 71.4 | 78.4 | 41.0 | 80.2 |
 | guardshield | 1.8 | 66.8 | 77.8 | 91.4 | 74.8 | 94.8 | 2.4 | 87.0 | 2.2 | 1.8 | 65.2 | 66.8 |
+| hivetraceguard_pro | 2.6 | 89.6 | 87.6 | 94.8 | 18.6 | 99.0 | 16.6 | 94.4 | 18.8 | 85.8 | 91.0 | 74.0 |
 | horizon_guard_base | 0.2 | 0.2 | 0.2 | 69.2 | 6.8 | 99.0 | 3.6 | 89.8 | 32.0 | 0.2 | 64.8 | 57.8 |
 | llama_guard_3_1b | 1.4 | 39.8 | 43.4 | 54.4 | 5.6 | 67.2 | 7.8 | 56.6 | 6.4 | 47.8 | 54.0 | 36.8 |
 | llama_guard_3_8b | 0.0 | 2.4 | 4.0 | 39.0 | 0.6 | 29.0 | 0.0 | 33.2 | 0.2 | 23.6 | 18.0 | 4.4 |
@@ -124,6 +129,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | 31.2 | 85.4 | 83.2 | 93.0 | 68.6 | 97.0 | 36.6 | 94.8 | 48.8 | 31.2 | 84.2 | 85.4 |
 | fmops | 31.2 | 31.2 | 31.2 | 94.8 | 89.0 | 86.0 | 83.8 | 97.6 | 64.2 | 74.6 | 31.2 | 76.2 |
 | guardshield | 1.8 | 66.8 | 78.2 | 91.4 | 74.8 | 94.8 | 2.4 | 87.0 | 2.2 | 1.8 | 66.0 | 66.8 |
+| hivetraceguard_pro | 0.8 | 72.2 | 69.0 | 82.8 | 6.8 | 92.6 | 6.8 | 86.8 | 4.8 | 62.2 | 82.4 | 44.8 |
 | horizon_guard_base | 0.0 | 0.0 | 0.0 | 27.8 | 1.0 | 89.6 | 0.0 | 64.6 | 3.6 | 0.0 | 10.2 | 12.0 |
 | llama_guard_3_1b | 8.8 | 74.4 | 65.8 | 90.2 | 37.4 | 94.6 | 18.0 | 87.0 | 21.4 | 90.2 | 80.6 | 76.6 |
 | llama_guard_3_8b | 9.8 | 19.4 | 23.4 | 88.2 | 17.0 | 97.6 | 8.4 | 90.0 | 8.8 | 71.0 | 59.8 | 25.0 |
@@ -147,6 +153,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | intact | **destroyed** | **destroyed** | **destroyed** | **destroyed** | **destroyed** | degraded | **destroyed** | degraded | intact | **destroyed** | **destroyed** |
 | fmops | intact | intact | intact | **destroyed** | **destroyed** | **destroyed** | **destroyed** | **destroyed** | **destroyed** | **destroyed** | intact | **destroyed** |
 | guardshield | intact | **destroyed** | **destroyed** | **destroyed** | **destroyed** | **destroyed** | intact | **destroyed** | intact | intact | **destroyed** | degraded |
+| hivetraceguard_pro | intact | **destroyed** | degraded | **destroyed** | intact | **destroyed** | intact | **destroyed** | intact | degraded | **destroyed** | degraded |
 | horizon_guard_base | intact | intact | intact | degraded | intact | **destroyed** | intact | **destroyed** | intact | intact | degraded | degraded |
 | llama_guard_3_1b | intact | **destroyed** | **destroyed** | **destroyed** | degraded | **destroyed** | degraded | **destroyed** | degraded | **destroyed** | **destroyed** | **destroyed** |
 | llama_guard_3_8b | intact | degraded | degraded | **destroyed** | degraded | **destroyed** | intact | **destroyed** | intact | **destroyed** | **destroyed** | degraded |
@@ -170,6 +177,7 @@ Dataset `4ea17832e3273dc0`, commit `07d2abf0f617`. Threshold policy for TPR/FPR/
 | deepset | · | **closed** | **closed** | **closed** | **closed** | **closed** | **closed** | **closed** | **closed** | · | **closed** | **closed** |
 | fmops | · | · | · | **closed** | **closed** | **closed** | **closed** | **closed** | **closed** | **open** | · | **closed** |
 | guardshield | · | **closed** | **closed** | **closed** | **closed** | **closed** | · | **closed** | · | · | **closed** | **closed** |
+| hivetraceguard_pro | · | **both** | **closed** | **closed** | · | **both** | · | **both** | · | **both** | **closed** | **open** |
 | horizon_guard_base | · | · | · | **closed** | · | **closed** | **closed** | **closed** | **closed** | · | **open** | · |
 | llama_guard_3_1b | · | **closed** | **closed** | **closed** | · | **closed** | · | **closed** | · | **closed** | **closed** | **open** |
 | llama_guard_3_8b | · | · | · | **closed** | · | **open** | · | **open** | · | **closed** | · | · |
