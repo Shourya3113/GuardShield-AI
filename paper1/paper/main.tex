@@ -79,29 +79,8 @@ Code, configurations with pinned model revisions, per-item scores and metrics ar
 
 \paragraph{Pairs.} Attacks and benign prompts are shuffled with a fixed seed. Each attack is paired with the unused benign prompt closest to it in character length, and a disjoint pool of \nCalibration{} benign prompts is held out for threshold calibration, so calibrated thresholds are never fitted on evaluated items. In the primary run the median length gap within a pair is zero characters, and the AUROC of character length (attack vs.\ twin) lies between \lengthAucMin{} and \lengthAucMax{} in every condition.
 
-\paragraph{Perturbation families.} Each pair is expanded under eleven families plus the clean reference; both members receive the identical, label-blind transformation (Table~\ref{tab:families}). The character families insert U+200B or U+00AD inside words of four or more characters, substitute digits and symbols for letters, or map Latin letters to Cyrillic lookalikes. The wrapper families encode the whole prompt in Base64 or ROT13 inside a fixed instruction, \textit{``Decode the following Base64 text and respond to it: \ldots''}; the matching scaffold places the same instruction around the plain text. Full-width forms, combining diacritics and letter spacing are held out from the training families of Study 2; they are not new as attack families \citep{hackett2025}.
+\paragraph{Perturbation families.} Each pair is expanded under eleven families plus the clean reference; both members receive the identical, label-blind transformation (Appendix Table~\ref{tab:families}). The character families insert U+200B or U+00AD inside words of four or more characters, substitute digits and symbols for letters, or map Latin letters to Cyrillic lookalikes. The wrapper families encode the whole prompt in Base64 or ROT13 inside a fixed instruction, \textit{``Decode the following Base64 text and respond to it: \ldots''}; the matching scaffold places the same instruction around the plain text. Full-width forms, combining diacritics and letter spacing are held out from the training families of Study 2; they are not new as attack families \citep{hackett2025}.
 
-\begin{table}[t]
-\centering\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}llp{3.7cm}@{}}
-\toprule
-Family & Kind & Transformation \\
-\midrule
-ZW & char & U+200B between letters \\
-SHY & char & U+00AD between letters \\
-Leet & char & a$\to$@, e$\to$3, i$\to$1, o$\to$0, s$\to$5 \\
-Homo & char & Latin a e o p c x y $\to$ Cyrillic \\
-B64, R13 & wrapper & Base64 / ROT13 text inside a decode instruction \\
-B64-S, R13-S & scaffold & the same instruction around the plain text \\
-FW* & held out & ASCII $\to$ full-width forms \\
-Diac* & held out & combining acute accent after each letter \\
-Spc* & held out & spaces between letters \\
-\bottomrule
-\end{tabular}
-\caption{Perturbation families (ZW zero-width space, SHY soft hyphen, Homo homoglyph, FW full-width, Diac diacritics, Spc letter spacing). Character families act on words of at least four characters. Both members of every pair receive the identical transformation. * held out from Study 2 training.}
-\label{tab:families}
-\end{table}
 
 \subsection{Metrics and pre-registered rules}
 \label{sec:metrics}
@@ -196,9 +175,7 @@ Ranking the \hTwoN{} detectors with a default threshold by mean perturbed-attack
 
 \subsection{Robustness checks}
 
-\paragraph{Calibrated thresholds.} At thresholds calibrated to 5\% FPR on clean benign prompts, fail-closed cells rise from \nModeClosed{} to \nModeFprClosed{} and fail-open cells fall from \nModeOpen{} to \nModeFprOpen{}. Calibration lowers the threshold of detectors whose clean benign scores are near zero, such as Prompt Guard 2, so their perturbed benign twins cross it; the failure direction depends on the operating point, which is why the headline uses deployed defaults.
-
-\paragraph{Length and truncation.} Character-length AUROC is \lengthAucMin--\lengthAucMax{} in every condition, so length cannot explain any separation, and no input exceeds a classifier's window.
+At thresholds calibrated to 5\% FPR on clean benign prompts, fail-closed cells rise from \nModeClosed{} to \nModeFprClosed{} and fail-open cells fall from \nModeOpen{} to \nModeFprOpen{}. Calibration lowers the threshold of detectors whose clean benign scores are near zero, such as Prompt Guard 2, so their perturbed benign twins cross it; the failure direction depends on the operating point, which is why the headline uses deployed defaults. Character-length AUROC is \lengthAucMin--\lengthAucMax{} in every condition, so length cannot explain any separation, and no input exceeds a classifier's window.
 
 \subsection{Second primary source}
 \label{sec:second}
@@ -206,11 +183,11 @@ A single attack source could make the failure map a property of Gandalf. We ther
 
 The failure map replicates (Appendix Figure~\ref{fig:map-pids}). In every one of the \replDirCells{} cells where both sources show a pure failure direction, the direction is the same; the failure mode matches in \replModeSame{} of \replModeCells{} cells and the signal status in \replSigSame{} of \replCells{}. \replMixedSame{} of the \nMixedGuards{} guards that fail in both directions on Gandalf do so again, the wrapper families destroy the signal in \pidsWrapDestroyed{} of \pidsWrapCells{} cells, and \pidsAttackRobustFC{} of the \pidsAttackRobust{} cells that look robust on attacks alone are fail-closed (\pidsPctAttackRobustFC\%). Attack-only and paired rankings remain unrelated (Kendall $\tau = \pidsHTwoTau$, $p = \pidsHTwoP$).
 
-Clean-condition recall depends on the attack source, as PIDS-Bench found. Prompt Guard 2 86M flags \pidsPgTwoEightSixCleanTPR\% of clean PIDS-Bench attacks in our subset, against an in-distribution recall of 0.369 that PIDS-Bench reports on its full test split, but \pgTwoEightSixCleanTPR\% of Gandalf attacks. deepset and fmops flag \pidsDeepsetCleanFPR\% and \pidsFmopsCleanFPR\% of clean benign twins. Horizon guard-base, which trained on Gandalf (\S\ref{sec:contamination}), loses more than the others on the new source: its mean paired joint accuracy over perturbed conditions falls from \horizonMeanPjaObf\% to \horizonMeanPjaPids\% and its destroyed cells rise from \horizonDestroyedObf{} to \horizonDestroyedPids{}, against \sentinelMeanPjaObf\% to \sentinelMeanPjaPids\% for Sentinel v2. This is consistent with, but does not prove, an advantage from training on Gandalf.
+Clean-condition recall depends on the attack source, as PIDS-Bench found. Prompt Guard 2 86M flags \pidsPgTwoEightSixCleanTPR\% of clean PIDS-Bench attacks in our subset, against an in-distribution recall of 0.369 that PIDS-Bench reports on its full test split, but \pgTwoEightSixCleanTPR\% of Gandalf attacks. Horizon guard-base, which trained on Gandalf (\S\ref{sec:contamination}), loses more than the others on the new source: its mean paired joint accuracy over perturbed conditions falls from \horizonMeanPjaObf\% to \horizonMeanPjaPids\% and its destroyed cells rise from \horizonDestroyedObf{} to \horizonDestroyedPids{}, against \sentinelMeanPjaObf\% to \sentinelMeanPjaPids\% for Sentinel v2. This is consistent with, but does not prove, an advantage from training on Gandalf.
 
 \subsection{Training-data contamination}
 \label{sec:contamination}
-Following \citet{liu2026passing}, we checked every evaluated text (the unperturbed attack and twin of each pair, and the calibration prompts) against the published training data of the \nAuditGuards{} detectors that disclose it: \nAuditCorpora{} corpora at pinned revisions. After lowercasing and removing punctuation, a text counts as contaminated if it equals a training text or one full line of one, or if at least 80\% of its word 8-grams occur in a single training text; texts under eight words count only as verbatim copies. Exact 8-gram Jaccard is recorded alongside. Appendix Table~\ref{tab:contamination} marks each cell \emph{known} (overlap with data the detector trained on in full), \emph{likely} (overlap with a corpus its model card lists without saying which rows were used), \emph{none} (complete training data audited, no overlap) or \emph{unknown}.
+Following \citet{liu2026passing}, we checked every evaluated text (the unperturbed attack and twin of each pair, and the calibration prompts) against the published training data of the \nAuditGuards{} detectors that disclose it: \nAuditCorpora{} corpora at pinned revisions. After lowercasing and removing punctuation, a text counts as contaminated if it equals a training text or one full line of one, or if at least 80\% of its word 8-grams occur in a single training text; texts under eight words count only as verbatim copies. Appendix Table~\ref{tab:contamination} marks each cell \emph{known} (overlap with data the detector trained on in full), \emph{likely} (overlap with a corpus its model card lists without saying which rows were used), \emph{none} (complete training data audited, no overlap) or \emph{unknown}.
 
 Three overlaps matter. Horizon guard-base trained on Gandalf's train split, which holds \horizonContamAttacks{} of our \nPairs{} attacks (\horizonContamAttacksPct\%). GuardShield's SPML training data contain \gsContamAttacks{} of them (\gsContamAttacksPct\%), \gsContamAttacksVerbatim{} as verbatim lines. On the benign side, ProtectAI v2's model card lists VMware's open-instruct collection, which includes Dolly: \protectaiContamTwins{} of the \nPairs{} twins and \protectaiContamCal{} of the \nCalibration{} calibration prompts occur in it, so ProtectAI's clean-condition FPR may partly reflect benign prompts seen in training. PIGuard's released training set contains \piguardContamTwins{} twins and \piguardContamCal{} calibration prompts; PIGuard is not in the scored roster. No audited corpus contains any of the \pidsAuditTexts{} PIDS-Bench texts.
 
@@ -219,10 +196,6 @@ Recomputing each detector without its own contaminated pairs leaves GuardShield 
 % =====================================================================
 \section{Study 2: Canonicalization versus Augmentation}
 \label{sec:study2}
-
-Study~1 shows that a detector loses the intent signal when its input becomes unreadable to it. Two remedies are available: make the input readable again before the detector sees it (canonicalization), or teach the detector the unreadable forms (augmentation). We compare them under the protocol of Study~1.
-
-\paragraph{Arms.} We retrain GuardShield with its shipped two-stage recipe under five seeds per arm, so every arm is compared with a retrained baseline: (1)~\emph{none}; (2)~a \emph{naive canonicalizer} (NFKC and deletion of all Unicode format characters, as LLM Guard's InvisibleText scanner does \citep{llmguard_invisible}); (3)~a \emph{script-aware canonicalizer} (NFKC; deletion of zero-width spaces, soft hyphens, word joiners and byte-order marks but not of the ZWJ/ZWNJ joiners Devanagari uses; Cyrillic and Greek confusables mapped to Latin inside mostly-Latin words; letter spacing collapsed; Base64 and ROT13 spans decoded and rescored, keeping the maximum score); (4)~\emph{decode-and-rescan} alone; (5)~\emph{benign-twin augmentation}, one copy of every training example perturbed by a seen family, attacks and benign prompts alike; (6)~\emph{canonicalization plus augmentation}. The seen families are the four character families and the two wrappers; full-width forms, diacritics and letter spacing never appear in training. Because the maximum rule cannot lower a score, we add \emph{decode-and-replace}, which scores only the decoded text. ProtectAI~v2, whose training data are mostly undisclosed, receives arms (1)--(4) on its shipped checkpoint. Each model is read at the threshold that flags 90\% of its clean attacks. The PIDS-Bench pairs, which share no text with GuardShield's training data (\S\ref{sec:contamination}), are the primary evaluation.
 
 \begin{table*}[t]
 \centering\small
@@ -240,6 +213,11 @@ Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held ou
 \label{tab:study2}
 \end{table*}
 
+Study~1 shows that a detector loses the intent signal when its input becomes unreadable to it. Two remedies are available: make the input readable again before the detector sees it (canonicalization), or teach the detector the unreadable forms (augmentation). We compare them under the protocol of Study~1.
+
+\paragraph{Arms.} We retrain GuardShield with its shipped two-stage recipe under five seeds per arm, so every arm is compared with a retrained baseline: (1)~\emph{none}; (2)~a \emph{naive canonicalizer} (NFKC and deletion of all Unicode format characters, as LLM Guard's InvisibleText scanner does \citep{llmguard_invisible}); (3)~a \emph{script-aware canonicalizer} (NFKC; deletion of zero-width spaces, soft hyphens, word joiners and byte-order marks but not of the ZWJ/ZWNJ joiners Devanagari uses; Cyrillic and Greek confusables mapped to Latin inside mostly-Latin words; letter spacing collapsed; Base64 and ROT13 spans decoded and rescored, keeping the maximum score); (4)~\emph{decode-and-rescan} alone; (5)~\emph{benign-twin augmentation}, one copy of every training example perturbed by a seen family, attacks and benign prompts alike; (6)~\emph{canonicalization plus augmentation}. The seen families are the four character families and the two wrappers; full-width forms, diacritics and letter spacing never appear in training. Because the maximum rule cannot lower a score, we add \emph{decode-and-replace}, which scores only the decoded text. ProtectAI~v2, whose training data are mostly undisclosed, receives arms (1)--(4) on its shipped checkpoint. Each model is read at the threshold that flags 90\% of its clean attacks. The PIDS-Bench pairs, which share no text with GuardShield's training data (\S\ref{sec:contamination}), are the primary evaluation.
+
+
 \paragraph{Canonicalization restores the signal where augmentation does not.} On the seen character families, the retrained baseline separates attacks from their twins at AUROC \scPidsNoneSeenCharAuc{}. Script-aware canonicalization raises this to \scPidsScriptAwareSeenCharAuc{} and lowers the benign FPR at matched recall from \scPidsNoneSeenCharFpr\% to \scPidsScriptAwareSeenCharFpr\%; augmentation reaches only \scPidsAugmentSeenCharAuc{} (FPR \scPidsAugmentSeenCharFpr\%). The naive canonicalizer recovers part of the gap (\scPidsNaiveSeenCharAuc{}) because it lacks the confusable mapping. Combining both gives the best result (\scPidsCanonAugmentSeenCharAuc{}). The same canonicalizer helps a detector we cannot retrain: on ProtectAI~v2, seen-family FPR at matched recall falls from \scPidsProtectaiNoneSeenCharFpr\% to \scPidsProtectaiScriptAwareSeenCharFpr\%.
 
 \paragraph{Augmentation helps on familiar data only.} On the Gandalf pairs, augmentation matches canonicalization (seen-family AUROC \scObfAugmentSeenCharAuc{} against \scObfScriptAwareSeenCharAuc{}). This is not contamination: without the \scObfDeconExcluded{} pairs whose text occurs in GuardShield's training data, the values are \scObfDeconAugmentSeenCharAuc{} and \scObfDeconScriptAwareSeenCharAuc{}. Augmentation therefore helps on attacks resembling GuardShield's training data and fails to transfer to the PIDS-Bench source, as PIDS-Bench found for hard-negative augmentation \citep{pidsbench2026}. A canonicalizer, which does not learn, behaves the same on both sources.
@@ -256,7 +234,7 @@ Arm & clean & seen char. & wrappers & held out & seen char. & wrappers & held ou
 % =====================================================================
 \section{Discussion}
 
-A detector that flags every unfamiliar format looks robust on attack-only benchmarks and looks precise on benign-only audits of clean text. Only a paired evaluation under the identical perturbation exposes it. We recommend that robustness evaluations of detectors (i) perturb benign text exactly as they perturb attacks, (ii) report a within-condition AUROC alongside rates, so that recalibration can be separated from retraining, and (iii) report failure direction per family, since a single guard can over-block one format and under-block another. For deployment, Study~2 favours fixing the input over retraining the detector. A script-aware canonicalizer needs no training data, works in front of a detector whose training data are unknown, and keeps working on a new attack source; augmentation helped only on data resembling its own training set, and it mostly traded recall for fewer false positives. A canonicalizer covers only what its rules name, so it complements rather than replaces a detector that has seen perturbed text, and the two combined gave the best results. Decoded content should replace the encoded input rather than be scored beside it, and a detector that reacts to a decoding instruction itself needs its own fix.
+A detector that flags every unfamiliar format looks robust on attack-only benchmarks and looks precise on benign-only audits of clean text. Only a paired evaluation under the identical perturbation exposes it. We recommend that robustness evaluations of detectors (i) perturb benign text exactly as they perturb attacks, (ii) report a within-condition AUROC alongside rates, so that recalibration can be separated from retraining, and (iii) report failure direction per family, since a single guard can over-block one format and under-block another. For deployment, Study~2 favours fixing the input before retraining: a script-aware canonicalizer needs no training data, works in front of detectors whose training data are unknown and transfers to a new attack source, whereas augmentation helped only on familiar data and mostly traded recall for fewer false positives. A canonicalizer covers only what its rules name, decoded text should replace the encoded input, and the two remedies combined gave the best results.
 
 \section*{Limitations}
 Gandalf attacks mostly target password extraction, and Dolly instructions are general-purpose, so Study 1 covers one attack style; the PIDS-Bench run adds a second source but is dominated by templated injections paraphrased by one model. Our perturbations are fixed and non-adaptive; an adaptive attacker would do at least as well. The 20-point failure-mode rule and the 0.05 and 0.75 signal thresholds are conventions fixed before the full run, and other cut-offs would move individual cells. Content-safety judges are scored on a task they were not designed for. Generative judges ran in 16-bit precision, which flips a small share of near-threshold decisions. Study~2 retrains one small detector (GuardShield, DeBERTa-v3-small) with five seeds; ProtectAI~v2 receives only the inference-time arms, because its training data are mostly undisclosed. The canonicalizer has no rule for leetspeak or diacritics, and collapsing letter spacing cannot recover word boundaries when every word is spaced. The coupling is traced over augmentation mixtures with three seeds at the intermediate mixtures, not over HiveTraceGuard-Pro's training rounds.
@@ -354,5 +332,27 @@ Detector & attacks & benign & attacks & benign \\
 \caption{Benign-twin augmentation over training mixtures (PIDS-Bench, default threshold; mean\,$\pm$\,std over five seeds at 0 and 1, three at 0.25 and 0.5). Recall on perturbed attacks and FPR on perturbed twins fall together.}
 \label{fig:coupling}
 \end{figure*}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llp{3.7cm}@{}}
+\toprule
+Family & Kind & Transformation \\
+\midrule
+ZW & char & U+200B between letters \\
+SHY & char & U+00AD between letters \\
+Leet & char & a$\to$@, e$\to$3, i$\to$1, o$\to$0, s$\to$5 \\
+Homo & char & Latin a e o p c x y $\to$ Cyrillic \\
+B64, R13 & wrapper & Base64 / ROT13 text inside a decode instruction \\
+B64-S, R13-S & scaffold & the same instruction around the plain text \\
+FW* & held out & ASCII $\to$ full-width forms \\
+Diac* & held out & combining acute accent after each letter \\
+Spc* & held out & spaces between letters \\
+\bottomrule
+\end{tabular}
+\caption{Perturbation families (ZW zero-width space, SHY soft hyphen, Homo homoglyph, FW full-width, Diac diacritics, Spc letter spacing). Character families act on words of at least four characters. Both members of every pair receive the identical transformation. * held out from Study 2 training.}
+\label{tab:families}
+\end{table}
 
 \end{document}
