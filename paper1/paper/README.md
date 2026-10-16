@@ -1,6 +1,6 @@
 # Paper 1 draft
 
-`main.tex` is in ACL Rolling Review format. Every result number comes from `generated/`, which `make_assets.py` builds from `paper1/runs/obf_main/metrics.json` and the contamination audit (`contamination.json` of `obf_main` and `pids_main`, `obf_main/metrics_decontaminated.json`). Do not type numbers into the text; add a macro to `make_assets.py` instead (SPEC section 8).
+`main.tex` is in the IEEE conference template (IEEEtran, numbered citations via natbib + IEEEtranN), as the mentor asked on 2026-10-16; `main_acl.tex` keeps the ACL Rolling Review version. Every result number comes from `generated/`, which `make_assets.py` builds from `paper1/runs/obf_main/metrics.json` and the contamination audit (`contamination.json` of `obf_main` and `pids_main`, `obf_main/metrics_decontaminated.json`). Do not type numbers into the text; add a macro to `make_assets.py` instead (SPEC section 8).
 
 ```bash
 python paper1/paper/make_assets.py
@@ -9,8 +9,8 @@ python paper1/paper/make_assets.py
 ## Building the PDF
 
 There is no LaTeX on the laptop, so build on Overleaf:
-1. Create a project from the official ACL template (https://github.com/acl-org/acl-style-files, or Overleaf's "ACL" template).
-2. Upload `main.tex`, `refs.bib` and the `generated/` folder, keeping the folder name.
+1. Upload `overleaf_upload.zip` as a new project (Overleaf already includes IEEEtran.cls and IEEEtranN.bst), or upload `main.tex`, `refs.bib` and the `generated/` folder, keeping the folder name.
+2. Fill in the author block (the red TODOs under the title).
 3. Compile with pdfLaTeX and BibTeX.
 
 ## Status (2026-10-14)
