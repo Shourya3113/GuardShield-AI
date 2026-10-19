@@ -29,9 +29,9 @@ PFIG = BASE / "paper1" / "paper" / "generated"
 TITLE = "GuardShield AI: A Real-Time Sidecar Proxy for Prompt-Injection Defense and Hallucination Detection, with an Audit of Format-Triggered Over-Defense in Prompt-Injection Detectors"
 STUDENTS = [("Shourya Solanki", "A2305223569"), ("Rachit Ryan Chug", "A2305223166"), ("Dhruv Raj Singh", "A2305223191")]
 GUIDE = "Dr. Abhishek Kaushal"
-DEPT = "Computer Science and Engineering"
+STUDENT_DEPT = "Amity School of Engineering and Technology (ASET)"  # the students' department
+GUIDE_DEPT = "Amity Centre of Artificial Intelligence (ACAI)"  # the guide's department
 PROGRAMME = "Computer Science and Engineering (Artificial Intelligence and Machine Learning)"
-INSTITUTION = "Amity School of Engineering & Technology"
 MONTH = "October 2026"
 
 
@@ -94,8 +94,7 @@ def title_page(r):
         line(f"{name} ({enr})", 12, bold=True, after=0)
     line("under the guidance of", 12, before=10)
     line(GUIDE, 13, bold=True, after=12)
-    line(f"DEPARTMENT OF {DEPT.upper()}", 12, bold=True, after=0)
-    line(INSTITUTION.upper(), 12, after=0)
+    line(STUDENT_DEPT.upper(), 12, bold=True, after=0)
     line("AMITY UNIVERSITY UTTAR PRADESH", 12, bold=True, after=0)
     line("NOIDA (U.P.)", 12, after=10)
     line(MONTH, 12)
@@ -105,7 +104,7 @@ def declaration(r):
     r.heading("DECLARATION", 1)
     names = ", ".join(n for n, _ in STUDENTS[:-1]) + f" and {STUDENTS[-1][0]}"
     r.para(f"We, {names}, students of B.Tech ({PROGRAMME}), hereby declare that the project titled "
-           f"\u201c{TITLE}\u201d, which is submitted by us to the Department of {DEPT}, {INSTITUTION}, Amity University "
+           f"\u201c{TITLE}\u201d, which is submitted by us to {STUDENT_DEPT}, Amity University "
            f"Uttar Pradesh, Noida, in partial fulfillment of the requirement for the award of the degree of Bachelor of "
            f"Technology in {PROGRAMME}, has not previously formed the basis for the award of any degree, diploma or "
            f"other similar title or recognition.")
@@ -122,7 +121,7 @@ def certificate(r):
     r.heading("CERTIFICATE", 1)
     names = ", ".join(n for n, _ in STUDENTS[:-1]) + f" and {STUDENTS[-1][0]}"
     r.para(f"On the basis of the declaration submitted by {names}, students of B.Tech ({PROGRAMME}), I hereby certify "
-           f"that the project titled \u201c{TITLE}\u201d, which is submitted to the Department of {DEPT}, {INSTITUTION}, "
+           f"that the project titled \u201c{TITLE}\u201d, which is submitted to {STUDENT_DEPT}, "
            f"Amity University Uttar Pradesh, Noida, in partial fulfillment of the requirement for the award of the degree "
            f"of Bachelor of Technology in {PROGRAMME}, is an original contribution with existing knowledge and a faithful "
            f"record of work carried out by them under my guidance and supervision.")
@@ -131,14 +130,14 @@ def certificate(r):
     r.para("")
     r.para("Noida", indent=False)
     r.para("Date: ____________", indent=False)
-    for t in (GUIDE, "(Guide)", f"Department of {DEPT}", INSTITUTION, "Amity University Uttar Pradesh, Noida"):
+    for t in (GUIDE, "(Guide)", GUIDE_DEPT, "Amity University Uttar Pradesh, Noida"):
         r.para(t, indent=False, align=WD_ALIGN_PARAGRAPH.RIGHT, space_after=0)
 
 
 def acknowledgement(r):
     r.page_break()
     r.heading("ACKNOWLEDGEMENT", 1)
-    r.para(f"We express our sincere gratitude to our project guide, {GUIDE}, Department of {DEPT}, {INSTITUTION}, for "
+    r.para(f"We express our sincere gratitude to our project guide, {GUIDE}, {GUIDE_DEPT}, for "
            "his continuous guidance, critical feedback and encouragement throughout this project. His suggestion to aim "
            "for a research publication shaped the second half of the work.")
     r.para("We thank the Head of the Department and the NTCC committee for the opportunity to carry out this project, "
