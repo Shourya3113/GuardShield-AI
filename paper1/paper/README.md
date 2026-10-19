@@ -10,8 +10,17 @@ python paper1/paper/make_assets.py
 
 There is no LaTeX on the laptop, so build on Overleaf:
 1. Upload `overleaf_upload.zip` as a new project (Overleaf already includes IEEEtran.cls and IEEEtranN.bst), or upload `main.tex`, `refs.bib` and the `generated/` folder, keeping the folder name.
-2. Fill in the author block (the red TODOs under the title).
-3. Compile with pdfLaTeX and BibTeX.
+2. Compile with pdfLaTeX and BibTeX.
+
+## Word version
+
+The mentor asked for a .docx. `make_docx.py` builds it from `main.tex` (same numbers, citations and cross-references, IEEE two-column layout) and lets Word add the footnote, hyphenation and a check PDF:
+
+```bash
+python paper1/paper/make_docx.py
+```
+
+Output: `docs/01 Reports/Research Paper/Guards That Reject the Unfamiliar (IEEE).docx`. Rebuild it after every change to `main.tex`; edit `main.tex`, not the .docx.
 
 ## Status (2026-10-14)
 

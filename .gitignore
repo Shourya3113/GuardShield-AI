@@ -74,6 +74,7 @@ paper1/runs/*/report.md
 
 # Overleaf bundle, rebuilt on demand
 paper1/paper/overleaf_upload.zip
+paper1/paper/generated/docx_build/
 
 # Study C retrained checkpoints (about 0.5 GB each); rebuilt by paper1/study_c/run_study_c.py train
 models/study_c/

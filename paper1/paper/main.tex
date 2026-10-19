@@ -20,6 +20,9 @@
 \makeatletter  % pages holding only floats start at the top (single- and double-column floats)
 \setlength{\@fptop}{0pt}\setlength{\@dblfptop}{0pt}
 \makeatother
+\makeatletter  % \linebreakand centres a second row of author blocks (as in the IEEE conference template)
+\newcommand{\linebreakand}{\end{@IEEEauthorhalign}\hfill\mbox{}\par\mbox{}\hfill\begin{@IEEEauthorhalign}}
+\makeatother
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\dg}{$^\circ$}       % degraded intent signal
 \newcommand{\ds}{$^\dagger$}     % destroyed intent signal
@@ -32,20 +35,20 @@
 Amity University Uttar Pradesh\\ Noida, India\\
 shourya3113.solanki@gmail.com}
 \and
-\IEEEauthorblockN{Dhruv Raj Singh}
-\IEEEauthorblockA{Amity School of Engineering\\ and Technology (ASET)\\
-Amity University Uttar Pradesh\\ Noida, India\\
-% e-mail to come
-}
-\and
 \IEEEauthorblockN{Rachit Ryan Chug}
 \IEEEauthorblockA{Amity School of Engineering\\ and Technology (ASET)\\
 Amity University Uttar Pradesh\\ Noida, India\\
 rachitryanchug10@gmail.com}
 \and
-\IEEEauthorblockN{Abhishek Kaushal}
-\IEEEauthorblockA{Amity Centre for\\ Artificial Intelligence (ACAI)\\
+\IEEEauthorblockN{Dhruv Raj Singh}
+\IEEEauthorblockA{Amity School of Engineering\\ and Technology (ASET)\\
 Amity University Uttar Pradesh\\ Noida, India\\
+% e-mail to come
+}
+\linebreakand
+\IEEEauthorblockN{Abhishek Kaushal}
+\IEEEauthorblockA{Amity Centre for Artificial Intelligence (ACAI)\\
+Amity University Uttar Pradesh, Noida, India\\
 abhishekkaushal401@gmail.com}}
 
 \begin{document}
