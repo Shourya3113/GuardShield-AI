@@ -30,7 +30,7 @@ TITLE = "GuardShield AI: A Real-Time Sidecar Proxy for Prompt-Injection Defense 
 STUDENTS = [("Shourya Solanki", "A2305223569"), ("Rachit Ryan Chug", "A2305223166"), ("Dhruv Raj Singh", "A2305223191")]
 GUIDE = "Dr. Abhishek Kaushal"
 STUDENT_DEPT = "Amity School of Engineering and Technology (ASET)"  # the students' department
-GUIDE_DEPT = "Amity Centre of Artificial Intelligence (ACAI)"  # the guide's department
+GUIDE_DEPT = "Amity Centre for Artificial Intelligence (ACAI)"  # the guide's department
 PROGRAMME = "Computer Science and Engineering (Artificial Intelligence and Machine Learning)"
 MONTH = "October 2026"
 
