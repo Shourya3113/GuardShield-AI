@@ -219,7 +219,7 @@ def ch_introduction(r):
            "cost. Uncertainty-based methods inspect the model's own probabilities, for example semantic entropy (Kuhn et "
            "al., 2023). Evidence-based methods compare the answer with retrieved sources, which is the setting of fact "
            "verification benchmarks such as FEVER (Thorne et al., 2018) and HaluEval (Li et al., 2023).")
-    r.para("The available alternatives for a developer fall into three groups, compared in Table 1.1.")
+    r.para(f"The available alternatives for a developer fall into three groups, compared in {r.next_table()}.")
     r.table(["Alternative", "Examples", "Strength", "Limitation"],
             [["Large LLM judges", "Llama Guard 3/4, Qwen3Guard, WildGuard", "Broad harm policy", "1\u201312 B parameters; high latency; trained for harmfulness, not injection"],
              ["Small encoder classifiers", "ProtectAI DeBERTa v2, Prompt Guard 2, deepset", "Fast, cheap", "Brittle under obfuscation; over-blocking"],
@@ -268,7 +268,7 @@ def ch_scope(r):
            "which was moved to the eighth-semester project because writing native-speaker text in three scripts for 400 "
            "prompts was too large for this semester.")
     r.section("2.2 Projected Budget")
-    r.para("The project was planned and completed with no expenditure, as summarised in Table 2.1.")
+    r.para(f"The project was planned and completed with no expenditure, as summarised in {r.next_table()}.")
     r.table(["Item", "Source", "Cost (INR)"],
             [["Laptop with NVIDIA RTX 3050 (4 GB)", "Team member's own machine", "0"],
              ["Cloud GPU (2 \u00d7 NVIDIA T4, about 30 GPU-hours per week)", "Kaggle free tier", "0"],
@@ -290,7 +290,24 @@ def ch_scope(r):
 
 def ch_requirements(r):
     r.chapter_heading("Requirement Analysis")
-    r.section("3.1 Functional Requirements")
+    r.para("The requirements were derived from the problem statement in Section 1.3 and from the threat model of "
+           "Section 1.2: an attacker controls some of the text that reaches the LLM, and the LLM may produce unsupported "
+           "claims. They are grouped into functional requirements, which state what GuardShield must do, and "
+           "non-functional requirements, which state how well it must do it. Each requirement was given a test or a "
+           "benchmark so that it could be checked rather than assumed.")
+    r.section("3.1 Stakeholders and Usage")
+    r.para("Three groups use the system. Application developers place the proxy between their application and the LLM "
+           "and need it to be a drop-in replacement for the model's API. Security and compliance teams need clear block "
+           "decisions, a low false-alarm rate and logs that show why a request was stopped. End users never see the proxy "
+           "directly, but they are affected by every false alarm, because a blocked legitimate request is a failed "
+           "request. The research audit adds a fourth group, researchers who evaluate detectors, who need a harness that "
+           "scores any detector in the same way.")
+    r.section("3.2 Functional Requirements")
+    t = r.next_table()
+    r.para(f"{t} lists the nine functional requirements in the order a request meets them. FR1 to FR5 cover the input "
+           "side: the proxy must speak the same API as the model, score every user message, see past padding in long "
+           "prompts, handle conversations rather than single prompts, and reject payloads too large to scan. FR6 and FR7 "
+           "cover the output side, during and after generation. FR8 and FR9 serve the evaluation and the research study.")
     r.table(["ID", "Requirement"],
             [["FR1", "Accept OpenAI-compatible /v1/chat/completions requests and forward safe ones to a configurable upstream LLM."],
              ["FR2", "Score every user message for prompt injection and block requests with risk at or above 0.5 (HTTP 403)."],
@@ -302,7 +319,17 @@ def ch_requirements(r):
              ["FR8", "Provide an audit harness that builds paired datasets, scores any configured detector, computes metrics and writes reports."],
              ["FR9", "Record provenance for every result: dataset SHA-256, weights SHA-256, model revision, git commit, device."]],
             "Functional requirements", widths=[0.6, 5.15])
-    r.section("3.2 Non-Functional Requirements")
+    r.para("FR4 deserves a note. A short follow-up such as “now do the same for the other one” is harmless alone but "
+           "can complete an attack started in the previous turn, so each user turn is scored both alone and with the "
+           "turn before it. Assistant turns are the opposite case: they were produced by the model, so re-scanning them "
+           "only adds false alarms, but an attacker could also paste a fake “assistant” turn into the history. "
+           "Signing every relayed assistant turn with a secret key lets the proxy skip only the turns it actually relayed. "
+           "The proxy requirements are checked by automated tests with a stub classifier; FR7 is checked on the FEVER and "
+           "HaluEval benchmarks, and FR8 by the tests of the audit harness.")
+    r.section("3.3 Non-Functional Requirements")
+    t = r.next_table()
+    r.para(f"Non-functional requirements turn “fast”, “accurate” and “reproducible” into targets "
+           f"that can be measured. {t} lists each target next to the value achieved in the final evaluation of Chapter 6.")
     r.table(["Category", "Requirement", "Achieved"],
             [["Latency", "Stage 1 median under 50 ms on a laptop GPU", f"{R1['metrics']['latency_p50_ms']:.1f} ms"],
              ["Latency", "Full pipeline median under 100 ms", f"{R4['metrics']['latency_p50_ms']:.1f} ms"],
@@ -313,12 +340,23 @@ def ch_requirements(r):
              ["Maintainability", "Automated tests in continuous integration", "40 tests"],
              ["Licensing", "Open-source release", "Apache-2.0"]],
             "Non-functional requirements", widths=[1.2, 3.0, 1.55])
-    r.section("3.3 Hardware and Software Requirements")
+    r.para("The latency targets follow from the purpose of a sidecar. An LLM response usually takes hundreds of "
+           "milliseconds to several seconds, so a safety layer that adds tens of milliseconds is acceptable, while one "
+           "that adds seconds, like an 8-billion-parameter judge, is not. The false-positive target was met on held-out "
+           "clean prompts but not under obfuscation, as Section 6.5 shows; that gap between the stated requirement and "
+           "behaviour on unfamiliar formats is what led to the research study. Reproducibility is treated as a "
+           "requirement rather than a convenience because several results in this field are known to be inflated by "
+           "overlap between training and test data (Liu, 2026).")
+    r.section("3.4 Hardware and Software Requirements")
+    r.para("The system was designed for the hardware a student team or a small company can be expected to have, and "
+           "uses only open-source software:")
     r.bullets([
         "Hardware: x86-64 machine, 8 GB RAM or more; NVIDIA GPU with 4 GB memory recommended (CPU works at lower speed).",
         "Software: Python 3.10+, PyTorch 2.6, Hugging Face Transformers 4.57, FastAPI, scikit-learn, NumPy and pandas.",
-        "Cloud (research audit only): Kaggle notebook with 2 \u00d7 T4 GPUs for the 8\u201312 B parameter judges.",
+        "Cloud (research audit only): Kaggle notebook with 2 × T4 GPUs for the 8–12 B parameter judges.",
     ])
+    r.para("All GuardShield components, including training, run on the 4 GB laptop GPU. Only the research audit needed "
+           "more memory, for the generative judges with 8 to 12 billion parameters, and it used free cloud GPUs instead.")
 
 
 def ch_literature(r):
@@ -375,7 +413,7 @@ def ch_literature(r):
            "prompt-injection detectors. Without that control, an evaluation cannot distinguish a detector that still "
            "recognises intent from one that blocks every unfamiliar format, nor say whether a failure can be fixed by "
            "moving the threshold. No prior work compares canonicalization and augmentation on the same detector with the "
-           "benign false-positive rate measured. Table 4.1 summarises the closest work.")
+           f"benign false-positive rate measured. {r.next_table()} summarises the closest work.")
     r.table(["Work", "What it does", "What this project adds"],
             [["Zhang et al. (2026)", "Benign arm and scaffold control under encodings, for chat models", "The same control for detectors, length-matched pairs, AUROC per condition"],
              ["Oblakov et al. (2026)", "Two-sided obfuscation for its own guard", "19 third-party detectors; tests the guard itself"],
@@ -459,6 +497,10 @@ def ch_results(r):
     r.chapter_heading("Results and Analysis")
     m1, m2, m3 = R1["metrics"], R2["metrics"], R3["metrics"]
     r.section("6.1 Stage 1 Detection Performance")
+    r.para(f"{r.next_table()} reports the Stage 1 classifier on two test sets: the held-out in-distribution split, "
+           "drawn from the same corpora as the training data, and a zero-shot out-of-distribution set of attack "
+           "templates and benign prompts that the model never saw during training. False-positive rate (FPR) is the "
+           "share of benign prompts blocked, and latency is the median time to score one prompt on the laptop GPU.")
     r.table(["Split", "N", "Accuracy", "Precision", "Recall", "F1", "FPR", "Median latency"],
             [["In-distribution test", "698", pct(m1["accuracy"]), pct(m1["precision"]), pct(m1["recall"]), f"{m1['f1_score']:.4f}", pct(m1["fpr"]), f"{m1['latency_p50_ms']:.2f} ms"],
              ["Zero-shot OOD", "500", pct(m2["accuracy"]), pct(m2["precision"]), pct(m2["recall"]), f"{m2['f1_score']:.4f}", pct(m2["fpr"]), f"{m2['latency_p50_ms']:.2f} ms"]],
@@ -468,11 +510,14 @@ def ch_results(r):
     c1, c2 = cm(R1), cm(R2)
     r.para(f"On the in-distribution test the classifier misses {c1['fn']} of {c1['fn'] + c1['tp']} attacks and blocks "
            f"{c1['fp']} of {c1['fp'] + c1['tn']} benign prompts ({fig_a}). On unseen prompts it misses {c2['fn']} of "
-           f"{c2['fn'] + c2['tp']} attacks and blocks {c2['fp']} of {c2['fp'] + c2['tn']} benign prompts ({fig_b}). Section "
-           f"6.6 shows that these clean-text numbers hide a large weakness under obfuscation, and Section 6.8 that part of "
+           f"{c2['fn'] + c2['tp']} attacks and blocks {c2['fp']} of {c2['fp'] + c2['tn']} benign prompts ({fig_b}). Sections "
+           f"6.5 to 6.7 show that these clean-text numbers hide a large weakness under obfuscation, and Section 6.8 that part of "
            f"the in-distribution advantage reflects overlap between SPML training text and public attack sets.")
     r.section("6.2 Comparison with Baselines")
     pi, po, ti, to = PAI["in_distribution"], PAI["out_of_distribution"], TF["in_distribution"], TF["out_of_distribution"]
+    r.para(f"To judge whether these numbers are good, {r.next_table()} compares GuardShield with two baselines scored on "
+           "identical splits: a TF-IDF bag-of-words model with logistic regression, the simplest learned detector, "
+           "and ProtectAI's DeBERTa-v3-base classifier, a widely used open-source detector.")
     r.table(["Model", "Parameters", "In-dist. accuracy", "In-dist. recall", "OOD accuracy", "OOD recall", "Latency"],
             [["TF-IDF + logistic regression", "linear", pct(ti["accuracy"]), pct(ti["recall"]), pct(to["accuracy"]), pct(to["recall"]), "< 1 ms"],
              ["ProtectAI DeBERTa-v3-base", PAI["metadata"]["total_parameters"], pct(pi["accuracy"]), pct(pi["recall"]), pct(po["accuracy"]), pct(po["recall"]), f"{pi['latency_p50_ms']:.2f} ms"],
@@ -485,6 +530,9 @@ def ch_results(r):
     r.section("6.3 Stage 2 Fact Verification")
     pb = R3["per_source_breakdown"]
     fe, he = pb["FEVER (NAACL 2018)"], pb["HaluEval (EMNLP 2023)"]
+    r.para(f"Stage 2 was evaluated on 400 claims from FEVER and 400 question–answer pairs from HaluEval, each half "
+           f"supported and half contradicted or hallucinated. {r.next_table()} gives the results; recall is the share of "
+           "unsupported claims that the verifier flags as contradicted.")
     r.table(["Benchmark", "N", "Accuracy", "Recall (contradiction)", "Precision", "FPR", "AUROC"],
             [["FEVER", "400", pct(fe["accuracy"]), pct(fe["recall"]), pct(fe["precision"]), pct(fe["fpr"]), f"{fe['auroc']:.4f}"],
              ["HaluEval QA", "400", pct(he["accuracy"]), pct(he["recall"]), pct(he["precision"]), pct(he["fpr"]), f"{he['auroc']:.4f}"],
@@ -502,7 +550,10 @@ def ch_results(r):
     r.para(f"Over five repeats of 100 sequential requests on the laptop GPU, Stage 1 alone takes a median "
            f"{e['stage1_isolated']['latency_p50_ms']:.2f} ms, Stage 2 alone {e['stage2_isolated']['latency_p50_ms']:.2f} ms, "
            f"and the full pipeline {e['latency_p50_ms']:.2f} ms (interquartile range {e['latency_iqr_ms']:.2f} ms, 95th "
-           f"percentile {e['latency_p95_ms']:.2f} ms).")
+           f"percentile {e['latency_p95_ms']:.2f} ms), well within the 100 ms target of Chapter 3.")
+    r.para(f"Multi-turn scanning was tested on 20 benign conversations of five turns each. {r.next_table()} counts the "
+           "false alarms of ProtectAI v2 scoring each user turn alone and of GuardShield with and without signed "
+           "assistant history (FR4 in Chapter 3).")
     g, p = MT["guardshield_eval"], MT["protectai_eval"]
     r.table(["Configuration", "User turns flagged (of 60)", "Conversations blocked (of 20)"],
             [["ProtectAI v2, each turn alone", f"{p['user_turns_false_positives']} ({pct(p['user_turns_fpr'])})", f"{p['conversations_blocked']} ({pct(p['conversation_fpr'])})"],
@@ -532,9 +583,13 @@ def ch_results(r):
            f"and by paired accuracy gives unrelated orders (Kendall \u03c4 = {M['hTwoTau']}), so attack-only leaderboards do "
            f"not predict real robustness.")
     r.para(f"On the second source (PIDS-Bench), every one of the {M['replDirCells']} cells with a clear failure direction "
-           f"keeps it, and the failure mode matches in {M['replModeSame']} of {M['replModeCells']} cells. Appendix B shows "
-           f"the second failure map.")
+           f"keeps it, and the failure mode matches in {M['replModeSame']} of {M['replModeCells']} cells (Figure B.1 in "
+           f"Appendix B).")
     r.section("6.6 Why Detectors Fail: the Tokenizer")
+    r.para(f"To explain the failure map, each character-family cell was classified by what the detector's own tokenizer "
+           "does to the perturbed text: it either maps it back to the clean tokens, turns words into unknown tokens, "
+           f"or splits them into many more pieces. {r.next_table()} cross-tabulates this outcome with the signal status "
+           "of the cell.")
     r.table(["Tokenizer outcome", "Intact", "Degraded", "Destroyed"],
             [["Perturbation normalized away", M["mechObfNormalizedIntact"], M["mechObfNormalizedDegraded"], M["mechObfNormalizedDestroyed"]],
              ["Collapsed into unknown tokens", M["mechObfUnknownIntact"], M["mechObfUnknownDegraded"], M["mechObfUnknownDestroyed"]],
@@ -554,6 +609,11 @@ def ch_results(r):
                        ("CanonAugment", "Canonicalize + augment")):
         k = f"scPids{arm}"
         rows.append([label, M[f"{k}SeenCharAuc"], M[f"{k}SeenWrapperAuc"], M[f"{k}HeldOutAuc"], M[f"{k}SeenCharFpr"] + "%", M[f"{k}SeenWrapperFpr"] + "%"])
+    r.para("Study 2 asks which of two mitigations repairs the failure: canonicalizing the input before scoring, or "
+           "training on obfuscated copies of both attacks and benign prompts (benign-twin augmentation). GuardShield "
+           "was retrained five times per arm, and each arm was evaluated on character families and wrappers seen in "
+           f"training and on held-out families. {r.next_table()} gives the results on PIDS-Bench, the source not used "
+           "in training.")
     r.table(["Arm (GuardShield, 5 seeds)", "AUROC seen char.", "AUROC wrappers", "AUROC held out", "FPR seen char.", "FPR wrappers"],
             rows, "Study 2 on PIDS-Bench, means over five seeds; FPR at the threshold that catches 90% of clean attacks",
             widths=[2.0, 0.75, 0.75, 0.75, 0.75, 0.75], size=9)
@@ -589,6 +649,7 @@ def ch_management(r):
     r.para(f"{fig} shows the schedule followed, as recorded in the weekly progress reports. The NTCC calendar fixed the "
            "external milestones: commencement on 20 July 2026, the first progress review on 24\u201327 August, the second on "
            "28 September\u20131 October, the end date on 9 October and the final report on 26 October 2026.")
+    r.para(f"{r.next_table()} lists the milestone reached in each period and the deliverable that recorded it.")
     r.table(["Week", "Milestone", "Deliverable"],
             [["W1", "Problem statement and architecture", "WPR 1, synopsis"],
              ["W2", "Literature survey and threat model", "WPR 2, dataset catalogue"],
@@ -600,6 +661,8 @@ def ch_management(r):
              ["W10\u2013W12", "Study 1 audit, Study 2 mitigation, research paper", "IEEE-format paper, this report"]],
             "Milestones and deliverables", widths=[0.85, 3.0, 1.9])
     r.section("7.2 Project Roles and Responsibilities")
+    r.para(f"The work was divided by role, as recorded in the weekly progress reports; {r.next_table()} gives the "
+           "division.")
     r.table(["Role", "Responsibilities", "Participant"],
             [["Lead architect", "Pipeline implementation, model training, benchmarking, research audit, paper", STUDENTS[0][0]],
              ["Research analyst", "Literature survey, NLI formulation, related-work positioning", STUDENTS[1][0]],
@@ -612,7 +675,7 @@ def ch_management(r):
 
 def ch_risk(r):
     r.chapter_heading("Risk Assessment")
-    r.para("Table 8.1 lists the risks identified at the start of the project and during it, with the mitigation applied.")
+    r.para(f"{r.next_table()} lists the risks identified at the start of the project and during it, with the mitigation applied.")
     r.table(["Risk", "Level (L/M/H)", "Likelihood", "Mitigation strategy"],
             [["Project size exceeds 12 weeks", "H", "High", "Hindi benchmark moved to the 8th-semester project; scope frozen in a written specification"],
              ["Laptop GPU too small for large judges", "M", "High", "Large judges scored on free Kaggle T4 GPUs; scoring made resumable"],
@@ -724,6 +787,9 @@ def appendices(r):
            "tokenizer analysis and Study 2 of this report. [Update with the venue and the submission or publication "
            "evidence once available, as required by the NTCC guidelines.]")
     r.appendix_heading("B", "Second Failure Map (PIDS-Bench)")
+    r.para(f"{r.next_figure()} repeats the Study 1 audit of Section 6.5 on 200 attack\u2013benign pairs from "
+           "PIDS-Bench, a second source with different attack styles. It uses the same colours and hatching as "
+           "Figure 6.4.")
     r.figure(PFIG / "fig_failure_map_pids.png", "Study 1 repeated on 200 PIDS-Bench pairs; encoding as in the main failure map", width=5.8)
     r.appendix_heading("C", "Reproducing the Results")
     r.para("All code, configurations and result files are in the project repository. The main commands are:")
@@ -756,6 +822,7 @@ def main():
         ch(r)
     references(r)
     appendices(r)
+    print(f"{r.check_citations()} tables and figures, all cited in the text")
     OUTDIR.mkdir(parents=True, exist_ok=True)
     out = OUTDIR / "GuardShield AI - Final Project Report.docx"
     r.save(out)

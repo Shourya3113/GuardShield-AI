@@ -69,6 +69,7 @@ class Report:
         self.figures = 0
         self.tables = 0
         self.appendix = None
+        self.labels = []
         s = self.doc.sections[0]
         s.page_width, s.page_height = Mm(210), Mm(297)
         s.left_margin = s.right_margin = Inches(1.25)
@@ -180,9 +181,31 @@ class Report:
         prefix = self.appendix if self.appendix else str(self.chapter)
         if kind == "fig":
             self.figures += 1
-            return f"{prefix}.{self.figures}"
-        self.tables += 1
-        return f"{prefix}.{self.tables}"
+            label = f"Figure {prefix}.{self.figures}"
+        else:
+            self.tables += 1
+            label = f"Table {prefix}.{self.tables}"
+        self.labels.append(label)
+        return label.split(" ", 1)[1]
+
+    def next_table(self, offset=0):
+        """Label the next table will get, so the text can cite it before it appears."""
+        prefix = self.appendix if self.appendix else str(self.chapter)
+        return f"Table {prefix}.{self.tables + 1 + offset}"
+
+    def next_figure(self, offset=0):
+        prefix = self.appendix if self.appendix else str(self.chapter)
+        return f"Figure {prefix}.{self.figures + 1 + offset}"
+
+    def check_citations(self):
+        """Every table and figure must be referred to in a body paragraph (not only in its own caption)."""
+        import re
+        body = " ".join(p.text for p in self.doc.paragraphs
+                        if p.style.name not in ("Figure Caption", "Table Caption"))
+        missing = [l for l in self.labels if not re.search(re.escape(l) + r"(?!\d)", body)]
+        if missing:
+            raise SystemExit(f"not cited in the text: {missing}")
+        return len(self.labels)
 
     def figure(self, path, caption, width=5.7):
         n = self._number("fig")
