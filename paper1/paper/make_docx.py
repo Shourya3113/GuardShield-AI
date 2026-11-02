@@ -356,8 +356,10 @@ def inline(s, ctx, fmt=None):
                     f["italic"] = True
                 elif name == "textbf":
                     f["bold"] = True
-                elif name in ("texttt", "url"):
+                elif name == "texttt":
                     f["mono"] = True
+                elif name == "url":
+                    f["link"] = True        # a clickable hyperlink in the body font (Courier is too wide for a column)
                 elif name == "textsc":
                     f["smallcaps"] = True
                 runs += inline(arg, ctx, f)
@@ -579,6 +581,12 @@ class Paper:
                     r.font.color.rgb = RGBColor(0xC0, 0, 0)
                 if size:
                     r.font.size = Pt(size)
+                if f.get("link"):
+                    from docx.opc.constants import RELATIONSHIP_TYPE as RT
+                    link = OxmlElement("w:hyperlink")
+                    link.set(qn("r:id"), p.part.relate_to(part, RT.HYPERLINK, is_external=True))
+                    r._r.addprevious(link)
+                    link.append(r._r)
         return p
 
     def para(self, runs, indent=True, align=None, size=None, space_after=None, bold=None, italic=None, style=None):
