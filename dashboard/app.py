@@ -1,7 +1,7 @@
 """
 GuardShield AI demo dashboard.
 
-    streamlit run dashboard/app.py
+    python -m streamlit run dashboard/app.py
 
 Tabs: Live pipeline (Stage 1 scan, generation with live entropy, Stage 2 fact check), Multi-turn & signing, and
 Results (system metrics, the Study 1 failure map and Study 2, from the committed result files).
