@@ -33,6 +33,7 @@ STUDENT_DEPT = "Amity School of Engineering and Technology (ASET)"  # the studen
 GUIDE_DEPT = "Amity Centre for Artificial Intelligence (ACAI)"  # the guide's department
 PROGRAMME = "Computer Science and Engineering (Artificial Intelligence and Machine Learning)"
 MONTH = "October 2026"
+REPO_URL = "https://github.com/Shourya3113/GuardShield-AI"
 
 
 def load(name):
@@ -783,7 +784,7 @@ def appendices(r):
     r.appendix_heading("A", "Research Paper")
     r.para("The research outcome of the project is the paper \u201cGuards That Reject the Unfamiliar: Format-Triggered "
            f"Over-Defense in Prompt-Injection Detectors\u201d by {', '.join(n for n, _ in STUDENTS)} and {GUIDE.replace('Dr. ', '')}, "
-           "prepared in the IEEE conference format (repository file paper1/paper/main.tex). It reports Study 1, the "
+           "prepared in the IEEE conference format (file paper1/paper/main.tex in the project repository, Appendix C). It reports Study 1, the "
            "tokenizer analysis and Study 2 of this report. [Update with the venue and the submission or publication "
            "evidence once available, as required by the NTCC guidelines.]")
     r.appendix_heading("B", "Second Failure Map (PIDS-Bench)")
@@ -792,7 +793,7 @@ def appendices(r):
            "Figure 6.4.")
     r.figure(PFIG / "fig_failure_map_pids.png", "Study 1 repeated on 200 PIDS-Bench pairs; encoding as in the main failure map", width=5.8)
     r.appendix_heading("C", "Reproducing the Results")
-    r.para("All code, configurations and result files are in the project repository. The main commands are:")
+    r.para(f"All code, configurations and result files are in the project repository, {REPO_URL}. The main commands are:")
     r.bullets([
         "python src/train_prescan_v3.py and python scripts/train_stage1_hard_negatives.py: train Stage 1.",
         "python src/evaluate_full_suite_v3.py: evaluate Stage 1 and Stage 2 and write docs/01 Reports/raw_eval_*.json.",
