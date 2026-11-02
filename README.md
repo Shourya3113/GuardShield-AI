@@ -246,7 +246,7 @@ Set `GUARDSHIELD_PROXY_SECRET` to a long random value (and `UPSTREAM_LLM_URL` if
 A Streamlit dashboard for live demonstrations, at `http://localhost:8501`:
 
 ```bash
-streamlit run dashboard/app.py
+python -m streamlit run dashboard/app.py
 ```
 
 - **Live pipeline**: pick a scenario or type a prompt. You see the Stage 1 risk gauge, the answer streaming token by token with a live entropy chart and the circuit breaker, the Stage 2 fact check against a reference context, and per-stage latency.
