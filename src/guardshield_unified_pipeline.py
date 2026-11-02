@@ -20,7 +20,7 @@ import time
 import math
 import argparse
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 
 # Suppress noisy TF logs
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
@@ -426,14 +426,46 @@ class GuardShieldPipeline:
         """Calculates normalized Shannon entropy H(x) in bits using the unified StreamingEntropyEngine."""
         return self.entropy_engine.compute_entropy(probabilities)
 
+    def _local_token_steps(self, prompt: str, max_new_tokens: int) -> Iterator[Tuple[str, List[float]]]:
+        """Greedy decoding with the in-process model, yielding each token with its top-3 probabilities.
+        The generated ids are kept in self._last_generated_ids for a clean final decode."""
+        if hasattr(self.gen_tokenizer, "apply_chat_template") and self.gen_tokenizer.chat_template:
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = self.gen_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        else:
+            formatted_prompt = prompt
+        gen_device = getattr(self.gen_model, "device", None) or next(self.gen_model.parameters()).device
+        next_input_ids = self.gen_tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(gen_device)
+        self._last_generated_ids = []
+        past_key_values = None
+        for _ in range(max_new_tokens):
+            with torch.no_grad():
+                outputs = self.gen_model(next_input_ids, past_key_values=past_key_values, use_cache=True)
+            past_key_values = getattr(outputs, "past_key_values", None)
+            probs = torch.softmax(outputs.logits[:, -1, :], dim=-1)[0]
+            top3_p, top3_idx = torch.topk(probs, 3)
+            next_token_id = top3_idx[0].view(1, 1).to(gen_device)
+            token_str = self.gen_tokenizer.decode(next_token_id[0])
+            self._last_generated_ids.append(int(next_token_id.item()))
+            next_input_ids = next_token_id
+            yield token_str, [float(p) for p in top3_p]
+            if next_token_id.item() == self.gen_tokenizer.eos_token_id or any(eos in token_str for eos in ["<|im_end|>", "<|end|>", "<|endoftext|>"]):
+                return
+
     def run(
         self,
         prompt: str,
         reference_context: Optional[str] = None,
-        max_new_tokens: int = 30
+        max_new_tokens: int = 30,
+        on_token: Optional[Callable[[Dict[str, Any]], None]] = None,
+        token_source: Optional[Iterable[Tuple[str, Optional[List[float]]]]] = None,
     ) -> Dict[str, Any]:
         """
         Executes the complete unified GuardShield AI pipeline on a single prompt.
+
+        on_token: called after every generated token with its entropy record (for live displays).
+        token_source: an external generator's stream of (token, top-k probabilities or None), e.g. an
+        OpenAI-compatible server such as Ollama; by default the in-process model generates.
         """
         pipeline_start_time = time.perf_counter()
         print("\n" + "#" * 80)
@@ -488,17 +520,6 @@ class GuardShieldPipeline:
         print("[STAGE 2-A] Streaming Autoregressive Decoding with Real-Time Entropy Calculation...")
         gen_start = time.perf_counter()
 
-        # Apply chat template
-        if hasattr(self.gen_tokenizer, "apply_chat_template") and self.gen_tokenizer.chat_template:
-            messages = [{"role": "user", "content": prompt}]
-            formatted_prompt = self.gen_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        else:
-            formatted_prompt = prompt
-
-        gen_device = getattr(self.gen_model, "device", None) or next(self.gen_model.parameters()).device
-        input_ids = self.gen_tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(gen_device)
-        current_ids = input_ids
-
         generated_tokens = []
         entropy_trace = []
         consecutive_spikes = 0
@@ -507,56 +528,46 @@ class GuardShieldPipeline:
         print(f"  {'Generated Token':<16} | {'Top-3 Dynamic Probabilities':<28} | {'Entropy H(x)':<12} | {'Status'}")
         print("  " + "-" * 76)
 
-        past_key_values = None
-        next_input_ids = input_ids
-
-        for step in range(max_new_tokens):
-            with torch.no_grad():
-                outputs = self.gen_model(next_input_ids, past_key_values=past_key_values, use_cache=True)
-                past_key_values = getattr(outputs, "past_key_values", None)
-                next_logits = outputs.logits[:, -1, :]
-                probs = torch.softmax(next_logits, dim=-1)[0]
-                top3_p, top3_idx = torch.topk(probs, 3)
-
-                top_probs_list = [float(p) for p in top3_p]
+        local = token_source is None
+        source = self._local_token_steps(prompt, max_new_tokens) if local else token_source
+        callback_s = 0.0
+        for step, (token_str, top_probs_list) in enumerate(source):
+            if top_probs_list and len(top_probs_list) >= 2:
                 h = self._compute_entropy(top_probs_list)
                 entropy_trace.append(h)
-
                 is_spike = h >= self.entropy_threshold
-                if is_spike:
-                    consecutive_spikes += 1
-                else:
-                    consecutive_spikes = 0
-
+                consecutive_spikes = consecutive_spikes + 1 if is_spike else 0
                 status_str = "TERMINATE_EARLY" if consecutive_spikes >= self.consecutive_spikes_limit else ("WARN_SPIKE" if is_spike else "OK")
-
-                next_token_id = top3_idx[0].view(1, 1).to(gen_device)
-                token_str = self.gen_tokenizer.decode(next_token_id[0])
-                clean_tok = token_str.replace("\n", "\\n").strip() or "<sp>"
-
-                # Format probabilities for table display
                 prob_str = str([round(p / sum(top_probs_list), 3) for p in top_probs_list])
-                print(f"  {repr(clean_tok):<16} | {prob_str:<28} | {h:<12.4f} | {status_str}")
+            else:  # an external generator without token probabilities: no entropy, no circuit breaker
+                h, is_spike, status_str, prob_str = None, False, "PASSTHROUGH", "n/a"
 
-                current_ids = torch.cat([current_ids, next_token_id], dim=-1)
-                generated_tokens.append(token_str)
-                next_input_ids = next_token_id
+            clean_tok = token_str.replace("\n", "\\n").strip() or "<sp>"
+            h_str = f"{h:.4f}" if h is not None else "n/a"
+            print(f"  {repr(clean_tok):<16} | {prob_str:<28} | {h_str:<12} | {status_str}")
+            generated_tokens.append(token_str)
+            if on_token is not None:
+                cb_start = time.perf_counter()
+                on_token({"step": step, "token": token_str, "top_probs": top_probs_list, "entropy": h, "is_spike": is_spike,
+                          "consecutive_spikes": consecutive_spikes, "status": status_str})
+                callback_s += time.perf_counter() - cb_start  # display time is not generation time
 
-                # Check circuit breaker
-                if consecutive_spikes >= self.consecutive_spikes_limit:
-                    print("  " + "-" * 76)
-                    print("  >> ⚠️ [CIRCUIT BREAKER ACTIVATED] Early termination triggered on sustained uncertainty!")
-                    early_terminated = True
-                    break
+            # Check circuit breaker
+            if consecutive_spikes >= self.consecutive_spikes_limit:
+                print("  " + "-" * 76)
+                print("  >> ⚠️ [CIRCUIT BREAKER ACTIVATED] Early termination triggered on sustained uncertainty!")
+                early_terminated = True
+                break
+            if step + 1 >= max_new_tokens:
+                break
 
-                if next_token_id.item() == self.gen_tokenizer.eos_token_id or any(eos in token_str for eos in ["<|im_end|>", "<|end|>", "<|endoftext|>"]):
-                    break
-
-        gen_latency = (time.perf_counter() - gen_start) * 1000.0
+        gen_latency = (time.perf_counter() - gen_start - callback_s) * 1000.0
 
         # Decode the generated token ids as a cohesive sequence to preserve proper token spacing across architectures
-        new_token_ids = current_ids[0][input_ids.shape[1]:]
-        raw_output_text = self.gen_tokenizer.decode(new_token_ids, skip_special_tokens=True).strip()
+        if local:
+            raw_output_text = self.gen_tokenizer.decode(self._last_generated_ids, skip_special_tokens=True).strip()
+        else:
+            raw_output_text = "".join(generated_tokens).strip()
         if not raw_output_text:
             raw_output_text = "".join(generated_tokens).replace("<|im_end|>", "").replace("<|end|>", "").replace("<|endoftext|>", "").strip()
 
@@ -653,6 +664,9 @@ class GuardShieldPipeline:
                 "final_output": final_text,
                 "fact_check_correction": final_text,
                 "grounding_premise": premise or "Assessed via token entropy uncertainty threshold",
+                "generated_text": raw_output_text,
+                "stage_2": {"decision": nli_decision, "knowledge_source": source_type, "entailment": round(entail_prob, 4),
+                            "neutral": round(neutral_prob, 4), "contradiction": round(contra_prob, 4)},
                 "confidence_scores": {
                     "entailment_confidence": round(entail_prob, 4),
                     "hallucination_contradiction_score": round(contra_prob, 4),
@@ -690,6 +704,9 @@ class GuardShieldPipeline:
                 "prompt": prompt,
                 "final_output": raw_output_text,
                 "grounding_premise": premise or "Verified via internal entropy stability",
+                "generated_text": raw_output_text,
+                "stage_2": {"decision": nli_decision, "knowledge_source": source_type, "entailment": round(entail_prob, 4),
+                            "neutral": round(neutral_prob, 4), "contradiction": round(contra_prob, 4)},
                 "confidence_scores": {
                     "entailment_confidence": round(entail_prob, 4),
                     "hallucination_contradiction_score": round(contra_prob, 4),

@@ -21,6 +21,10 @@ pydantic==2.13.4
 requests==2.32.4
 httpx==0.28.1
 
+# Demo dashboard (dashboard/)
+streamlit==1.50.0
+plotly==6.8.0
+
 # Reporting & Document Generation
 python-docx>=1.1.0
 python-pptx>=0.6.21

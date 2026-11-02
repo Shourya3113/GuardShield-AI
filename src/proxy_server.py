@@ -179,6 +179,18 @@ def build_upstream_payload(req: ChatCompletionRequest) -> Dict[str, Any]:
         m.pop("signature", None)
     return payload
 
+def top_probs_from_choice(choice: Dict[str, Any]) -> List[float]:
+    """Top-k token probabilities of one streamed choice, from either OpenAI logprobs layout (empty if absent)."""
+    logprobs_info = choice.get("logprobs") or {}
+    content_lps = logprobs_info.get("content") or []
+    if content_lps and isinstance(content_lps, list):
+        items = content_lps[0].get("top_logprobs") or []
+    elif isinstance(logprobs_info.get("top_logprobs"), list):
+        items = logprobs_info["top_logprobs"]
+    else:
+        items = []
+    return [math.exp(float(i["logprob"])) for i in items if isinstance(i, dict) and "logprob" in i]
+
 def first_choice_message(data: Any) -> Optional[Dict[str, Any]]:
     choices = data.get("choices") if isinstance(data, dict) else None
     if not choices or not isinstance(choices[0], dict):
@@ -323,19 +335,7 @@ async def chat_completions(req: ChatCompletionRequest):
                             if content_chunk:
                                 streamed_chunks_accum.append(content_chunk)
                                 choice_obj = chunk_json.get("choices", [{}])[0]
-                                extracted_probs = []
-
-                                logprobs_info = choice_obj.get("logprobs") or {}
-                                content_lps = logprobs_info.get("content") or []
-                                if content_lps and isinstance(content_lps, list):
-                                    top_lps = content_lps[0].get("top_logprobs") or []
-                                    for item in top_lps:
-                                        if isinstance(item, dict) and "logprob" in item:
-                                            extracted_probs.append(math.exp(float(item["logprob"])))
-                                elif "top_logprobs" in logprobs_info and isinstance(logprobs_info["top_logprobs"], list):
-                                    for item in logprobs_info["top_logprobs"]:
-                                        if isinstance(item, dict) and "logprob" in item:
-                                            extracted_probs.append(math.exp(float(item["logprob"])))
+                                extracted_probs = top_probs_from_choice(choice_obj)
 
                                 if len(extracted_probs) >= 2:
                                     res = session_entropy_engine.process_token(content_chunk, extracted_probs)

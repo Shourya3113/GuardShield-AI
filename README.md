@@ -242,7 +242,20 @@ python src/proxy_server.py
 
 Set `GUARDSHIELD_PROXY_SECRET` to a long random value (and `UPSTREAM_LLM_URL` if the LLM is not at `http://localhost:11434/v1`). Without the secret, assistant-history signatures use an ephemeral per-process key and stop verifying after a restart.
 
-### 5. Interactive Command-Line Demonstration
+### 5. Demo Dashboard
+A Streamlit dashboard for live demonstrations, at `http://localhost:8501`:
+
+```bash
+streamlit run dashboard/app.py
+```
+
+- **Live pipeline**: pick a scenario or type a prompt. You see the Stage 1 risk gauge, the answer streaming token by token with a live entropy chart and the circuit breaker, the Stage 2 fact check against a reference context, and per-stage latency.
+- **Multi-turn & signing**: scans a conversation turn by turn. Signed assistant turns are skipped, and a forged one is caught.
+- **Results**: system metrics and baselines, the interactive Study 1 failure map (both data sources), and the Study 2 charts. All are read from the committed result files.
+
+The answers come from Qwen2.5-0.5B running inside the app. To use a bigger model, choose **Ollama** in the sidebar (Ollama must be running, e.g. `ollama serve`). The models load and warm up when the page first opens, which takes about 20 s. For an offline demo, open the dashboard once while online so the Hugging Face models are cached, then set `HF_HUB_OFFLINE=1`. Every scenario carries its own reference context, so nothing needs the internet.
+
+### 6. Interactive Command-Line Demonstration
 Test custom prompts against the dual-stage defense in real-time:
 
 ```bash
